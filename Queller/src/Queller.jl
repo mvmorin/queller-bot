@@ -8,7 +8,6 @@ export load_graph,
 
 
 ################################################################################
-# Graph and node type
 
 function valid_id(id::String)
 	valid_char(c) = islowercase(c) | (c == '_') | isdigit(c)
@@ -19,8 +18,52 @@ end
 
 abstract type GraphNode end
 
+
+
 ################################################################################
 
+struct QuellerGraph
+	id::String
+	text::String
+	root_node::String
+
+	nodes::Dict{String,GraphNode}
+
+	QuellerGraph(id, text, root_node) =
+		new(valid_id(id), text, valid_id(root_node), Dict{String, GraphNode}())
+end
+QuellerGraph(;id, text, root_node) = QuellerGraph(id, text, root_node)
+
+function add!(g::QuellerGraph, n::GraphNode)
+	n.id in keys(g.nodes) && error("Node ID already exists in graph")
+	g.nodes[n.id] = n
+	return g
+end
+
+function graph2dot(g::QuellerGraph)
+	start_node =
+		"""
+			$(g.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(g.text))"];
+			$(g.id) -> $(g.root_node);
+		"""
+
+	body = mapreduce(node2dot, *, values(g.nodes))
+
+	return """
+		digraph {
+			rankdir=TB
+
+		$(start_node)
+
+		$(body)
+		}
+		"""
+end
+
+
+
+
+################################################################################
 
 struct EndNode <: GraphNode
 	id::String
@@ -28,7 +71,8 @@ struct EndNode <: GraphNode
 
 	EndNode(id, text) = new(valid_id(id), text)
 end
-EndNode(id) = EndNode(id,"End of Action")
+EndNode(graph; id, text="End of Action.") = add!(graph, EndNode(id, text))
+
 node2dot(n::EndNode) =
 	"""
 		$(n.id) [shape=diamond, style=filled, fillcolor=red, label="$(escape_string(n.text))"];
@@ -43,8 +87,12 @@ struct PerformAction <: GraphNode
 	action::String
 	next_node::String
 
-	PerformAction(id, action, next_node) = new(valid_id(id), action, valid_id(next_node))
+	PerformAction(id, action, next_node) =
+		new(valid_id(id), action, valid_id(next_node))
 end
+PerformAction(graph; id, action, next_node) =
+	add!(graph, PerformAction(id, action, next_node))
+
 node2dot(n::PerformAction) =
 	"""
 		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(n.action))"];
@@ -59,8 +107,13 @@ struct YesNoCondition <: GraphNode
 	next_node_yes::String
 	next_node_no::String
 
-	YesNoCondition(id, condition, next_node_yes, next_node_no) = new(valid_id(id), condition, valid_id(next_node_yes), valid_id(next_node_no))
+	YesNoCondition(id, condition, next_node_yes, next_node_no) =
+		new(valid_id(id), condition, valid_id(next_node_yes), valid_id(next_node_no))
 end
+
+YesNoCondition(graph; id, condition, next_node_yes, next_node_no) =
+	add!(graph, YesNoCondition(id, condition, next_node_yes, next_node_no))
+
 node2dot(n::YesNoCondition) =
 	"""
 		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
@@ -69,19 +122,25 @@ node2dot(n::YesNoCondition) =
 
 	"""
 
+
+
 ################################################################################
 
 struct JumpToSubgraph <: GraphNode
 	id::String
-	jump_text::String
+	text::String
 	next_node::String
-	subgraph_start_id::String
+	subgraph_id::String
 
-	JumpToSubgraph(id, jump_text, next_node, subgraph_start_id) = new(valid_id(id), jump_text, valid_id(next_node), valid_id(subgraph_start_id))
+	JumpToSubgraph(id, text, next_node, subgraph_id) =
+		new(valid_id(id), text, valid_id(next_node), valid_id(subgraph_id))
 end
+JumpToSubgraph(graph; id, text, next_node, subgraph_id) =
+	add!(graph, JumpToSubgraph(id, text, next_node, subgraph_id))
+
 node2dot(n::JumpToSubgraph) =
 	"""
-		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.jump_text))"];
+		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.text))"];
 		$(n.id) -> $(n.next_node);
 
 	"""
@@ -92,6 +151,9 @@ struct ReturnFromSubgraph <: GraphNode
 
 	ReturnFromSubgraph(id, jump_text) = new(valid_id(id), jump_text)
 end
+ReturnFromSubgraph(graph; id, jump_text) =
+	add!(graph, ReturnFromSubgraph(id, jump_text))
+
 node2dot(n::ReturnFromSubgraph) =
 	"""
 		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.jump_text))"];
@@ -100,41 +162,6 @@ node2dot(n::ReturnFromSubgraph) =
 
 
 ################################################################################
-struct QuellerGraph
-	id::String
-	text::String
-	root_node::String
-
-	nodes::Dict{String,GraphNode}
-
-	function QuellerGraph(id, text, root_node)
-		graph_id = valid_id(id)
-		text = text
-		root_node = root_node
-		nodes = Dict{String, GraphNode}()
-
-		new(id, text, root_node, nodes)
-	end
-end
-
-function add!(g::QuellerGraph, n::GraphNode)
-	n.id in keys(g.nodes) && error("Node ID already exists in graph")
-	g.nodes[n.id] = n
-	return g
-end
-
-function graph2dot(g::QuellerGraph)
-	# ToDo: Add the implicit start node
-# node2dot(n::StartNode) =
-# 	"""
-# 		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(n.text))"];
-# 		$(n.id) -> $(n.next_node);
-
-# 	"""
-
-	body = mapreduce(node2dot, *, values(g.nodes))
-	return "digraph {\nrankdir=TB;\n" * body * "}"
-end
 
 load_graph(file) = include(file)
 
@@ -147,9 +174,12 @@ function load_graphs(files...)
 	return graphs
 end
 
-function graph2dot(file_in, file_out)
+function graph2dot(file_in, file_out=nothing)
 	g = load_graph(file_in)
 	s = graph2dot(g)
+
+	isnothing(file_out) && (file_out = file_in*".gv")
+
 	open(file_out, "w") do f
 		write(f,s)
 	end

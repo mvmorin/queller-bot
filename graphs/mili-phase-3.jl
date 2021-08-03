@@ -1,68 +1,77 @@
 let
-	graph = QuellerGraph("phase_3_mili",
-		"Military Strategy: Phase 3",
-		"p3_1",
+	graph = QuellerGraph(
+		id = "phase_3_mili",
+		text = "Phase 3: Military Strategy",
+		root_node = "p3_1",
 		)
 
 
-	add!(graph, YesNoCondition("p3_1",
-		"""
-		Is the fellowship on the
-		mordor track?
-		""",
-		"p3_1_yes",
-		"p3_2"
-		))
-	add!(graph, PerformAction("p3_1_yes",
-		"""
-		Assign the maximum allowed
-		number of dice to the hunt
-		pool.
-		""",
-		"p3_end",
-		))
+	YesNoCondition(graph,
+		id = "p3_1",
+		condition = """
+			Is the fellowship on the
+			mordor track?
+			""",
+		next_node_yes = "p3_1_yes",
+		next_node_no = "p3_2"
+		)
+	PerformAction(graph,
+		id = "p3_1_yes",
+		action = """
+			Assign the maximum allowed
+			number of dice to the hunt
+			pool.
+			""",
+		next_node = "p3_end",
+		)
 
 
+	YesNoCondition(graph,
+		id = "p3_2",
+		condition = """
+			Is the fellowships progress
+			greater than 5?
+			""",
+		next_node_yes = "p3_2_yes",
+		next_node_no = "p3_3",
+		)
+	PerformAction(graph,
+		id = "p3_2_yes",
+		action = """
+			Assign 2 dice to the hunt pool.
+			""",
+		next_node = "p3_end",
+		)
 
-	add!(graph, YesNoCondition("p3_2",
-		"""
-		Is the fellowships progress
-		greater than 5?
-		""",
-		"p3_2_yes",
-		"p3_3"
-		))
-	add!(graph, PerformAction("p3_2_yes",
-		"""
-		Assign 2 dice to the hunt pool.
-		""",
-		"p3_end",
-		))
 
+	YesNoCondition(graph,
+		id = "p3_3",
+		condition = """
+			Is the fellowship at the
+			starting position and is
+			its progress is 0?
+			""",
+		next_node_yes = "p3_3_yes",
+		next_node_no = "p3_3_no",
+		)
+	PerformAction(graph,
+		id = "p3_3_yes",
+		action = """
+			Assign 0 dice to the hunt pool.
+			""",
+		next_node = "p3_end",
+		)
+	PerformAction(graph,
+		id = "p3_3_no",
+		action = """
+			Assign 1 dice to the hunt pool.
+			""",
+		next_node = "p3_end",
+		)
 
-
-	add!(graph, YesNoCondition("p3_3",
-		"""
-		Is the fellowship at the
-		starting position and is
-		its progress is 0?
-		""",
-		"p3_3_yes",
-		"p3_3_no"
-		))
-	add!(graph, PerformAction("p3_3_yes",
-		"""
-		Assign 0 dice to the hunt pool.
-		""",
-		"p3_end",
-		))
-	add!(graph, PerformAction("p3_3_no",
-		"""
-		Assign 1 dice to the hunt pool.
-		""",
-		"p3_end",
-		))
-
-	add!(graph, EndNode("p3_end", "End of phase."))
+	EndNode(graph,
+		id = "p3_end",
+		text = "End of Phase",
+		)
 
 end
