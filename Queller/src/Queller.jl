@@ -1,7 +1,6 @@
 module Queller
 
-export load_graph,
-	load_graphs,
+export load_graphs,
 	graph2dot
 
 
@@ -21,37 +20,16 @@ abstract type GraphNode end
 ################################################################################
 
 struct QuellerGraph
-	id::String
-	text::String
 	root_node::String
-
 	nodes::Dict{String,GraphNode}
-
-	QuellerGraph(id, text, root_node) =
-		new(valid_id(id), text, valid_id(root_node), Dict{String, GraphNode}())
-end
-QuellerGraph(;id, text, root_node) = QuellerGraph(id, text, root_node)
-
-function add!(g::QuellerGraph, n::GraphNode)
-	n.id in keys(g.nodes) && error("Node ID already exists in graph")
-	g.nodes[n.id] = n
-	return g
 end
 
 function graph2dot(g::QuellerGraph)
-	start_node =
-		"""
-			$(g.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(g.text))"];
-			$(g.id) -> $(g.root_node);
-		"""
-
 	body = mapreduce(node2dot, *, values(g.nodes))
 
 	return """
 		digraph {
 			rankdir=TB
-
-		$(start_node)
 
 		$(body)
 		}
@@ -63,13 +41,27 @@ end
 
 ################################################################################
 
+struct StartNode <: GraphNode
+	id::String
+	text::String
+	next_node::String
+
+	StartNode(;id, text, next_node) = new(valid_id(id), text, valid_id(next_node))
+end
+
+node2dot(n::StartNode) =
+	"""
+		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(n.text))"];
+		$(n.id) -> $(n.next_node);
+
+	"""
+
 struct EndNode <: GraphNode
 	id::String
 	text::String
 
-	EndNode(id, text) = new(valid_id(id), text)
+	EndNode(;id, text="End of Action") = new(valid_id(id), text)
 end
-EndNode(graph; id, text="End of Action.") = add!(graph, EndNode(id, text))
 
 node2dot(n::EndNode) =
 	"""
@@ -85,11 +77,9 @@ struct PerformAction <: GraphNode
 	action::String
 	next_node::String
 
-	PerformAction(id, action, next_node) =
+	PerformAction(;id, action, next_node) =
 		new(valid_id(id), action, valid_id(next_node))
 end
-PerformAction(graph; id, action, next_node) =
-	add!(graph, PerformAction(id, action, next_node))
 
 node2dot(n::PerformAction) =
 	"""
@@ -105,12 +95,9 @@ struct YesNoCondition <: GraphNode
 	next_node_yes::String
 	next_node_no::String
 
-	YesNoCondition(id, condition, next_node_yes, next_node_no) =
+	YesNoCondition(;id, condition, next_node_yes, next_node_no) =
 		new(valid_id(id), condition, valid_id(next_node_yes), valid_id(next_node_no))
 end
-
-YesNoCondition(graph; id, condition, next_node_yes, next_node_no) =
-	add!(graph, YesNoCondition(id, condition, next_node_yes, next_node_no))
 
 node2dot(n::YesNoCondition) =
 	"""
@@ -130,11 +117,9 @@ struct JumpToSubgraph <: GraphNode
 	next_node::String
 	subgraph_id::String
 
-	JumpToSubgraph(id, text, next_node, subgraph_id) =
+	JumpToSubgraph(;id, text, next_node, subgraph_id) =
 		new(valid_id(id), text, valid_id(next_node), valid_id(subgraph_id))
 end
-JumpToSubgraph(graph; id, text, next_node, subgraph_id) =
-	add!(graph, JumpToSubgraph(id, text, next_node, subgraph_id))
 
 node2dot(n::JumpToSubgraph) =
 	"""
@@ -147,10 +132,8 @@ struct ReturnFromSubgraph <: GraphNode
 	id::String
 	jump_text::String
 
-	ReturnFromSubgraph(id, jump_text) = new(valid_id(id), jump_text)
+	ReturnFromSubgraph(;id, jump_text) = new(valid_id(id), jump_text)
 end
-ReturnFromSubgraph(graph; id, jump_text) =
-	add!(graph, ReturnFromSubgraph(id, jump_text))
 
 node2dot(n::ReturnFromSubgraph) =
 	"""
@@ -161,19 +144,40 @@ node2dot(n::ReturnFromSubgraph) =
 
 ################################################################################
 
-load_graph(file) = include(file)
-
-function load_graphs(files...)
-	graphs = Dict{String,QuellerGraph}()
-	for file in files
-		g = load_graph(file)
-		graphs[g.start_id] = g
-	end
-	return graphs
+function unique_node_ids(nodes)
+	ids = getfield.(nodes, :id)
+	return length(ids) == length(unique(ids))
 end
 
+function unique_root_ids(graphs)
+	ids = get_field.(graphs, :root_node)
+	return length(ids) == length(unique(ids))
+end
+
+function load_graphs(file)
+	nodes = include(file)
+	unique_node_ids(nodes) || error("Error loading nodes, not all ids are unique.")
+	start_nodes = filter(n -> isa(n, StartNode), nodes)
+	nodes_d = Dict(n.id => n for n in nodes)
+
+	return [QuellerGraph(start.id, nodes_d) for start in start_nodes]
+end
+
+function load_graphs(f_head,f_tail...)
+	graphs = load_graphs(f_head)
+	for f in f_tail
+		graphs = [graphs; load_graphs(f)]
+	end
+	unique_root_ids(graphs) || error("Error loading graphs, not all root node ids are unique.")
+	return Dict(g.root_node => g for g in graphs)
+end
+
+
+
+################################################################################
+
 function graph2dot(file_in, file_out=nothing)
-	g = load_graph(file_in)
+	g = load_graphs(file_in)[1] # Only take the first start point of the graph
 	s = graph2dot(g)
 
 	isnothing(file_out) && (file_out = file_in*".gv")
