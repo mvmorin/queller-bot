@@ -1,0 +1,4 @@
+name = "Queller"
+uuid = "ff664aa8-59ba-40cb-ba19-90d2a2c4cb9b"
+authors = ["Martin Morin <martin.morin@control.lth.se>"]
+version = "0.1.0"

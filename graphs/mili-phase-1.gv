@@ -1,0 +1,21 @@
+digraph {
+rankdir=TB;
+	p1_2 [shape=box, style=filled, fillcolor=purple, label="Draw event cards.\n"];
+	p1_2 -> p1_3;
+
+	phase_1_mili [shape=ellipse, style=filled, fillcolor=green, label="Military Strategy: Phase 1"];
+	phase_1_mili -> p1_1;
+
+	p1_1 [shape=box, style=filled, fillcolor=purple, label="Recover action dice.\n"];
+	p1_1 -> p1_2;
+
+	p1_3 [shape=box, style=filled, fillcolor=yellow, label="Is more than 6 card held?\n"];
+	p1_3 -> p1_discard [label = "Yes"];
+	p1_3 -> p1_end [label = "No"];
+
+	p1_end [shape=diamond, style=filled, fillcolor=red, label="End of phase."];
+
+	p1_discard [shape=box, style=filled, fillcolor=purple, label="Discard event cards down to 6.\n\nPriority:\n\n1. Doesn't use the term \"Fellowship revealed\"\n2. Character card\n3. Strategy card\n4. Descending order of initiative\n5. Doesn't place a tile\n"];
+	p1_discard -> p1_end;
+
+}

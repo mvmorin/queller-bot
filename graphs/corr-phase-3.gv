@@ -1,0 +1,46 @@
+digraph {
+rankdir=TB;
+	p3_1_yes [shape=box, style=filled, fillcolor=purple, label="Roll a d6. On 4+, assign\n1 die to the hunt pool,\notherwise do nothing.\n"];
+	p3_1_yes -> p3_end;
+
+	p3_2_yes [shape=box, style=filled, fillcolor=purple, label="Assign the maximum allowed\nnumber of dice to the hunt\npool.\n"];
+	p3_2_yes -> p3_end;
+
+	phase_3_corr [shape=ellipse, style=filled, fillcolor=green, label="Corruption Strategy: Phase 3"];
+	phase_3_corr -> p3_1;
+
+	p3_4_yes [shape=box, style=filled, fillcolor=purple, label="Assign 2 dice to the hunt pool.\n"];
+	p3_4_yes -> p3_end;
+
+	p3_2 [shape=box, style=filled, fillcolor=yellow, label="Is the fellowship on the\nmordor track?\n"];
+	p3_2 -> p3_2_yes [label = "Yes"];
+	p3_2 -> p3_3 [label = "No"];
+
+	p3_3_yes [shape=box, style=filled, fillcolor=purple, label="Assign 1 die to the hunt pool.\n"];
+	p3_3_yes -> p3_end;
+
+	p3_5_no [shape=box, style=filled, fillcolor=purple, label="Assign 1 dice to the hunt pool.\n"];
+	p3_5_no -> p3_end;
+
+	p3_end [shape=diamond, style=filled, fillcolor=red, label="End of phase."];
+
+	p3_3 [shape=box, style=filled, fillcolor=yellow, label="Is a *mobile* army adjecent\nto *target* which would the\ngame if it attacked or does\nthe shadow only has 7 dice?\n"];
+	p3_3 -> p3_3_yes [label = "Yes"];
+	p3_3 -> p3_4 [label = "No"];
+
+	p3_1 [shape=box, style=filled, fillcolor=yellow, label="Is the fellowship at the\nstarting position and is\nits progress is 0?\n"];
+	p3_1 -> p3_1_yes [label = "Yes"];
+	p3_1 -> p3_2 [label = "No"];
+
+	p3_5 [shape=box, style=filled, fillcolor=yellow, label="Does the shortest path to morder\nfor the fellowship lead via a\nshadow stronghold and the progress\nallows them to pass it or be\nwithin 2 steps from it?\n"];
+	p3_5 -> p3_5_yes [label = "Yes"];
+	p3_5 -> p3_5_no [label = "No"];
+
+	p3_5_yes [shape=box, style=filled, fillcolor=purple, label="Assign 2 dice to the hunt pool.\n"];
+	p3_5_yes -> p3_end;
+
+	p3_4 [shape=box, style=filled, fillcolor=yellow, label="Is the fellowships progress\ngreater than 4?\n"];
+	p3_4 -> p3_4_yes [label = "Yes"];
+	p3_4 -> p3_5 [label = "No"];
+
+}

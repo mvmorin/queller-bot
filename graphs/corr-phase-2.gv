@@ -1,0 +1,15 @@
+digraph {
+rankdir=TB;
+	p2_mili [shape=box, style=filled, fillcolor=purple, label="Use the military strategy for the\nremaining phases of the turn.\n"];
+	p2_mili -> p2_end;
+
+	p2_end [shape=diamond, style=filled, fillcolor=red, label="End of phase."];
+
+	p2_1 [shape=box, style=filled, fillcolor=yellow, label="After the free peoples player have\nchosed whether to reveal, is the\ncorruption points lower than the\nshadow victory points?\n"];
+	p2_1 -> p2_mili [label = "Yes"];
+	p2_1 -> p2_end [label = "No"];
+
+	phase_2_corr [shape=ellipse, style=filled, fillcolor=green, label="Corruption Strategy: Phase 2"];
+	phase_2_corr -> p2_1;
+
+}
