@@ -1,7 +1,5 @@
 module Queller
 
-greet() = print("Hello")
-
 export load_graph,
 	load_graphs,
 	graph2dot
