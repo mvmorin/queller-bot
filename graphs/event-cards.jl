@@ -8,9 +8,7 @@ let
 	 YesNoCondition(
 					id = "ep_1",
 					condition = """
-					Is a playable
-					*preferred*
-					card held?
+					A *preferred* card is *playable*.
 					""",
 					next_yes = "ep_1_yes",
 					next_no = "ep_return",
@@ -25,11 +23,9 @@ let
 	 PerformAction(
 				   id = "ep_1_action",
 				   action = """
-				   Play event card
+				   Play a *playable* *preferred* card.
 
-				   Priority:
-				   1. *Preferred* Event Card
-				   2. Ascending Order of Initiative
+				   Priority: Ascending Order of Initiative
 				   """,
 				   next = "ep_1_end"
 				   )
@@ -49,7 +45,7 @@ let
 	 YesNoCondition(
 					id = "eg_1",
 					condition = """
-					Is less than 4 cards held?
+					Holding less than 4 cards.
 					""",
 					next_yes = "eg_1_yes",
 					next_no = "eg_2",
@@ -72,7 +68,7 @@ let
 	 YesNoCondition(
 					id = "eg_2",
 					condition = """
-					Is a playable event card held?
+					A card is *playable*.
 					""",
 					next_yes = "eg_2_yes",
 					next_no = "eg_3",
@@ -84,7 +80,7 @@ let
 	 PerformAction(
 				   id = "eg_2_action",
 				   action = """
-				   Play event card.
+				   Play a *playable* card.
 
 				   Priority: Ascending order of initiative
 				   """,
@@ -107,7 +103,7 @@ let
 	 YesNoCondition(
 					id = "eg_3_discard",
 					condition = """
-					Is more than 6 card held?
+					Holding more than 6 cards.
 					""",
 					next_yes = "eg_3_discard_yes",
 					next_no = "eg_3_discard_no",
@@ -115,10 +111,10 @@ let
 	 PerformAction(
 				   id = "eg_3_discard_yes",
 				   action = """
-				   Discard event cards down to 6.
+				   Discard down to 6 cards.
 
 				   Priority:
-				   1. Not *Preferred* Event Card
+				   1. Not *Preferred* Card
 				   2. Doesn't use the term "Fellowship revealed"
 				   3. Doesn't place a tile
 				   4. Ascending order of initiative
@@ -143,8 +139,8 @@ let
 	 YesNoCondition(
 					id = "ec_1",
 					condition = """
-					Is SP holding an "if
-					Fellowship revealed" card?
+					An "if Fellowship revealed" card
+					is *playable*.
 					""",
 					next_yes = "ec_1_yes",
 					next_no = "ec_2",
@@ -156,7 +152,7 @@ let
 	 PerformAction(
 				   id = "ec_1_action",
 				   action = """
-				   Play an "if Fellowship revealed" card.
+				   Play a *playable* "if Fellowship revealed" card.
 
 				   Priority: Ascending order of initiative
 				   """,
@@ -167,10 +163,7 @@ let
 	 YesNoCondition(
 					id = "ec_2",
 					condition = """
-					Is SP holding a card which
-					can add corruption to the
-					Fellowship or add a hunt
-					tile?
+					A card that adds corruption or adds a hunt tile is *playable*.
 					""",
 					next_yes = "ec_2_yes",
 					next_no = "ec_3",
@@ -182,8 +175,7 @@ let
 	 PerformAction(
 				   id = "ec_2_action",
 				   action = """
-				   Play a card which adds corruption or
-				   adds a hunt tile
+				   Play a *playable* card which adds corruption or adds a hunt tile.
 
 				   Priority: Ascending order of initiative
 				   """,
@@ -194,8 +186,7 @@ let
 	 YesNoCondition(
 					id = "ec_3",
 					condition = """
-					Is SP holding less than 4 event
-					cards?
+					Holding less than 4 cards?
 					""",
 					next_yes = "ec_3_yes",
 					next_no = "ec_return",
@@ -207,7 +198,7 @@ let
 	 PerformAction(
 				   id = "ec_3_action",
 				   action = """
-				   Draw a character event card
+				   Draw a character card.
 				   """,
 				   next = "ec_3_end"
 				   )
@@ -216,8 +207,6 @@ let
 	 ReturnFromGraph(
 					 id = "ec_return",
 					 )
-
-
 
 	 ]
 end

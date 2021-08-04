@@ -147,7 +147,7 @@ struct ReturnFromGraph <: GraphNode
 	id::String
 	jump_text::String
 
-	ReturnFromGraph(;id, jump_text="Continue from where\nyou jumped to this\n graph") = new(valid_id(id), jump_text)
+	ReturnFromGraph(;id, jump_text="Continue from where\nyou jumped to this\n graph.") = new(valid_id(id), jump_text)
 end
 
 node2dot(n::ReturnFromGraph) =
@@ -183,25 +183,16 @@ end
 
 
 ################################################################################
-#
-# Dice are represented by the following characters
-#
-# Character Die: C
-# Army Die: A
-# Muster Die: M
-# Army/Muster Die: H
-# Event Die: P (palantir)
-# Eye: E
-# Will of the West: W (not used)
 
-DICE_DICT = Dict(
+DICE = Dict(
 	'C' => "Character Die",
 	'A' => "Army Die",
 	'M' => "Muster Die",
 	'H' => "Army/Muster Die",
 	'P' => "Event Die",
 	'E' => "Eye",
-	'W' => "Will of the West")
+	'W' => "Will of the West", # Never used
+	)
 
 struct RollActionDice <: GraphNode
 	id::String
@@ -212,7 +203,7 @@ end
 
 node2dot(n::RollActionDice) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Roll action dice."];
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Roll the action dice."];
 		$(n.id) -> $(n.next);
 
 	"""
@@ -226,50 +217,45 @@ end
 
 node2dot(n::AvailableModifiers) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Check if an elven ring\n or Messenger of the Dark\n Tower is available"];
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Check if an elven ring\n or Messenger of the Dark\n Tower is available."];
 		$(n.id) -> $(n.next);
 
 	"""
 
-struct SelectActiveDie <: GraphNode
+struct SetActiveDie <: GraphNode
 	id::String
 	next::String
 	next_no_die::String
 
-	priority::String # String of die to use
+	die::Char
 	may_use_ring::Bool
 	may_use_messenger::Bool
 
-	SelectActiveDie(;id, next, next_no_die, priority, may_use_ring=false, may_use_messenger=false) =
-		new(valid_id(id), valid_id(next), valid_id(next_no_die), priority, may_use_ring, may_use_messenger)
+	SetActiveDie(;id, next, next_no_die, die, may_use_ring=false, may_use_messenger=false) =
+		new(valid_id(id), valid_id(next), valid_id(next_no_die), die, may_use_ring, may_use_messenger)
 end
 
-function node2dot(n::SelectActiveDie)
-	prio_list = [DICE_DICT[die] for die in n.priority]
-
-	if n.priority[1] == 'A'
-		n.may_use_messenger && push!(prio_list, "Muster Die and Messenger of the Dark Tower")
-	elseif n.priority[1] == 'M'
-		n.may_use_messenger && push!(prio_list, "Army Die and Messenger of the Dark Tower")
+function node2dot(n::SetActiveDie)
+	prio_list = [DICE[n.die]]
+	if n.die == 'A'
+		push!(prio_list, "$(DICE['H']) as $(DICE['A'])")
+		push!(prio_list, "$(DICE['M']) and Messenger of the Dark Tower as $(DICE['A'])")
+	elseif n.die == 'M'
+		push!(prio_list, "$(DICE['H']) as a $(DICE['M'])")
+		push!(prio_list, "$(DICE['A']) and Messenger of the Dark Tower as $(DICE['M'])")
 	end
 
-	n.may_use_ring && push!(prio_list, "Random Non-*Preferred* Die and an Eleven Ring")
+	if n.may_use_ring
+		push!(prio_list, "A random non-*preferred* die and an Elven Ring as $(DICE[n.die])")
+	end
+
 
 	text = """
-	Set the active die to one of the
-	following in descending priority.
+	Set the first matching die as the Active Die:
 
 	"""
-	for (i, die) in enumerate(prio_list)
-		text *= "$(i). $(die)\n"
-	end
-	if 'H' in n.priority || n.may_use_ring
-		text *= """
-
-		For the Elven Rings and Army/Muster dice,
-		convert to the highest priority die when
-		instructed to use the active die.
-		"""
+	for (i, d) in enumerate(prio_list)
+		text *= "$(i). $(d)\n"
 	end
 
 	return """
@@ -305,7 +291,7 @@ end
 
 node2dot(n::DieHasBeenUsed) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Has a die been used?"];
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="A die has been used."];
 		$(n.id) -> $(n.next_used) [label="Yes"];
 		$(n.id) -> $(n.next_not_used) [label="No"];
 
@@ -318,12 +304,31 @@ struct ReserveDie <: GraphNode
 
 	ReserveDie(;id, next) = new(valid_id(id), valid_id(next))
 end
+
 node2dot(n::ReserveDie) =
 	"""
-		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Set aside die to use\nmuster a minion as\n last action "];
+		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Set aside die to recruit\na minion as a last action."];
 		$(n.id) -> $(n.next);
 
 	"""
+
+struct IsDieReserved <: GraphNode
+	id::String
+	next_yes::String
+	next_no::String
+
+	IsDieReserved(;id, next_yes, next_no) = new(valid_id(id), valid_id(next_yes), valid_id(next_no))
+end
+
+node2dot(n::IsDieReserved) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="A die is set aside to recruit\na minion as a last action."];
+		$(n.id) -> $(n.next_yes) [label="Yes"];
+		$(n.id) -> $(n.next_no) [label="No"];
+
+	"""
+
+
 
 
 

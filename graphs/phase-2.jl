@@ -10,10 +10,7 @@ let
 	 YesNoCondition(
 					id = "p2_mili_1",
 					condition = """
-					After the free peoples player have
-					chosed whether to reveal, is the
-					shadow victory points lower than
-					the corruption points?
+					The Shadow victory points are lower than the corruption points, after the Free Peoples' have chosen whether to reveal.
 					""",
 					next_yes = "p2_mili_change",
 					next_no = "p2_mili_end",
@@ -41,10 +38,7 @@ let
 	 YesNoCondition(
 					id = "p2_corr_1",
 					condition = """
-					After the free peoples player have
-					chosed whether to reveal, is the
-					corruption points lower than the
-					shadow victory points?
+					The corruption points are lower than the the Shadow victory points, after the Free Peoples' have chosen whether to reveal.
 					""",
 					next_yes = "p2_corr_change",
 					next_no = "p2_corr_end",

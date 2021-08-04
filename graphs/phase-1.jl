@@ -29,7 +29,7 @@ let
 	 YesNoCondition(
 					id = "p1_mili_3",
 					condition = """
-					Is more than 6 card held?
+					Holding more than 6 cards.
 					""",
 					next_yes = "p1_mili_discard",
 					next_no = "p1_mili_end",
@@ -40,7 +40,6 @@ let
 				   Discard event cards down to 6.
 
 				   Priority:
-
 				   1. Doesn't use the term "Fellowship revealed"
 				   2. Character card
 				   3. Strategy card
@@ -82,7 +81,7 @@ let
 	 YesNoCondition(
 					id = "p1_corr_3",
 					condition = """
-					Is more than 6 card held?
+					Holding more than 6 cards.
 					""",
 					next_yes = "p1_corr_discard",
 					next_no = "p1_corr_end_1",
@@ -90,7 +89,7 @@ let
 	 YesNoCondition(
 					id = "p1_corr_discard",
 					condition = """
-					Is more than 1 strategy card held?
+					Holding more than 1 strategy cards.
 					""",
 					next_yes = "p1_corr_discard_1",
 					next_no = "p1_corr_discard_2",
@@ -101,7 +100,6 @@ let
 				   Discard event cards down to 6.
 
 				   Priority:
-
 				   1. Doesn't use the term "Fellowship revealed"
 				   2. Doesn't place a tile
 				   3. Strategy card
