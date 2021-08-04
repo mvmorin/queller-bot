@@ -1,7 +1,7 @@
 module Queller
 
 export load_graphs,
-	graph2dot,
+	graph2pdf,
 	graph2ps
 
 
@@ -229,10 +229,9 @@ struct SetActiveDie <: GraphNode
 
 	die::Char
 	may_use_ring::Bool
-	may_use_messenger::Bool
 
-	SetActiveDie(;id, next, next_no_die, die, may_use_ring=false, may_use_messenger=false) =
-		new(valid_id(id), valid_id(next), valid_id(next_no_die), die, may_use_ring, may_use_messenger)
+	SetActiveDie(;id, next, next_no_die, die, may_use_ring=false) =
+		new(valid_id(id), valid_id(next), valid_id(next_no_die), die, may_use_ring)
 end
 
 function node2dot(n::SetActiveDie)
@@ -368,22 +367,14 @@ end
 
 ################################################################################
 
-function graph2dot(file_in, file_out=nothing)
+graph2ps(file_in, file_out="out.ps") = graph2format(file_in, "ps", file_out)
+graph2pdf(file_in, file_out="out.pdf") = graph2format(file_in, "pdf", file_out)
+
+function graph2format(file_in, format, file_out)
 	g = load_graphs(file_in)[1] # Only take the first start point of the graph
 	s = graph2dot(g)
 
-	isnothing(file_out) && (file_out = file_in*".gv")
-
-	open(file_out, "w") do f
-		write(f,s)
-	end
-end
-
-function graph2ps(file_in)
-	g = load_graphs(file_in)[1] # Only take the first start point of the graph
-	s = graph2dot(g)
-
-	open(`dot -Tps -o out.ps`, write = true) do io
+	open(`dot -T$(format) -o $(file_out)`, write = true) do io
 		print(io,s)
 	end
 end
