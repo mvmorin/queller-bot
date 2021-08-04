@@ -1,7 +1,22 @@
 module Queller
 
 export load_graphs,
-	graph2dot
+	graph2dot,
+	graph2ps
+
+
+################################################################################
+# Notes
+#
+# Character Die: C
+# Army Die: A
+# Muster Die: M
+# Army/Muster Die: H
+# Event Die: P (palantir)
+# Eye: E
+#
+# SP = shadow player
+# FP = free peoples player
 
 
 ################################################################################
@@ -44,15 +59,15 @@ end
 struct StartNode <: GraphNode
 	id::String
 	text::String
-	next_node::String
+	next::String
 
-	StartNode(;id, text, next_node) = new(valid_id(id), text, valid_id(next_node))
+	StartNode(;id, text, next) = new(valid_id(id), text, valid_id(next))
 end
 
 node2dot(n::StartNode) =
 	"""
 		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(n.text))"];
-		$(n.id) -> $(n.next_node);
+		$(n.id) -> $(n.next);
 
 	"""
 
@@ -75,16 +90,16 @@ node2dot(n::EndNode) =
 struct PerformAction <: GraphNode
 	id::String
 	action::String
-	next_node::String
+	next::String
 
-	PerformAction(;id, action, next_node) =
-		new(valid_id(id), action, valid_id(next_node))
+	PerformAction(;id, action, next) =
+		new(valid_id(id), action, valid_id(next))
 end
 
 node2dot(n::PerformAction) =
 	"""
 		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(n.action))"];
-		$(n.id) -> $(n.next_node);
+		$(n.id) -> $(n.next);
 
 	"""
 
@@ -92,18 +107,18 @@ node2dot(n::PerformAction) =
 struct YesNoCondition <: GraphNode
 	id::String
 	condition::String
-	next_node_yes::String
-	next_node_no::String
+	next_yes::String
+	next_no::String
 
-	YesNoCondition(;id, condition, next_node_yes, next_node_no) =
-		new(valid_id(id), condition, valid_id(next_node_yes), valid_id(next_node_no))
+	YesNoCondition(;id, condition, next_yes, next_no) =
+		new(valid_id(id), condition, valid_id(next_yes), valid_id(next_no))
 end
 
 node2dot(n::YesNoCondition) =
 	"""
 		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
-		$(n.id) -> $(n.next_node_yes) [label = "Yes"];
-		$(n.id) -> $(n.next_node_no) [label = "No"];
+		$(n.id) -> $(n.next_yes) [label = "Yes"];
+		$(n.id) -> $(n.next_no) [label = "No"];
 
 	"""
 
@@ -111,35 +126,207 @@ node2dot(n::YesNoCondition) =
 
 ################################################################################
 
-struct JumpToSubgraph <: GraphNode
+struct JumpToGraph <: GraphNode
 	id::String
 	text::String
-	next_node::String
-	subgraph_id::String
+	next::String
+	jump_graph::String
 
-	JumpToSubgraph(;id, text, next_node, subgraph_id) =
-		new(valid_id(id), text, valid_id(next_node), valid_id(subgraph_id))
+	JumpToGraph(;id, text, next, jump_graph) =
+		new(valid_id(id), text, valid_id(next), valid_id(jump_graph))
 end
 
-node2dot(n::JumpToSubgraph) =
+node2dot(n::JumpToGraph) =
 	"""
 		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.text))"];
-		$(n.id) -> $(n.next_node);
+		$(n.id) -> $(n.next);
 
 	"""
 
-struct ReturnFromSubgraph <: GraphNode
+struct ReturnFromGraph <: GraphNode
 	id::String
 	jump_text::String
 
-	ReturnFromSubgraph(;id, jump_text) = new(valid_id(id), jump_text)
+	ReturnFromGraph(;id, jump_text="Continue from where\nyou jumped to this\n graph") = new(valid_id(id), jump_text)
 end
 
-node2dot(n::ReturnFromSubgraph) =
+node2dot(n::ReturnFromGraph) =
 	"""
 		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.jump_text))"];
 
 	"""
+
+
+
+################################################################################
+
+struct SetStrategy <: GraphNode
+	id::String
+	strategy::String
+	next::String
+
+	SetStrategy(;id, strategy, next) = new(valid_id(id), strategy, valid_id(next))
+end
+
+function node2dot(n::SetStrategy)
+	text = """
+	Use the $(n.strategy) strategy
+	until prompted otherwise.
+	"""
+	return """
+		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(text))"];
+		$(n.id) -> $(n.next);
+
+	"""
+end
+
+
+
+################################################################################
+#
+# Dice are represented by the following characters
+#
+# Character Die: C
+# Army Die: A
+# Muster Die: M
+# Army/Muster Die: H
+# Event Die: P (palantir)
+# Eye: E
+# Will of the West: W (not used)
+
+DICE_DICT = Dict(
+	'C' => "Character Die",
+	'A' => "Army Die",
+	'M' => "Muster Die",
+	'H' => "Army/Muster Die",
+	'P' => "Event Die",
+	'E' => "Eye",
+	'W' => "Will of the West")
+
+struct RollActionDice <: GraphNode
+	id::String
+	next::String
+
+	RollActionDice(;id, next) = new(valid_id(id), valid_id(next))
+end
+
+node2dot(n::RollActionDice) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Roll action dice."];
+		$(n.id) -> $(n.next);
+
+	"""
+
+struct AvailableModifiers <: GraphNode
+	id::String
+	next::String
+
+	AvailableModifiers(;id, next) = new(valid_id(id), valid_id(next))
+end
+
+node2dot(n::AvailableModifiers) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Check if an elven ring\n or Messenger of the Dark\n Tower is available"];
+		$(n.id) -> $(n.next);
+
+	"""
+
+struct SelectActiveDie <: GraphNode
+	id::String
+	next::String
+	next_no_die::String
+
+	priority::String # String of die to use
+	may_use_ring::Bool
+	may_use_messenger::Bool
+
+	SelectActiveDie(;id, next, next_no_die, priority, may_use_ring=false, may_use_messenger=false) =
+		new(valid_id(id), valid_id(next), valid_id(next_no_die), priority, may_use_ring, may_use_messenger)
+end
+
+function node2dot(n::SelectActiveDie)
+	prio_list = [DICE_DICT[die] for die in n.priority]
+
+	if n.priority[1] == 'A'
+		n.may_use_messenger && push!(prio_list, "Muster Die and Messenger of the Dark Tower")
+	elseif n.priority[1] == 'M'
+		n.may_use_messenger && push!(prio_list, "Army Die and Messenger of the Dark Tower")
+	end
+
+	n.may_use_ring && push!(prio_list, "Random Non-*Preferred* Die and an Eleven Ring")
+
+	text = """
+	Set the active die to one of the
+	following in descending priority.
+
+	"""
+	for (i, die) in enumerate(prio_list)
+		text *= "$(i). $(die)\n"
+	end
+	if 'H' in n.priority || n.may_use_ring
+		text *= """
+
+		For the Elven Rings and Army/Muster dice,
+		convert to the highest priority die when
+		instructed to use the active die.
+		"""
+	end
+
+	return """
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(text))"];
+		$(n.id) -> $(n.next) [label="Die Available"];
+		$(n.id) -> $(n.next_no_die) [label="No Matching Die"];
+
+	"""
+end
+
+
+struct UseActiveDie <: GraphNode
+	id::String
+	next::String
+
+	UseActiveDie(;id, next) = new(valid_id(id), valid_id(next))
+end
+
+node2dot(n::UseActiveDie) =
+	"""
+		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Use the Active Die to:"];
+		$(n.id) -> $(n.next);
+
+	"""
+
+struct DieHasBeenUsed <: GraphNode
+	id::String
+	next_used::String
+	next_not_used::String
+
+	DieHasBeenUsed(;id, next_used, next_not_used) = new(valid_id(id), valid_id(next_used), valid_id(next_not_used))
+end
+
+node2dot(n::DieHasBeenUsed) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Has a die been used?"];
+		$(n.id) -> $(n.next_used) [label="Yes"];
+		$(n.id) -> $(n.next_not_used) [label="No"];
+
+	"""
+
+
+struct ReserveDie <: GraphNode
+	id::String
+	next::String
+
+	ReserveDie(;id, next) = new(valid_id(id), valid_id(next))
+end
+node2dot(n::ReserveDie) =
+	"""
+		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Set aside die to use\nmuster a minion as\n last action "];
+		$(n.id) -> $(n.next);
+
+	"""
+
+
+
 
 
 ################################################################################
@@ -184,6 +371,15 @@ function graph2dot(file_in, file_out=nothing)
 
 	open(file_out, "w") do f
 		write(f,s)
+	end
+end
+
+function graph2ps(file_in)
+	g = load_graphs(file_in)[1] # Only take the first start point of the graph
+	s = graph2dot(g)
+
+	open(`dot -Tps -o out.ps`, write = true) do io
+		print(io,s)
 	end
 end
 
