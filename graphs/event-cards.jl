@@ -25,10 +25,18 @@ let
 				   action = """
 				   Play a *playable* *preferred* card.
 
-				   Priority: Ascending Order of Initiative
+				   Priority:
+				   1. Ascending Order of Initiative
+				   2. Random
 				   """,
-				   next = "ep_1_end"
+				   next = "ep_1_resolve"
 				   )
+	 JumpToGraph(
+				 id = "ep_1_resolve",
+				 text = "Event Cards: Resolution",
+				 next = "ep_1_end",
+				 jump_graph = "event_cards_resolution",
+				 )
 	 EndNode(id = "ep_1_end")
 
 
@@ -82,10 +90,18 @@ let
 				   action = """
 				   Play a *playable* card.
 
-				   Priority: Ascending order of initiative
+				   Priority:
+				   1. Ascending order of initiative
+				   2. Random
 				   """,
-				   next = "eg_2_end"
+				   next = "eg_2_resolve"
 				   )
+	 JumpToGraph(
+				 id = "eg_2_resolve",
+				 text = "Event Cards: Resolution",
+				 next = "eg_2_end",
+				 jump_graph = "event_cards_resolution",
+				 )
 	 EndNode(id = "eg_2_end")
 
 
@@ -114,10 +130,11 @@ let
 				   Discard down to 6 cards.
 
 				   Priority:
-				   1. Not *Preferred* Card
+				   1. Not *preferred* card
 				   2. Doesn't use the term "Fellowship revealed"
 				   3. Doesn't place a tile
 				   4. Ascending order of initiative
+				   5. Random
 				   """,
 				   next = "eg_3_discard_yes_end",
 				   )
@@ -154,10 +171,18 @@ let
 				   action = """
 				   Play a *playable* "if Fellowship revealed" card.
 
-				   Priority: Ascending order of initiative
+				   Priority:
+				   1. Ascending order of initiative
+				   2. Random
 				   """,
-				   next = "ec_1_end"
+				   next = "ec_1_resolve"
 				   )
+	 JumpToGraph(
+				 id = "ec_1_resolve",
+				 text = "Event Cards: Resolution",
+				 next = "ec_1_end",
+				 jump_graph = "event_cards_resolution",
+				 )
 	 EndNode(id = "ec_1_end")
 
 	 YesNoCondition(
@@ -177,10 +202,18 @@ let
 				   action = """
 				   Play a *playable* card which adds corruption or adds a hunt tile.
 
-				   Priority: Ascending order of initiative
+				   Priority:
+				   1. Ascending order of initiative
+				   2. Random
 				   """,
-				   next = "ec_2_end"
+				   next = "ec_2_resolve"
 				   )
+	 JumpToGraph(
+				 id = "ec_2_resolve",
+				 text = "Event Cards: Resolution",
+				 next = "ec_2_end",
+				 jump_graph = "event_cards_resolution",
+				 )
 	 EndNode(id = "ec_2_end")
 
 	 YesNoCondition(
@@ -207,6 +240,69 @@ let
 	 ReturnFromGraph(
 					 id = "ec_return",
 					 )
+
+
+
+	 StartNode(
+			   id = "event_cards_resolution",
+			   text = "Event Cards: Resolution",
+			   next = "er_1",
+			   )
+	 ResolveCard(
+				 id = "er_1",
+				 next = "er_2",
+				 )
+	 MultipleChoice(
+					id = "er_2",
+					conditions = """
+					Select card effect to resolve.
+
+					1. No effect to resolve
+					2. Region selection for muster
+					3. Army selection for movement or attack
+					4. Hunt allocation
+					""",
+					nexts = [
+							 "er_no_effect",
+							 "er_muster",
+							 "er_army",
+							 "er_hunt",
+							 ],
+					)
+	 ReturnFromGraph(
+					 id = "er_no_effect",
+					 )
+	 JumpToGraph(
+				 id = "er_muster",
+				 text = "Muster: Card",
+				 next = "er_2",
+				 jump_graph = "muster_card",
+				 )
+	 JumpToGraph(
+				 id = "er_army",
+				 text = "Movement and Attack:\nCard",
+				 next = "er_2",
+				 jump_graph = "movement_attack_card",
+				 )
+	 CheckStrategy(
+				   id = "er_hunt",
+				   strategy = "corruption",
+				   next_true = "er_hunt_corr",
+				   next_false = "er_hunt_mili",
+				   )
+	 JumpToGraph(
+				 id = "er_hunt_corr",
+				 text = "Phase 3: Corruption Strategy",
+				 next = "er_2",
+				 jump_graph = "phase_3_corr",
+				 )
+	 JumpToGraph(
+				 id = "er_hunt_mili",
+				 text = "Phase 3: Military Strategy",
+				 next = "er_2",
+				 jump_graph = "phase_3_mili",
+				 )
+
 
 	 ]
 end

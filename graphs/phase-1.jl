@@ -45,6 +45,7 @@ let
 				   3. Strategy card
 				   4. Descending order of initiative
 				   5. Doesn't place a tile
+				   6. Random
 				   """,
 				   next = "p1_mili_end",
 				   )
@@ -105,6 +106,7 @@ let
 				   3. Strategy card
 				   4. Character card
 				   5. Descending order of initiative
+				   6. Random
 				   """,
 				   next = "p1_corr_end_2",
 				   )
@@ -114,12 +116,12 @@ let
 				   Discard event cards down to 6.
 
 				   Priority:
-
 				   1. Doesn't use the term "Fellowship revealed"
 				   2. Doesn't place a tile
 				   3. Character card
 				   4. Strategy card
 				   5. Descending order of initiative
+				   6. Random
 				   """,
 				   next = "p1_corr_end_2",
 				   )

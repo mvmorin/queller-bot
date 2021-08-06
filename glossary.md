@@ -50,7 +50,7 @@
 		- is not a target of a Shadow army; and
 		- is not a Free Peoples' garrison; and
 		- the Free Peoples' army has higher value than the Shadow garrison.
-	- Orthanc is under threat if
+	- Orthanc is considered under threat if
 		- it contains less than 4 hit points of Shadow units; and
 		- Gandalf the White is in play; and
 		- a companion is in Fangorn.
@@ -58,13 +58,14 @@
 
 - Value: Point rating of army calculated as:
 	- +1 for each hit point
-	- +1 for each combat die including Captain of the West (capped at 5)
-	- +1 for each point of leadership (capped at lower of 5 or total army units)
+		- When defending in a region with a stronghold, only count the 5
+		  strongest units.
+	- +1 for each combat die including Captain of the West (maximum of +5)
+	- +1 for each point of leadership (maximum of +X where X is the lower of 5 or the number of army units)
 	- +1 for each Captain of the West
 	- +1 for defending in a fortification or city region
 	- x1.5 (rounded down) if
 		- defending in a stronghold; or
-		- army is mobile or a threat.
-	  For value given by hit points, only multiply the value given by the five strongest units in the region.
-	- x0.5 for sorties (rounded down)
+		- army is mobile and a threat.
+	- x0.5 if considered or performing a sortie (rounded down)
 	- If an army is mobile, exclude Saruman from the value calculation.

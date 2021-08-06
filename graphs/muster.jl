@@ -8,8 +8,8 @@ let
 			   )
 	 IsDieReserved(
 				   id = "m_2_reserved_check",
-				   next_yes = "m_2",
-				   next_no = "m_2_return",
+				   next_yes = "m_2_return",
+				   next_no = "m_2",
 				   )
 	 YesNoCondition(
 					id = "m_2",
@@ -163,36 +163,13 @@ let
 			   text = "Muster: Muster",
 			   next = "m_4",
 			   )
-	 StartNode(
-			   id = "muster_card",
-			   text = "Muster: Card",
-			   next = "m_4_2",
-			   )
-
 	 YesNoCondition(
 					id = "m_4",
 					condition = """
 					A card that musters is "playable".
 					""",
-					next_yes = "m_4_1",
+					next_yes = "m_4_die",
 					next_no = "m_5",
-					)
-	 PerformAction(
-				   id = "m_4_1",
-				   next = "m_4_2",
-				   action = """
-				   Select a *playable* muster card.
-
-				   Priority: Ascending order of initiative
-				   """
-				   )
-	 YesNoCondition(
-					id = "m_4_2",
-					condition = """
-					The selected card allow for the muster locations to be chosen.
-					""",
-					next_yes = "m_4_card_instead_of_die",
-					next_no = "m_4_die",
 					)
 	 UseActiveDie(
 				  id = "m_4_die",
@@ -200,72 +177,54 @@ let
 				  )
 	 PerformAction(
 				   id = "m_4_action",
-				   next = "m_4_end",
+				   next = "m_4_resolve",
 				   action = """
-				   Play the selected card.
+				   Play a *playable* muster card.
+
+				   Priority:
+				   1. Ascending order of initiative
+				   2. Random
 				   """
 				   )
-	 PerformAction(
-				   id = "m_4_card_instead_of_die",
-				   next = "m_5_1",
-				   action = """
-				   Use the selected card instead of the active die when resolving the following queries and when told to muster.
-				   """
-				   )
+	 JumpToGraph(
+				 id = "m_4_resolve",
+				 text = "Event Cards: Resolution",
+				 next = "m_4_end",
+				 jump_graph = "event_cards_resolution",
+				 )
 	 EndNode(id = "m_4_end")
-
-
-
-
 
 	 YesNoCondition(
 					id = "m_5",
 					condition = """
 					Muster is possible.
 					""",
-					next_yes = "m_5_1",
+					next_yes = "m_muster_position",
 					next_no = "m_return",
 					)
+	 JumpToGraph(
+				 id = "m_muster_position",
+				 text = "Muster: Region",
+				 next = "m_5_end",
+				 jump_graph = "event_cards_resolution",
+				 )
 	 ReturnFromGraph(
 					 id = "m_return",
 					 )
-	 YesNoCondition(
-					id = "m_5_1",
-					condition = """
-					Muster can create an *exposed* *target*.
-					""",
-					next_yes = "m_5_die",
-					next_no = "m_6",
-					)
-	 UseActiveDie(
-				  id = "m_5_die",
-				  next = "m_5_action",
-				  )
-	 PerformAction(
-				   id = "m_5_action",
-				   next = "m_5_end",
-				   action = """
-				   *Focus* priority:
-				   1. Region which creates an *exposed* *target*
-				   2. Random
-
-				   Muster:
-				   *Primary*: Elite
-				   *Secondary*: Regular
-
-				   If unit is unavailable, rotate as:
-				   Elite -> Regular -> Nazgûl -> Elite
-				   """
-				   )
 	 EndNode(id = "m_5_end")
 
 
+
+
+	 StartNode(
+			   id = "muster_region",
+			   text = "Muster: Region",
+			   next = "m_6_1",
+			   )
 	 YesNoCondition(
-					id = "m_6",
+					id = "m_6_1",
 					condition = """
-					The Fellowship is adjacent to a Shadow settlement.
-					And, the progress put the Fellowship outside Mordor.
-					And, no army is adjacent to the Fellowship's current region.
+					Muster can create an *exposed* *target*.
 					""",
 					next_yes = "m_6_die",
 					next_no = "m_7",
@@ -279,23 +238,26 @@ let
 				   next = "m_6_end",
 				   action = """
 				   *Focus* priority:
-				   1. Fellowship's current region
+				   1. Region which creates an *exposed* *target*
+				   2. Random
 
 				   Muster:
-				   *Primary*: Regular
-				   *Secondary*: Nazgûl
+				   *Primary*: Elite
+				   *Secondary*: Regular
 
 				   If unit is unavailable, rotate as:
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 EndNode(id = "m_6_end")
+	 ReturnFromGraph(id = "m_6_end")
 
 
 	 YesNoCondition(
 					id = "m_7",
 					condition = """
-					Muster is possible in a region containing a Shadow army.
+					The Fellowship is adjacent to a Shadow settlement.
+					And, the progress put the Fellowship outside Mordor.
+					And, no army is adjacent to the Fellowship's current region.
 					""",
 					next_yes = "m_7_die",
 					next_no = "m_8",
@@ -307,6 +269,36 @@ let
 	 PerformAction(
 				   id = "m_7_action",
 				   next = "m_7_end",
+				   action = """
+				   *Focus* priority:
+				   1. Fellowship's current region
+
+				   Muster:
+				   *Primary*: Regular
+				   *Secondary*: Nazgûl
+
+				   If unit is unavailable, rotate as:
+				   Elite -> Regular -> Nazgûl -> Elite
+				   """
+				   )
+	 ReturnFromGraph(id = "m_7_end")
+
+
+	 YesNoCondition(
+					id = "m_8",
+					condition = """
+					Muster is possible in a region containing a Shadow army.
+					""",
+					next_yes = "m_8_die",
+					next_no = "m_9",
+					)
+	 UseActiveDie(
+				  id = "m_8_die",
+				  next = "m_8_action",
+				  )
+	 PerformAction(
+				   id = "m_8_action",
+				   next = "m_8_end",
 				   action = """
 				   *Focus* priority:
 				   1. Army is *mobile*
@@ -324,24 +316,24 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 EndNode(id = "m_7_end")
+	 ReturnFromGraph(id = "m_8_end")
 
 
 	 YesNoCondition(
-					id = "m_8",
+					id = "m_9",
 					condition = """
 					Less than 6 Nazgûl in play.
 					""",
-					next_yes = "m_9_yes",
-					next_no = "m_9_no",
+					next_yes = "m_10_yes",
+					next_no = "m_10_no",
 					)
 	 UseActiveDie(
-				  id = "m_9_yes",
-				  next = "m_9_yes_action",
+				  id = "m_10_yes",
+				  next = "m_10_yes_action",
 				  )
 	 PerformAction(
-				   id = "m_9_yes_action",
-				   next = "m_9_end",
+				   id = "m_10_yes_action",
+				   next = "m_10_end",
 				   action = """
 				   *Focus* priority:
 				   1. Closest to army whose *target* is in a nation at war
@@ -359,12 +351,12 @@ let
 				   """
 				   )
 	 UseActiveDie(
-				  id = "m_9_no",
-				  next = "m_9_no_action",
+				  id = "m_10_no",
+				  next = "m_10_no_action",
 				  )
 	 PerformAction(
-				   id = "m_9_no_action",
-				   next = "m_9_end",
+				   id = "m_10_no_action",
+				   next = "m_10_end",
 				   action = """
 				   *Focus* priority:
 				   1. Closest to army whose *target* is in a nation at war
@@ -381,7 +373,7 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 EndNode(id = "m_9_end")
+	 ReturnFromGraph(id = "m_10_end")
 
 	 ]
 end

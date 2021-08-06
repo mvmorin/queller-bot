@@ -134,9 +134,8 @@ let
 					An army die was used and it have one move remaining.
 					""",
 					next_yes = "mv_3",
-					next_no = "mv_3_end",
+					next_no = "mv_end_check",
 					)
-	 EndNode(id = "mv_3_end")
 
 
 
@@ -176,9 +175,8 @@ let
 					An army die was used and it have one move remaining.
 					""",
 					next_yes = "mv_4",
-					next_no = "mv_4_end",
+					next_no = "mv_end_check",
 					)
-	 EndNode(id = "mv_4_end")
 
 
 
@@ -224,9 +222,8 @@ let
 					An army die was used and it have one move remaining.
 					""",
 					next_yes = "mv_5",
-					next_no = "mv_5_end",
+					next_no = "mv_end_check",
 					)
-	 EndNode(id = "mv_5_end")
 
 	 YesNoCondition(
 					id = "mv_6",
@@ -265,9 +262,19 @@ let
 					An army die was used and it have one move remaining.
 					""",
 					next_yes = "mv_6",
-					next_no = "mv_6_end",
+					next_no = "mv_end_check",
 					)
-	 EndNode(id = "mv_6_end")
+
+
+	 CardIsResolving(
+					 id = "mv_end_check",
+					 next_false = "mv_end_action",
+					 next_true = "mv_end_card_resolve",
+					 )
+	 ReturnFromGraph(
+					 id = "mv_end_card_resolve"
+					 )
+	 EndNode(id = "mv_end_action")
 
 	 ]
 end

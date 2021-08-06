@@ -65,11 +65,19 @@ let
 				   next = "p3_mili_end",
 				   )
 
-	 EndNode(
-			 id = "p3_mili_end",
-			 text = "End of Phase",
-			 )
 
+	 CardIsResolving(
+					 id = "p3_mili_end",
+					 next_false = "p3_mili_end_phase",
+					 next_true = "p3_mili_end_card_resolve",
+					 )
+	 ReturnFromGraph(
+					 id = "p3_mili_end_card_resolve"
+					 )
+	 EndNode(
+			 id = "p3_mili_end_phase",
+			 text = "End of Phase"
+			 )
 
 	# Corruption
 	 StartNode(
@@ -177,9 +185,17 @@ let
 				   )
 
 
+	 CardIsResolving(
+					 id = "p3_corr_end",
+					 next_false = "p3_corr_end_phase",
+					 next_true = "p3_corr_end_card_resolve",
+					 )
+	 ReturnFromGraph(
+					 id = "p3_corr_end_card_resolve"
+					 )
 	 EndNode(
-			 id = "p3_corr_end",
-			 text = "End of phase."
+			 id = "p3_corr_end_phase",
+			 text = "End of Phase"
 			 )
 
 	 ]

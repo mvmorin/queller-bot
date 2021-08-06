@@ -123,6 +123,48 @@ node2dot(n::YesNoCondition) =
 	"""
 
 
+struct BinaryCondition <: GraphNode
+	id::String
+	condition::String
+	next_true::String
+	next_false::String
+
+	BinaryCondition(;id, condition, next_true, next_false) =
+		new(valid_id(id), condition, valid_id(next_true), valid_id(next_false))
+end
+
+node2dot(n::BinaryCondition) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
+		$(n.id) -> $(n.next_yes) [label = "True"];
+		$(n.id) -> $(n.next_no) [label = "False"];
+
+	"""
+
+
+struct MultipleChoice <: GraphNode
+	id::String
+	conditions::String
+	nexts::Vector{String}
+
+	MultipleChoice(;id, conditions, nexts) =
+		new(valid_id(id), conditions, valid_id.(nexts))
+end
+
+function node2dot(n::MultipleChoice)
+	dot_node = """
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.conditions))"];
+	"""
+
+	for (i, nx) in enumerate(n.nexts)
+		dot_node *= """
+			$(n.id) -> $(nx) [label = "$(i)"];
+		"""
+	end
+	return dot_node*'\n'
+end
+
+
 
 ################################################################################
 
@@ -181,6 +223,28 @@ function node2dot(n::SetStrategy)
 end
 
 
+struct CheckStrategy <: GraphNode
+	id::String
+	strategy::String
+	next_true::String
+	next_false::String
+
+	CheckStrategy(;id, strategy, next_true, next_false) =
+		new(valid_id(id), strategy, valid_id(next_true), valid_id(next_false))
+end
+
+function node2dot(n::CheckStrategy)
+	text = """
+	The $(n.strategy) strategy is used.
+	"""
+	return """
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(text))"];
+		$(n.id) -> $(n.next_true) [label="True"];
+		$(n.id) -> $(n.next_false) [label="False"];
+
+	"""
+end
+
 
 ################################################################################
 
@@ -203,7 +267,7 @@ end
 
 node2dot(n::RollActionDice) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Roll the action dice."];
+		$(n.id) [shape=box, style=filled, fillcolor=purple, label="Roll the action dice."];
 		$(n.id) -> $(n.next);
 
 	"""
@@ -265,6 +329,40 @@ function node2dot(n::SetActiveDie)
 	"""
 end
 
+struct ResolveCard <: GraphNode
+	id::String
+	next::String
+
+	ResolveCard(;id, next) = new(valid_id(id), valid_id(next))
+end
+node2dot(n::ResolveCard) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Set the played card a\n the card to be resolved."];
+		$(n.id) -> $(n.next);
+
+	"""
+
+struct CardIsResolving <: GraphNode
+	id::String
+	next_true::String
+	next_false::String
+
+	CardIsResolving(;id, next_true, next_false) =
+		new(valid_id(id), valid_id(next_true), valid_id(next_false))
+end
+
+node2dot(n::CardIsResolving) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="A card is being\nresolved."];
+		$(n.id) -> $(n.next_true) [label="True"];
+		$(n.id) -> $(n.next_false) [label="False"];
+
+	"""
+
+
+
+
+
 
 struct UseActiveDie <: GraphNode
 	id::String
@@ -275,7 +373,7 @@ end
 
 node2dot(n::UseActiveDie) =
 	"""
-		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Use the Active Die to:"];
+		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Use the Active Die or\n resolve card to:"];
 		$(n.id) -> $(n.next);
 
 	"""
@@ -295,6 +393,8 @@ node2dot(n::DieHasBeenUsed) =
 		$(n.id) -> $(n.next_not_used) [label="No"];
 
 	"""
+
+
 
 
 struct ReserveDie <: GraphNode
