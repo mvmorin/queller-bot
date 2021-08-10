@@ -6,20 +6,6 @@ export load_graphs,
 
 
 ################################################################################
-# Notes
-#
-# Character Die: C
-# Army Die: A
-# Muster Die: M
-# Army/Muster Die: H
-# Event Die: P (palantir)
-# Eye: E
-#
-# SP = shadow player
-# FP = free peoples player
-
-
-################################################################################
 
 function valid_id(id::String)
 	valid_char(c) = islowercase(c) | (c == '_') | isdigit(c)
@@ -50,8 +36,6 @@ function graph2dot(g::QuellerGraph)
 		}
 		"""
 end
-
-
 
 
 ################################################################################
@@ -87,87 +71,6 @@ node2dot(n::EndNode) =
 
 ################################################################################
 
-struct PerformAction <: GraphNode
-	id::String
-	action::String
-	next::String
-
-	PerformAction(;id, action, next) =
-		new(valid_id(id), action, valid_id(next))
-end
-
-node2dot(n::PerformAction) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(n.action))"];
-		$(n.id) -> $(n.next);
-
-	"""
-
-
-struct YesNoCondition <: GraphNode
-	id::String
-	condition::String
-	next_yes::String
-	next_no::String
-
-	YesNoCondition(;id, condition, next_yes, next_no) =
-		new(valid_id(id), condition, valid_id(next_yes), valid_id(next_no))
-end
-
-node2dot(n::YesNoCondition) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
-		$(n.id) -> $(n.next_yes) [label = "Yes"];
-		$(n.id) -> $(n.next_no) [label = "No"];
-
-	"""
-
-
-struct BinaryCondition <: GraphNode
-	id::String
-	condition::String
-	next_true::String
-	next_false::String
-
-	BinaryCondition(;id, condition, next_true, next_false) =
-		new(valid_id(id), condition, valid_id(next_true), valid_id(next_false))
-end
-
-node2dot(n::BinaryCondition) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
-		$(n.id) -> $(n.next_yes) [label = "True"];
-		$(n.id) -> $(n.next_no) [label = "False"];
-
-	"""
-
-
-struct MultipleChoice <: GraphNode
-	id::String
-	conditions::String
-	nexts::Vector{String}
-
-	MultipleChoice(;id, conditions, nexts) =
-		new(valid_id(id), conditions, valid_id.(nexts))
-end
-
-function node2dot(n::MultipleChoice)
-	dot_node = """
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.conditions))"];
-	"""
-
-	for (i, nx) in enumerate(n.nexts)
-		dot_node *= """
-			$(n.id) -> $(nx) [label = "$(i)"];
-		"""
-	end
-	return dot_node*'\n'
-end
-
-
-
-################################################################################
-
 struct JumpToGraph <: GraphNode
 	id::String
 	text::String
@@ -197,6 +100,69 @@ node2dot(n::ReturnFromGraph) =
 		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.jump_text))"];
 
 	"""
+
+
+################################################################################
+
+struct PerformAction <: GraphNode
+	id::String
+	action::String
+	next::String
+
+	PerformAction(;id, action, next) =
+		new(valid_id(id), action, valid_id(next))
+end
+
+node2dot(n::PerformAction) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(n.action))"];
+		$(n.id) -> $(n.next);
+
+	"""
+
+
+struct BinaryCondition <: GraphNode
+	id::String
+	condition::String
+	next_true::String
+	next_false::String
+
+	BinaryCondition(;id, condition, next_true, next_false) =
+		new(valid_id(id), condition, valid_id(next_true), valid_id(next_false))
+end
+
+node2dot(n::BinaryCondition) =
+	"""
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
+		$(n.id) -> $(n.next_true) [label = "True"];
+		$(n.id) -> $(n.next_false) [label = "False"];
+
+	"""
+
+
+struct MultipleChoice <: GraphNode
+	id::String
+	conditions::String
+	nexts::Vector{String}
+
+	MultipleChoice(;id, conditions, nexts) =
+		new(valid_id(id), conditions, valid_id.(nexts))
+end
+
+function node2dot(n::MultipleChoice)
+	dot_node = """
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.conditions))"];
+	"""
+
+	for (i, nx) in enumerate(n.nexts)
+		dot_node *= """
+			$(n.id) -> $(nx) [label = "$(i)"];
+		"""
+	end
+	return dot_node*'\n'
+end
+
+
 
 
 
@@ -329,39 +295,6 @@ function node2dot(n::SetActiveDie)
 	"""
 end
 
-struct ResolveCard <: GraphNode
-	id::String
-	next::String
-
-	ResolveCard(;id, next) = new(valid_id(id), valid_id(next))
-end
-node2dot(n::ResolveCard) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Set the played card a\n the card to be resolved."];
-		$(n.id) -> $(n.next);
-
-	"""
-
-struct CardIsResolving <: GraphNode
-	id::String
-	next_true::String
-	next_false::String
-
-	CardIsResolving(;id, next_true, next_false) =
-		new(valid_id(id), valid_id(next_true), valid_id(next_false))
-end
-
-node2dot(n::CardIsResolving) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="A card is being\nresolved."];
-		$(n.id) -> $(n.next_true) [label="True"];
-		$(n.id) -> $(n.next_false) [label="False"];
-
-	"""
-
-
-
-
 
 
 struct UseActiveDie <: GraphNode
@@ -373,57 +306,8 @@ end
 
 node2dot(n::UseActiveDie) =
 	"""
-		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Use the Active Die or\n resolve card to:"];
+		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Use the Active Die to:"];
 		$(n.id) -> $(n.next);
-
-	"""
-
-struct DieHasBeenUsed <: GraphNode
-	id::String
-	next_used::String
-	next_not_used::String
-
-	DieHasBeenUsed(;id, next_used, next_not_used) = new(valid_id(id), valid_id(next_used), valid_id(next_not_used))
-end
-
-node2dot(n::DieHasBeenUsed) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="A die has been used."];
-		$(n.id) -> $(n.next_used) [label="Yes"];
-		$(n.id) -> $(n.next_not_used) [label="No"];
-
-	"""
-
-
-
-
-struct ReserveDie <: GraphNode
-	id::String
-	next::String
-
-	ReserveDie(;id, next) = new(valid_id(id), valid_id(next))
-end
-
-node2dot(n::ReserveDie) =
-	"""
-		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Set aside die to recruit\na minion as a last action."];
-		$(n.id) -> $(n.next);
-
-	"""
-
-struct IsDieReserved <: GraphNode
-	id::String
-	next_yes::String
-	next_no::String
-
-	IsDieReserved(;id, next_yes, next_no) = new(valid_id(id), valid_id(next_yes), valid_id(next_no))
-end
-
-node2dot(n::IsDieReserved) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="A die is set aside to recruit\na minion as a last action."];
-		$(n.id) -> $(n.next_yes) [label="Yes"];
-		$(n.id) -> $(n.next_no) [label="No"];
 
 	"""
 

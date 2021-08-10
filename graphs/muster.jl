@@ -6,60 +6,82 @@ let
 			   text = "Muster: Minion",
 			   next = "m_2_reserved_check",
 			   )
-	 IsDieReserved(
+	 BinaryCondition(
 				   id = "m_2_reserved_check",
-				   next_yes = "m_2_return",
-				   next_no = "m_2",
+				   next_true = "m_2_return",
+				   next_false = "m_2",
+				   condition = """
+				   A die has been reserved for recruiting a minion as a last action.
+				   """,
 				   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_2",
 					condition = """
 					Minion can be recruited.
 					""",
-					next_yes = "m_2_1",
-					next_no = "m_2_return",
+					next_true = "m_2_1",
+					next_false = "m_2_return",
 					)
 	 ReturnFromGraph(
 					 id = "m_2_return",
 					 )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_2_1",
 					condition = """
 					The Free Peoples' have a Will of the West die.
 					And, Gandalf the White has not been recruited.
 					And, no minion have been recruited.
 					""",
-					next_yes = "m_2_1_yes",
-					next_no = "m_2_1_no",
+					next_true = "m_2_1_yes",
+					next_false = "m_2_minion_selection",
 					)
-	 ReserveDie(
+	 UseActiveDie(
 				id = "m_2_1_yes",
-				next = "m_2_1_return",
+				next = "m_2_1_reserve",
 				)
+	 PerformAction(
+				   id = "m_2_1_reserve",
+				   next = "m_2_1_return",
+				   action = """
+				   Reserve one muster die to use for recruiting a minion as a last action.
+				   """,
+				   )
 	 ReturnFromGraph(
 					 id = "m_2_1_return",
 					 )
 
-	 PerformAction(
-				   id = "m_2_1_no",
-				   next = "m_2_wk",
-				   action = """
-				   Select a minion that can be reqruited.
+	 StartNode(
+			   id = "muster_minion_selection",
+			   text = "Muster: Minion Selectoin",
+			   next = "m_2_minion_selection",
+			   )
+	 MultipleChoice(
+					id = "m_2_minion_selection",
+					conditions = """
+					Select a minion that can be reqruited.
 
-				   Priority:
-				   1. Saruman
-				   2. Witch King
-				   3. Mouth of Sauron
+					Priority:
+					1. Saruman
+					2. Witch King
+					3. Mouth of Sauron
+					""",
+					nexts = [
+							 "m_2_saruman_die",
+							 "m_2_wk_die",
+							 "m_2_mos_die",
+							 ]
+					)
+	 UseActiveDie(
+				  id = "m_2_saruman_die",
+				  next = "m_2_saruman_placement",
+				  )
+	 PerformAction(
+				   id = "m_2_saruman_placement",
+				   next = "m_2_saruman_end",
+				   action = """
+				   Recruit Saruman.
 				   """
 				   )
-	 YesNoCondition(
-					id = "m_2_wk",
-					condition = """
-					The Witch King was selected.
-					""",
-					next_yes = "m_2_wk_die",
-					next_no = "m_2_mos",
-					)
 	 UseActiveDie(
 				  id = "m_2_wk_die",
 				  next = "m_2_wk_placement",
@@ -82,14 +104,6 @@ let
 				   10. Random
 				   """
 				   )
-	 YesNoCondition(
-					id = "m_2_mos",
-					condition = """
-					Mouth of Sauron was selected.
-					""",
-					next_yes = "m_2_mos_die",
-					next_no = "m_2_mos_end",
-					)
 	 UseActiveDie(
 				  id = "m_2_mos_die",
 				  next = "m_2_mos_placement",
@@ -111,6 +125,7 @@ let
 				   9. Random
 				   """
 				   )
+	 EndNode(id = "m_2_saruman_end")
 	 EndNode(id = "m_2_wk_end")
 	 EndNode(id = "m_2_mos_end")
 
@@ -124,13 +139,13 @@ let
 			   text = "Muster: Politics",
 			   next = "m_3",
 			   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_3",
 					condition = """
 					A Shadow nation is not at war.
 					""",
-					next_yes = "m_3_yes",
-					next_no = "m_3_return",
+					next_true = "m_3_yes",
+					next_false = "m_3_return",
 					)
 	 ReturnFromGraph(
 					 id = "m_3_return",
@@ -163,13 +178,13 @@ let
 			   text = "Muster: Muster",
 			   next = "m_4",
 			   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_4",
 					condition = """
 					A card that musters is "playable".
 					""",
-					next_yes = "m_4_die",
-					next_no = "m_5",
+					next_true = "m_4_die",
+					next_false = "m_5",
 					)
 	 UseActiveDie(
 				  id = "m_4_die",
@@ -177,7 +192,7 @@ let
 				  )
 	 PerformAction(
 				   id = "m_4_action",
-				   next = "m_4_resolve",
+				   next = "m_4_end",
 				   action = """
 				   Play a *playable* muster card.
 
@@ -186,48 +201,27 @@ let
 				   2. Random
 				   """
 				   )
-	 JumpToGraph(
-				 id = "m_4_resolve",
-				 text = "Event Cards: Resolution",
-				 next = "m_4_end",
-				 jump_graph = "event_cards_resolution",
-				 )
 	 EndNode(id = "m_4_end")
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_5",
 					condition = """
 					Muster is possible.
 					""",
-					next_yes = "m_muster_position",
-					next_no = "m_return",
+					next_true = "m_6",
+					next_false = "m_return",
 					)
-	 JumpToGraph(
-				 id = "m_muster_position",
-				 text = "Muster: Region",
-				 next = "m_5_end",
-				 jump_graph = "event_cards_resolution",
-				 )
 	 ReturnFromGraph(
 					 id = "m_return",
 					 )
-	 EndNode(id = "m_5_end")
 
-
-
-
-	 StartNode(
-			   id = "muster_region",
-			   text = "Muster: Region",
-			   next = "m_6_1",
-			   )
-	 YesNoCondition(
-					id = "m_6_1",
+	 BinaryCondition(
+					id = "m_6",
 					condition = """
 					Muster can create an *exposed* *target*.
 					""",
-					next_yes = "m_6_die",
-					next_no = "m_7",
+					next_true = "m_6_die",
+					next_false = "m_7",
 					)
 	 UseActiveDie(
 				  id = "m_6_die",
@@ -249,18 +243,18 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 ReturnFromGraph(id = "m_6_end")
+	 EndNode(id = "m_6_end")
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_7",
 					condition = """
-					The Fellowship is adjacent to a Shadow settlement.
+					The Fellowship is adjacent to, or in, a region it is possible to muster in.
 					And, the progress put the Fellowship outside Mordor.
 					And, no army is adjacent to the Fellowship's current region.
 					""",
-					next_yes = "m_7_die",
-					next_no = "m_8",
+					next_true = "m_7_die",
+					next_false = "m_8",
 					)
 	 UseActiveDie(
 				  id = "m_7_die",
@@ -271,7 +265,7 @@ let
 				   next = "m_7_end",
 				   action = """
 				   *Focus* priority:
-				   1. Fellowship's current region
+				   1. The Fellowship's current region
 
 				   Muster:
 				   *Primary*: Regular
@@ -281,16 +275,16 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 ReturnFromGraph(id = "m_7_end")
+	 EndNode(id = "m_7_end")
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_8",
 					condition = """
 					Muster is possible in a region containing a Shadow army.
 					""",
-					next_yes = "m_8_die",
-					next_no = "m_9",
+					next_true = "m_8_die",
+					next_false = "m_9",
 					)
 	 UseActiveDie(
 				  id = "m_8_die",
@@ -316,16 +310,16 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 ReturnFromGraph(id = "m_8_end")
+	 EndNode(id = "m_8_end")
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "m_9",
 					condition = """
 					Less than 6 Nazgûl in play.
 					""",
-					next_yes = "m_10_yes",
-					next_no = "m_10_no",
+					next_true = "m_10_yes",
+					next_false = "m_10_no",
 					)
 	 UseActiveDie(
 				  id = "m_10_yes",
@@ -333,7 +327,7 @@ let
 				  )
 	 PerformAction(
 				   id = "m_10_yes_action",
-				   next = "m_10_end",
+				   next = "m_10_end_yes",
 				   action = """
 				   *Focus* priority:
 				   1. Closest to army whose *target* is in a nation at war
@@ -350,13 +344,14 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
+	 EndNode(id = "m_10_end_yes")
 	 UseActiveDie(
 				  id = "m_10_no",
 				  next = "m_10_no_action",
 				  )
 	 PerformAction(
 				   id = "m_10_no_action",
-				   next = "m_10_end",
+				   next = "m_10_end_no",
 				   action = """
 				   *Focus* priority:
 				   1. Closest to army whose *target* is in a nation at war
@@ -373,7 +368,113 @@ let
 				   Elite -> Regular -> Nazgûl -> Elite
 				   """
 				   )
-	 ReturnFromGraph(id = "m_10_end")
+	 EndNode(id = "m_10_end_no")
+
+
+
+
+################################################################################
+
+	 StartNode(
+			   id = "muster_card",
+			   text = "Muster: Card",
+			   next = "m_c_6",
+			   )
+	 BinaryCondition(
+					id = "m_c_6",
+					condition = """
+					Muster can create an *exposed* *target*.
+					""",
+					next_true = "m_c_6_action",
+					next_false = "m_c_7",
+					)
+	 PerformAction(
+				   id = "m_c_6_action",
+				   next = "m_c_6_end",
+				   action = """
+				   *Focus* priority:
+				   1. Region which creates an *exposed* *target*
+				   2. Random
+
+				   Muster:
+				   *Primary*: Units according to card
+				   *Secondary*: Units according to card
+				   """
+				   )
+	 EndNode(id = "m_c_6_end")
+
+
+	 BinaryCondition(
+					id = "m_c_7",
+					condition = """
+					The Fellowship is adjacent to, or in, a region it is possible to muster in.
+					And, the progress put the Fellowship outside Mordor.
+					And, no army is adjacent to the Fellowship's current region.
+					""",
+					next_true = "m_c_7_action",
+					next_false = "m_c_8",
+					)
+	 PerformAction(
+				   id = "m_c_7_action",
+				   next = "m_c_7_end",
+				   action = """
+				   *Focus* priority:
+				   1. The Fellowship's current region
+
+				   Muster:
+				   *Primary*: Units according to card
+				   *Secondary*: Units according to card
+				   """
+				   )
+	 EndNode(id = "m_c_7_end")
+
+
+	 BinaryCondition(
+					id = "m_c_8",
+					condition = """
+					Muster is possible in a region containing a Shadow army.
+					""",
+					next_true = "m_c_8_action",
+					next_false = "m_c_9",
+					)
+	 PerformAction(
+				   id = "m_c_8_action",
+				   next = "m_c_8_end",
+				   action = """
+				   *Focus* priority:
+				   1. Army is *mobile*
+				   2. Army's *target* is a nation at war
+				   3. Army becomes mobile if the Witch King is added
+				   4. Opposing army does not contain Gandalf the White
+				   5. Army with the highest *value*
+				   6. Random
+
+				   Muster:
+				   *Primary*: Units according to card
+				   *Secondary*: Units according to card
+				   """
+				   )
+	 EndNode(id = "m_c_8_end")
+
+
+	 PerformAction(
+				   id = "m_c_9",
+				   next = "m_c_9_end",
+				   action = """
+				   *Focus* priority:
+				   1. Closest to army whose *target* is in a nation at war
+				   2. Closest to army whose *target* is in an active nation.
+				   3. Closest to a *mobile* army
+				   4. Closest to army whose *target* is in a passive nation.
+				   5. Random
+
+				   Muster:
+				   *Primary*: Units according to card
+				   *Secondary*: Units according to card
+				   """
+				   )
+	 EndNode(id = "m_c_9_end")
+
 
 	 ]
 end

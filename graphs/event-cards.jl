@@ -5,13 +5,13 @@ let
 			   text = "Event Cards: Preferred",
 			   next = "ep_1",
 			   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "ep_1",
 					condition = """
 					A *preferred* card is *playable*.
 					""",
-					next_yes = "ep_1_yes",
-					next_no = "ep_return",
+					next_true = "ep_1_yes",
+					next_false = "ep_return",
 					)
 	 ReturnFromGraph(
 					 id = "ep_return",
@@ -29,14 +29,8 @@ let
 				   1. Ascending Order of Initiative
 				   2. Random
 				   """,
-				   next = "ep_1_resolve"
+				   next = "ep_1_end"
 				   )
-	 JumpToGraph(
-				 id = "ep_1_resolve",
-				 text = "Event Cards: Resolution",
-				 next = "ep_1_end",
-				 jump_graph = "event_cards_resolution",
-				 )
 	 EndNode(id = "ep_1_end")
 
 
@@ -50,13 +44,13 @@ let
 			   text = "Event Cards: General",
 			   next = "eg_1",
 			   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "eg_1",
 					condition = """
 					Holding less than 4 cards.
 					""",
-					next_yes = "eg_1_yes",
-					next_no = "eg_2",
+					next_true = "eg_1_yes",
+					next_false = "eg_2",
 					)
 	 UseActiveDie(
 				  id = "eg_1_yes",
@@ -73,13 +67,13 @@ let
 
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "eg_2",
 					condition = """
 					A card is *playable*.
 					""",
-					next_yes = "eg_2_yes",
-					next_no = "eg_3",
+					next_true = "eg_2_yes",
+					next_false = "eg_3",
 					)
 	 UseActiveDie(
 				  id = "eg_2_yes",
@@ -94,14 +88,8 @@ let
 				   1. Ascending order of initiative
 				   2. Random
 				   """,
-				   next = "eg_2_resolve"
+				   next = "eg_2_end"
 				   )
-	 JumpToGraph(
-				 id = "eg_2_resolve",
-				 text = "Event Cards: Resolution",
-				 next = "eg_2_end",
-				 jump_graph = "event_cards_resolution",
-				 )
 	 EndNode(id = "eg_2_end")
 
 
@@ -116,13 +104,13 @@ let
 				   """,
 				   next = "eg_3_discard",
 				   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "eg_3_discard",
 					condition = """
 					Holding more than 6 cards.
 					""",
-					next_yes = "eg_3_discard_yes",
-					next_no = "eg_3_discard_no",
+					next_true = "eg_3_discard_yes",
+					next_false = "eg_3_discard_no",
 					)
 	 PerformAction(
 				   id = "eg_3_discard_yes",
@@ -153,14 +141,14 @@ let
 			   text = "Event Cards: Corruption",
 			   next = "ec_1",
 			   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "ec_1",
 					condition = """
 					An "if Fellowship revealed" card
 					is *playable*.
 					""",
-					next_yes = "ec_1_yes",
-					next_no = "ec_2",
+					next_true = "ec_1_yes",
+					next_false = "ec_2",
 					)
 	 UseActiveDie(
 				  id = "ec_1_yes",
@@ -175,23 +163,17 @@ let
 				   1. Ascending order of initiative
 				   2. Random
 				   """,
-				   next = "ec_1_resolve"
+				   next = "ec_1_end"
 				   )
-	 JumpToGraph(
-				 id = "ec_1_resolve",
-				 text = "Event Cards: Resolution",
-				 next = "ec_1_end",
-				 jump_graph = "event_cards_resolution",
-				 )
 	 EndNode(id = "ec_1_end")
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "ec_2",
 					condition = """
 					A card that adds corruption or adds a hunt tile is *playable*.
 					""",
-					next_yes = "ec_2_yes",
-					next_no = "ec_3",
+					next_true = "ec_2_yes",
+					next_false = "ec_3",
 					)
 	 UseActiveDie(
 				  id = "ec_2_yes",
@@ -206,23 +188,17 @@ let
 				   1. Ascending order of initiative
 				   2. Random
 				   """,
-				   next = "ec_2_resolve"
+				   next = "ec_2_end"
 				   )
-	 JumpToGraph(
-				 id = "ec_2_resolve",
-				 text = "Event Cards: Resolution",
-				 next = "ec_2_end",
-				 jump_graph = "event_cards_resolution",
-				 )
 	 EndNode(id = "ec_2_end")
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "ec_3",
 					condition = """
 					Holding less than 4 cards?
 					""",
-					next_yes = "ec_3_yes",
-					next_no = "ec_return",
+					next_true = "ec_3_yes",
+					next_false = "ec_return",
 					)
 	 UseActiveDie(
 				  id = "ec_3_yes",
@@ -242,66 +218,6 @@ let
 					 )
 
 
-
-	 StartNode(
-			   id = "event_cards_resolution",
-			   text = "Event Cards: Resolution",
-			   next = "er_1",
-			   )
-	 ResolveCard(
-				 id = "er_1",
-				 next = "er_2",
-				 )
-	 MultipleChoice(
-					id = "er_2",
-					conditions = """
-					Select card effect to resolve.
-
-					1. No effect to resolve
-					2. Region selection for muster
-					3. Army selection for movement or attack
-					4. Hunt allocation
-					""",
-					nexts = [
-							 "er_no_effect",
-							 "er_muster",
-							 "er_army",
-							 "er_hunt",
-							 ],
-					)
-	 ReturnFromGraph(
-					 id = "er_no_effect",
-					 )
-	 JumpToGraph(
-				 id = "er_muster",
-				 text = "Muster: Card",
-				 next = "er_2",
-				 jump_graph = "muster_card",
-				 )
-	 JumpToGraph(
-				 id = "er_army",
-				 text = "Movement and Attack:\nCard",
-				 next = "er_2",
-				 jump_graph = "movement_attack_card",
-				 )
-	 CheckStrategy(
-				   id = "er_hunt",
-				   strategy = "corruption",
-				   next_true = "er_hunt_corr",
-				   next_false = "er_hunt_mili",
-				   )
-	 JumpToGraph(
-				 id = "er_hunt_corr",
-				 text = "Phase 3: Corruption Strategy",
-				 next = "er_2",
-				 jump_graph = "phase_3_corr",
-				 )
-	 JumpToGraph(
-				 id = "er_hunt_mili",
-				 text = "Phase 3: Military Strategy",
-				 next = "er_2",
-				 jump_graph = "phase_3_mili",
-				 )
 
 
 	 ]

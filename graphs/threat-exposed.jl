@@ -63,13 +63,13 @@ let
 			   )
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_t",
 					condition = """
 					A *threat* exist.
 					""",
-					next_yes = "tx_1",
-					next_no = "tx_5",
+					next_true = "tx_1",
+					next_false = "tx_5",
 					)
 
 	 ################################################################################
@@ -79,11 +79,11 @@ let
 				  next_no_die = "tx_1_army",
 				  die = 'C',
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_1_char_cond",
 					condition = attack_threat_cond,
-					next_yes = "tx_1_use_die",
-					next_no = "tx_1_army",
+					next_true = "tx_1_use_die",
+					next_false = "tx_1_army",
 					)
 	 SetActiveDie(
 				  id = "tx_1_army",
@@ -92,11 +92,11 @@ let
 				  die = 'A',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_1_army_cond",
 					condition = attack_threat_cond,
-					next_yes = "tx_1_use_die",
-					next_no = "tx_2",
+					next_true = "tx_1_use_die",
+					next_false = "tx_2",
 					)
 	 UseActiveDie(
 				  id = "tx_1_use_die",
@@ -116,11 +116,11 @@ let
 				  next_no_die = "tx_2_army",
 				  die = 'C',
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_2_char_cond",
 					condition = move_adjacent_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_2_army",
+					next_true = "tx_move_use_die",
+					next_false = "tx_2_army",
 					)
 	 SetActiveDie(
 				  id = "tx_2_army",
@@ -129,11 +129,11 @@ let
 				  die = 'A',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_2_army_cond",
 					condition = move_adjacent_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_3",
+					next_true = "tx_move_use_die",
+					next_false = "tx_3",
 					)
 
 	 ################################################################################
@@ -143,11 +143,11 @@ let
 				  next_no_die = "tx_3_army",
 				  die = 'C',
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_3_char_cond",
 					condition = move_stronghold_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_3_army",
+					next_true = "tx_move_use_die",
+					next_false = "tx_3_army",
 					)
 	 SetActiveDie(
 				  id = "tx_3_army",
@@ -156,11 +156,11 @@ let
 				  die = 'A',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_3_army_cond",
 					condition = move_stronghold_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_4",
+					next_true = "tx_move_use_die",
+					next_false = "tx_4",
 					)
 
 	 ################################################################################
@@ -170,11 +170,11 @@ let
 				  next_no_die = "tx_4_army",
 				  die = 'C',
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_4_char_cond",
 					condition = move_toward_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_4_army",
+					next_true = "tx_move_use_die",
+					next_false = "tx_4_army",
 					)
 	 SetActiveDie(
 				  id = "tx_4_army",
@@ -183,11 +183,11 @@ let
 				  die = 'A',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_4_army_cond",
 					condition = move_toward_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_5",
+					next_true = "tx_move_use_die",
+					next_false = "tx_5",
 					)
 
 	 ################################################################################
@@ -197,11 +197,11 @@ let
 				  next_no_die = "tx_5_army",
 				  die = 'C',
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_5_char_cond",
 					condition = move_exposed_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_5_army",
+					next_true = "tx_move_use_die",
+					next_false = "tx_5_army",
 					)
 	 SetActiveDie(
 				  id = "tx_5_army",
@@ -210,11 +210,11 @@ let
 				  die = 'A',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_5_army_cond",
 					condition = move_exposed_cond,
-					next_yes = "tx_move_use_die",
-					next_no = "tx_m",
+					next_true = "tx_move_use_die",
+					next_false = "tx_m",
 					)
 
 	 ################################################################################
@@ -227,11 +227,11 @@ let
 				   next = "tx_move_movement_remains",
 				   action = move_text
 				   )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_move_movement_remains",
 					condition = move_remain_cond,
-					next_yes = "tx_use_remaining_movement",
-					next_no = "tx_move_end",
+					next_true = "tx_use_remaining_movement",
+					next_false = "tx_move_end",
 					)
 	 JumpToGraph(
 				 id = "tx_use_remaining_movement",
@@ -249,11 +249,11 @@ let
 				  die = 'M',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_m_cond",
 					condition = muster_cond,
-					next_yes = "tx_m_die",
-					next_no = "tx_c",
+					next_true = "tx_m_die",
+					next_false = "tx_c",
 					)
 	 UseActiveDie(
 				  id = "tx_m_die",
@@ -274,11 +274,11 @@ let
 				  die = 'C',
 				  may_use_ring = true,
 				  )
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "tx_c_cond",
 					condition = character_cond,
-					next_yes = "tx_c_1",
-					next_no = "tx_return",
+					next_true = "tx_c_1",
+					next_false = "tx_return",
 					)
 	 JumpToGraph(
 				 id = "tx_c_1",

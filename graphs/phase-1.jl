@@ -26,13 +26,13 @@ let
 
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "p1_mili_3",
 					condition = """
 					Holding more than 6 cards.
 					""",
-					next_yes = "p1_mili_discard",
-					next_no = "p1_mili_end",
+					next_true = "p1_mili_discard",
+					next_false = "p1_mili_end",
 					)
 	 PerformAction(
 				   id = "p1_mili_discard",
@@ -79,21 +79,21 @@ let
 
 
 
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "p1_corr_3",
 					condition = """
 					Holding more than 6 cards.
 					""",
-					next_yes = "p1_corr_discard",
-					next_no = "p1_corr_end_1",
+					next_true = "p1_corr_discard",
+					next_false = "p1_corr_end_1",
 					)
-	 YesNoCondition(
+	 BinaryCondition(
 					id = "p1_corr_discard",
 					condition = """
 					Holding more than 1 strategy cards.
 					""",
-					next_yes = "p1_corr_discard_1",
-					next_no = "p1_corr_discard_2",
+					next_true = "p1_corr_discard_1",
+					next_false = "p1_corr_discard_2",
 					)
 	 PerformAction(
 				   id = "p1_corr_discard_1",

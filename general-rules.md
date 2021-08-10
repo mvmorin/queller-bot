@@ -31,3 +31,4 @@
 26. Where Isengard is the source of the primary and Saruman is in play, use Voice of Saruman.
     If Orthanc is under threat use upgrade, otherwise if 3 regulars available use muster.
     If there aren’t enough figures for either ability use, then muster as normal
+
