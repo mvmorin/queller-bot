@@ -50,7 +50,7 @@ end
 
 node2dot(n::StartNode) =
 	"""
-		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(n.text))"];
+		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(n.text))\n($(escape_string(n.id)))"];
 		$(n.id) -> $(n.next);
 
 	"""
@@ -83,7 +83,7 @@ end
 
 node2dot(n::JumpToGraph) =
 	"""
-		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.text))"];
+		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.text))\n($(escape_string(n.jump_graph)))"];
 		$(n.id) -> $(n.next);
 
 	"""
@@ -182,7 +182,7 @@ function node2dot(n::SetStrategy)
 	until prompted otherwise.
 	"""
 	return """
-		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(text))"];
+		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(text))"];
 		$(n.id) -> $(n.next);
 
 	"""
@@ -204,7 +204,7 @@ function node2dot(n::CheckStrategy)
 	The $(n.strategy) strategy is used.
 	"""
 	return """
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(text))"];
+		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(text))"];
 		$(n.id) -> $(n.next_true) [label="True"];
 		$(n.id) -> $(n.next_false) [label="False"];
 

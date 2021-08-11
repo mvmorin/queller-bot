@@ -218,7 +218,7 @@ let
 	 BinaryCondition(
 					id = "m_6",
 					condition = """
-					Muster can create an *exposed* *target*.
+					Muster can create an *exposed* region.
 					""",
 					next_true = "m_6_die",
 					next_false = "m_7",
@@ -232,7 +232,7 @@ let
 				   next = "m_6_end",
 				   action = """
 				   *Focus* priority:
-				   1. Region which creates an *exposed* *target*
+				   1. Region which creates an *exposed* region
 				   2. Random
 
 				   Muster:
@@ -383,7 +383,7 @@ let
 	 BinaryCondition(
 					id = "m_c_6",
 					condition = """
-					Muster can create an *exposed* *target*.
+					Muster can create an *exposed* region.
 					""",
 					next_true = "m_c_6_action",
 					next_false = "m_c_7",
@@ -393,7 +393,7 @@ let
 				   next = "m_c_6_end",
 				   action = """
 				   *Focus* priority:
-				   1. Region which creates an *exposed* *target*
+				   1. Region which creates an *exposed* region
 				   2. Random
 
 				   Muster:

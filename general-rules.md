@@ -12,10 +12,6 @@
 
 9. Consider both moves when evaluating true/false and priorities for an army die. If two moves combined can meet a condition, then the condition is true.
 
-# Battles
-10. Remove Shadow units to support card play until the army would become passive.
-11. The player must select and play their card before Queller.
-
 # Cards
 15. If a card is blocking Queller from carrying out an action it will carry out the requirements to remove it from play if possible. It will do this only if it tries to carry out the blocked action.
 16. Use cards “in play” at the first opportunity.

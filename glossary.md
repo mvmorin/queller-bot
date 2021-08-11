@@ -22,7 +22,9 @@
 	- its nation is active and its value is equal or greater than the specified opposing army's value; or
 	- it has hit the stacking limit and contains the Witch King or 5 leadership.
 
-- Exposed: An empty target of a Shadow army for which the shortest path to is clear of Free Peoples' armies.
+- Exposed: A region is exposed by a Shadow army if
+	- it could be the target if distance is ignored; and
+	- the shortest path to the region is clear of Free Peoples' armies.
 
 - Garrison: An army inside a stronghold or in a stronghold region. A sieging army are adjacent the besieged garrison as well as the surrounding regions. A besieged army is adjacent to the sieging army.
 
