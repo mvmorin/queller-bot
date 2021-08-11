@@ -225,6 +225,7 @@ let
 				 )
 
 
+
 ########################################
 	BinaryCondition(
 					id = "should_play_card",
@@ -262,7 +263,6 @@ let
 
 
 
-
 ################################################################################
 	 StartNode(
 			   id = "battle_resolve",
@@ -288,7 +288,6 @@ let
 				   """,
 				   )
 	 ReturnFromGraph(id = "battle_resolve_return")
-
 
 
 
@@ -402,7 +401,6 @@ let
 			 id = "no_more_round_end_2",
 			 text = "End of Battle",
 			 )
-
 
 	 ]
 end
