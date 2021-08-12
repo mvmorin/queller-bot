@@ -9,13 +9,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_mili_1",
-					condition = """
-					The fellowship is on the Mordor track.
-					""",
-					next_true = "p3_mili_1_yes",
-					next_false = "p3_mili_2"
-					)
+					 id = "p3_mili_1",
+					 condition = """
+					 The fellowship is on the Mordor track.
+					 """,
+					 next_true = "p3_mili_1_yes",
+					 next_false = "p3_mili_2"
+					 )
 	 PerformAction(
 				   id = "p3_mili_1_yes",
 				   action = """
@@ -26,13 +26,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_mili_2",
-					condition = """
-					The Fellowship's progress is greater than 5.
-					""",
-					next_true = "p3_mili_2_yes",
-					next_false = "p3_mili_3",
-					)
+					 id = "p3_mili_2",
+					 condition = """
+					 The Fellowship's progress is greater than 5.
+					 """,
+					 next_true = "p3_mili_2_yes",
+					 next_false = "p3_mili_3",
+					 )
 	 PerformAction(
 				   id = "p3_mili_2_yes",
 				   action = """
@@ -43,13 +43,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_mili_3",
-					condition = """
-					The Fellowship is on the starting position and its progress is 0.
-					""",
-					next_true = "p3_mili_3_yes",
-					next_false = "p3_mili_3_no",
-					)
+					 id = "p3_mili_3",
+					 condition = """
+					 The Fellowship is on the starting position and its progress is 0.
+					 """,
+					 next_true = "p3_mili_3_yes",
+					 next_false = "p3_mili_3_no",
+					 )
 	 PerformAction(
 				   id = "p3_mili_3_yes",
 				   action = """
@@ -71,7 +71,7 @@ let
 			 text = "End of Phase"
 			 )
 
-	# Corruption
+	 # Corruption
 	 StartNode(
 			   id = "phase_3_corr",
 			   text = "Phase 3: Corruption Strategy",
@@ -81,13 +81,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_corr_1",
-					condition = """
-					The Fellowship is on the starting position and its progess is 0.
-					""",
-					next_true = "p3_corr_1_yes",
-					next_false = "p3_corr_2",
-					)
+					 id = "p3_corr_1",
+					 condition = """
+					 The Fellowship is on the starting position and its progess is 0.
+					 """,
+					 next_true = "p3_corr_1_yes",
+					 next_false = "p3_corr_2",
+					 )
 	 PerformAction(
 				   id = "p3_corr_1_yes",
 				   action = """
@@ -99,13 +99,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_corr_2",
-					condition = """
-					The Fellowship is on the Mordor track.
-					""",
-					next_true = "p3_corr_2_yes",
-					next_false = "p3_corr_3",
-					)
+					 id = "p3_corr_2",
+					 condition = """
+					 The Fellowship is on the Mordor track.
+					 """,
+					 next_true = "p3_corr_2_yes",
+					 next_false = "p3_corr_3",
+					 )
 	 PerformAction(
 				   id = "p3_corr_2_yes",
 				   action = """
@@ -117,14 +117,14 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_corr_3",
-					condition = """
-					A *mobile* army is adjacent to *target* which provides enough victory points to win the game.
-					Or, the Shadow have 7 dice.
-					""",
-					next_true = "p3_corr_3_yes",
-					next_false = "p3_corr_4",
-					)
+					 id = "p3_corr_3",
+					 condition = """
+					 A *mobile* army is adjacent to *target* which provides enough victory points to win the game.
+					 Or, the Shadow have 7 dice.
+					 """,
+					 next_true = "p3_corr_3_yes",
+					 next_false = "p3_corr_4",
+					 )
 	 PerformAction(
 				   id = "p3_corr_3_yes",
 				   action = """
@@ -136,13 +136,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_corr_4",
-					condition = """
-					The Fellowship's progress is greater than 4.
-					""",
-					next_true = "p3_corr_4_yes",
-					next_false = "p3_corr_5",
-					)
+					 id = "p3_corr_4",
+					 condition = """
+					 The Fellowship's progress is greater than 4.
+					 """,
+					 next_true = "p3_corr_4_yes",
+					 next_false = "p3_corr_5",
+					 )
 	 PerformAction(
 				   id = "p3_corr_4_yes",
 				   action = """
@@ -154,13 +154,13 @@ let
 
 
 	 BinaryCondition(
-					id = "p3_corr_5",
-					condition = """
-					The Fellowship's shortest path to Mordor leads via a Shadow stronghold and the progress allows them to pass it or be within 2 steps from it.
-					""",
-					next_true = "p3_corr_5_yes",
-					next_false = "p3_corr_5_no",
-					)
+					 id = "p3_corr_5",
+					 condition = """
+					 The Fellowship's shortest path to Mordor leads via a Shadow stronghold and the progress allows them to pass it or be within 2 steps from it.
+					 """,
+					 next_true = "p3_corr_5_yes",
+					 next_false = "p3_corr_5_no",
+					 )
 	 PerformAction(
 				   id = "p3_corr_5_yes",
 				   action = """

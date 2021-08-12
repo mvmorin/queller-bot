@@ -13,9 +13,9 @@ let
 			   )
 
 	 RollActionDice(
-				   id = "p4_1",
-				   next = "p4_end",
-				   )
+					id = "p4_1",
+					next = "p4_end",
+					)
 
 	 EndNode(
 			 id = "p4_end",

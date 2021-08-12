@@ -56,7 +56,7 @@ let
 	"""
 
 
-################################################################################
+	################################################################################
 	[
 	 StartNode(
 			   id = "battle",
@@ -75,7 +75,7 @@ let
 					 next_false = "def_in_stronghold",
 					 )
 
-########################################
+	 ########################################
 	 BinaryCondition(
 					 id = "def_in_stronghold",
 					 condition = """
@@ -124,7 +124,7 @@ let
 			 )
 
 
-########################################
+	 ########################################
 	 BinaryCondition(
 					 id = "should_retreat_to_stronghold",
 					 condition = """
@@ -172,7 +172,7 @@ let
 
 
 
- ########################################
+	 ########################################
 	 BinaryCondition(
 					 id = "is_sortie",
 					 condition = "Battle is a sortie.",
@@ -199,13 +199,13 @@ let
 
 
 
-########################################
-	BinaryCondition(
-					id = "army_with_wk",
-					condition = "Army include the Witch King.",
-					next_true = "wk_card_prio",
-					next_false = "should_play_card",
-					)
+	 ########################################
+	 BinaryCondition(
+					 id = "army_with_wk",
+					 condition = "Army include the Witch King.",
+					 next_true = "wk_card_prio",
+					 next_false = "should_play_card",
+					 )
 	 PerformAction(
 				   id = "wk_card_prio",
 				   action = wk_card_prio,
@@ -226,16 +226,16 @@ let
 
 
 
-########################################
-	BinaryCondition(
-					id = "should_play_card",
-					condition = """
-					The Shadow is conducting a siege.
-					Or, the Shadow is holding more than 4 cards.
-					""",
-					next_true = "attack_card_prio",
-					next_false = "attack_play_no_card",
-					)
+	 ########################################
+	 BinaryCondition(
+					 id = "should_play_card",
+					 condition = """
+					 The Shadow is conducting a siege.
+					 Or, the Shadow is holding more than 4 cards.
+					 """,
+					 next_true = "attack_card_prio",
+					 next_false = "attack_play_no_card",
+					 )
 
 	 PerformAction(
 				   id = "attack_card_prio",
@@ -263,7 +263,7 @@ let
 
 
 
-################################################################################
+	 ################################################################################
 	 StartNode(
 			   id = "battle_resolve",
 			   text = "Battle: Resolve",
@@ -292,7 +292,7 @@ let
 
 
 
-################################################################################
+	 ################################################################################
 	 StartNode(
 			   id = "battle_round_end",
 			   text = "Battle: Round End",
@@ -317,10 +317,10 @@ let
 					 )
 
 	 PerformAction(
-					  id = "move_into_conquered",
-					  action = "Move the largest *value* possible into the conquered region.",
-					  next = "move_into_conquered_end",
-					  )
+				   id = "move_into_conquered",
+				   action = "Move the largest *value* possible into the conquered region.",
+				   next = "move_into_conquered_end",
+				   )
 	 EndNode(
 			 id = "move_into_conquered_end",
 			 text = "End of Battle",
@@ -329,9 +329,9 @@ let
 
 	 PerformAction(
 				   id = "end_without_moving",
-					  action = "Do not move any units into the conquered region.",
-					  next = "end_without_moving_end",
-					  )
+				   action = "Do not move any units into the conquered region.",
+				   next = "end_without_moving_end",
+				   )
 	 EndNode(
 			 id = "end_without_moving_end",
 			 text = "End of Battle",

@@ -57,20 +57,21 @@ let
 	"""
 
 	[
+	 ################################################################################
 	 StartNode(
-			   id = "characters_army",
+			   id = "character_army",
 			   text = "Character:\n Army Movement",
 			   next = "lc_1",
 			   )
 
 	 BinaryCondition(
-					id = "lc_1",
-					condition = """
-					*Aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
-					""",
-					next_true = "lc_1_yes",
-					next_false = "lc_2",
-					)
+					 id = "lc_1",
+					 condition = """
+					 *Aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
+					 """,
+					 next_true = "lc_1_yes",
+					 next_false = "lc_2",
+					 )
 	 UseActiveDie(
 				  id = "lc_1_yes",
 				  next = "lc_1_action",
@@ -85,13 +86,13 @@ let
 	 EndNode(id = "lc_1_end")
 
 	 BinaryCondition(
-					id = "lc_2",
-					condition = """
-					*Mobile* army with leadership and a valid move/attack towards *target*.
-					""",
-					next_true = "lc_2_yes",
-					next_false = "lc_3",
-					)
+					 id = "lc_2",
+					 condition = """
+					 *Mobile* army with leadership and a valid move/attack towards *target*.
+					 """,
+					 next_true = "lc_2_yes",
+					 next_false = "lc_3",
+					 )
 	 JumpToGraph(
 				 id = "lc_2_yes",
 				 text = "Movement and Attack:\n Basic",
@@ -100,21 +101,20 @@ let
 				 )
 
 
-
-
+	 ################################################################################
 	 StartNode(
-			   id = "characters_move",
+			   id = "character_move",
 			   text = "Character:\n Movement",
 			   next = "lc_3",
 			   )
 	 BinaryCondition(
-					id = "lc_3",
-					condition = """
-					A Nazgûl or the Witch King is in play.
-					""",
-					next_true = "lc_wk",
-					next_false = "lc_3_no",
-					)
+					 id = "lc_3",
+					 condition = """
+					 A Nazgûl or the Witch King is in play.
+					 """,
+					 next_true = "lc_wk",
+					 next_false = "lc_3_no",
+					 )
 	 JumpToGraph(
 				 id = "lc_3_no",
 				 text = "Event Cards: Preferred",
@@ -126,19 +126,19 @@ let
 					 )
 
 
-
+	 ########################################
 	 StartNode(
-			   id = "characters_which_king",
+			   id = "character_which_king",
 			   text = "Character:\n Which King",
 			   next = "lc_wk_yes",
 			   )
 
 	 BinaryCondition(
-					id = "lc_wk",
-					condition = move_wk_cond,
-					next_true = "lc_wk_yes",
- 					next_false = "lc_naz_1",
-					)
+					 id = "lc_wk",
+					 condition = move_wk_cond,
+					 next_true = "lc_wk_yes",
+					 next_false = "lc_naz_1",
+					 )
 	 UseActiveDie(
 				  id = "lc_wk_yes",
 				  next = "lc_wk_action",
@@ -150,15 +150,13 @@ let
 				   )
 
 
-
-
-
+	 ########################################
 	 BinaryCondition(
-					id = "lc_naz_1",
-					condition = move_nazgul_cond,
-					next_true = "lc_naz_1_yes",
- 					next_false = "lc_mos_1",
-					)
+					 id = "lc_naz_1",
+					 condition = move_nazgul_cond,
+					 next_true = "lc_naz_1_yes",
+					 next_false = "lc_mos_1",
+					 )
 	 UseActiveDie(
 				  id = "lc_naz_1_yes",
 				  next = "lc_naz_1_action",
@@ -171,11 +169,11 @@ let
 
 
 	 BinaryCondition(
-					id = "lc_naz_2",
-					condition = move_nazgul_cond,
-					next_true = "lc_naz_2_yes",
- 					next_false = "lc_mos_3",
-					)
+					 id = "lc_naz_2",
+					 condition = move_nazgul_cond,
+					 next_true = "lc_naz_2_yes",
+					 next_false = "lc_mos_3",
+					 )
 	 UseActiveDie(
 				  id = "lc_naz_2_yes",
 				  next = "lc_naz_2_action",
@@ -187,14 +185,13 @@ let
 				   )
 
 
-
-
+	 ########################################
 	 BinaryCondition(
-					id = "lc_mos_1",
-					condition = move_mos_cond,
-					next_true = "lc_mos_1_yes",
- 					next_false = "lc_play_card",
-					)
+					 id = "lc_mos_1",
+					 condition = move_mos_cond,
+					 next_true = "lc_mos_1_yes",
+					 next_false = "lc_play_card",
+					 )
 	 UseActiveDie(
 				  id = "lc_mos_1_yes",
 				  next = "lc_mos_1_action",
@@ -206,11 +203,11 @@ let
 				   )
 
 	 BinaryCondition(
-					id = "lc_mos_2",
-					condition = move_mos_cond,
-					next_true = "lc_mos_2_yes",
- 					next_false = "lc_mos_end_2",
-					)
+					 id = "lc_mos_2",
+					 condition = move_mos_cond,
+					 next_true = "lc_mos_2_yes",
+					 next_false = "lc_mos_end_2",
+					 )
 	 UseActiveDie(
 				  id = "lc_mos_2_yes",
 				  next = "lc_mos_2_action",
@@ -222,11 +219,11 @@ let
 				   )
 
 	 BinaryCondition(
-					id = "lc_mos_3",
-					condition = move_mos_cond,
-					next_true = "lc_mos_3_yes",
- 					next_false = "lc_mos_end_3",
-					)
+					 id = "lc_mos_3",
+					 condition = move_mos_cond,
+					 next_true = "lc_mos_3_yes",
+					 next_false = "lc_mos_end_3",
+					 )
 	 UseActiveDie(
 				  id = "lc_mos_3_yes",
 				  next = "lc_mos_3_action",
@@ -238,11 +235,11 @@ let
 				   )
 
 	 BinaryCondition(
-					id = "lc_mos_4",
-					condition = move_mos_cond,
-					next_true = "lc_mos_4_yes",
- 					next_false = "lc_mos_end_4",
-					)
+					 id = "lc_mos_4",
+					 condition = move_mos_cond,
+					 next_true = "lc_mos_4_yes",
+					 next_false = "lc_mos_end_4",
+					 )
 	 UseActiveDie(
 				  id = "lc_mos_4_yes",
 				  next = "lc_mos_4_action",
@@ -259,8 +256,7 @@ let
 	 EndNode(id = "lc_mos_end_4")
 
 
-
-
+	 ########################################
 	 JumpToGraph(
 				 id = "lc_play_card",
 				 text = "Event Cards: Preferred",
@@ -272,9 +268,9 @@ let
 					 )
 
 
-
+	 ################################################################################
 	 StartNode(
-			   id = "characters_wk_prio",
+			   id = "character_wk_prio",
 			   text = "Character:\n Witch King Priority",
 			   next = "lc_wk_prio",
 			   )
@@ -285,8 +281,10 @@ let
 				   )
 	 EndNode(id = "lc_wk_prio_end")
 
+
+	 ################################################################################
 	 StartNode(
-			   id = "characters_nazgul_prio",
+			   id = "character_nazgul_prio",
 			   text = "Character:\n Nazgûl Priority",
 			   next = "lc_nazgul_prio",
 			   )
@@ -298,8 +296,9 @@ let
 	 EndNode(id = "lc_nazgul_prio_end")
 
 
+	 ################################################################################
 	 StartNode(
-			   id = "characters_mos_prio",
+			   id = "character_mos_prio",
 			   text = "Character:\n Mouth of Sauron Priority",
 			   next = "lc_mos_prio",
 			   )

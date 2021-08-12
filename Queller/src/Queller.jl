@@ -127,8 +127,13 @@ DICE = Dict(
 	'H' => "Army/Muster Die",
 	'P' => "Event Die",
 	'E' => "Eye",
-	'W' => "Will of the West", # Never used
+	# 'W' => "Will of the West", # Never used
 	)
+function valid_die(c)
+	c in keys(DICE) || error("\'$(c)\' is not a valid die.")
+	return c
+end
+
 
 struct RollActionDice <: GraphNode
 	id::String
@@ -155,7 +160,7 @@ struct SetActiveDie <: GraphNode
 	may_use_ring::Bool
 
 	SetActiveDie(;id, next, next_no_die, die, may_use_ring=false) =
-		new(valid_id(id), valid_id(next), valid_id(next_no_die), die, may_use_ring)
+		new(valid_id(id), valid_id(next), valid_id(next_no_die), valid_die(die), may_use_ring)
 end
 children(n::SetActiveDie) = [n.next, n.next_no_die]
 
@@ -166,6 +171,15 @@ struct UseActiveDie <: GraphNode
 	UseActiveDie(;id, next) = new(valid_id(id), valid_id(next))
 end
 children(n::UseActiveDie) = [n.next]
+
+struct SetRandomDie <: GraphNode
+	id::String
+	next::String
+
+	SetRandomDie(;id, next) = new(valid_id(id), valid_id(next))
+end
+children(n::SetRandomDie) = [n.next]
+
 
 ################################################################################
 
@@ -194,7 +208,7 @@ end
 function load_graphs(file)
 	nodes = include(file)
 	!unique_node_ids(nodes) && error("Error loading nodes, not all ids are unique.")
-	!all_children_exists(nodes) && error("Error loading nodes, not all child nodes exists.")
+	# !all_children_exists(nodes) && error("Error loading nodes, not all child nodes exists.")
 	nodes_d = Dict(n.id => n for n in nodes)
 
 	start_nodes = filter(n -> isa(n, StartNode), nodes)

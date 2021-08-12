@@ -74,7 +74,7 @@ let
 	"""
 
 	[
-################################################################################
+	 ################################################################################
 	 StartNode(
 			   id = "movement_attack_besiege",
 			   text = "Movement and Attack:\n Besiege",
@@ -82,13 +82,13 @@ let
 			   )
 
 	 BinaryCondition(
-					id = "mv_1",
-					condition = """
-					A *mobile* army is adjacent to *target* not under siege.
-					""",
-					next_true = "mv_1_yes",
-					next_false = "mv_1_return",
-					)
+					 id = "mv_1",
+					 condition = """
+					 A *mobile* army is adjacent to *target* not under siege.
+					 """,
+					 next_true = "mv_1_yes",
+					 next_false = "mv_1_return",
+					 )
 	 ReturnFromGraph(
 					 id = "mv_1_return",
 					 )
@@ -115,22 +115,22 @@ let
 
 
 
-################################################################################
+	 ################################################################################
 	 StartNode(
 			   id = "movement_attack_corr",
 			   text = "Movement and Attack:\n Corruption",
 			   next = "mv_2",
 			   )
 	 BinaryCondition(
-					id = "mv_2",
-					condition = """
-					There are dice in the hunt pool.
-					And, no army is in the Fellowship's region.
-					And, an army can move into that region without increasing the distance to its *target* (the *target* may change).
-					""",
-					next_true = "mv_2_yes",
-					next_false = "mv_3",
-					)
+					 id = "mv_2",
+					 condition = """
+					 There are dice in the hunt pool.
+					 And, no army is in the Fellowship's region.
+					 And, an army can move into that region without increasing the distance to its *target* (the *target* may change).
+					 """,
+					 next_true = "mv_2_yes",
+					 next_false = "mv_3",
+					 )
 	 UseActiveDie(
 				  id = "mv_2_yes",
 				  next = "mv_2_action",
@@ -143,32 +143,29 @@ let
 				   """
 				   )
 	 BinaryCondition(
-					id = "mv_2_movement_remains",
-					condition = """
-					An army die was used and it have one move remaining.
-					""",
-					next_true = "mv_2",
-					next_false = "mv_2_end",
-					)
+					 id = "mv_2_movement_remains",
+					 condition = """
+					 An army die was used and it have one move remaining.
+					 """,
+					 next_true = "mv_2",
+					 next_false = "mv_2_end",
+					 )
 	 EndNode(id = "mv_2_end")
 
 
-
-
-
-
+	 ########################################
 	 BinaryCondition(
-					id = "mv_3",
-					condition = settlement_cond,
-					next_true = "mv_3_1",
-					next_false = "mv_4",
-					)
+					 id = "mv_3",
+					 condition = settlement_cond,
+					 next_true = "mv_3_1",
+					 next_false = "mv_4",
+					 )
 	 BinaryCondition(
-					id = "mv_3_1",
-					condition = settlement_cond_2,
-					next_true = "mv_3_yes",
-					next_false = "mv_3_no",
-					)
+					 id = "mv_3_1",
+					 condition = settlement_cond_2,
+					 next_true = "mv_3_yes",
+					 next_false = "mv_3_no",
+					 )
 	 UseActiveDie(
 				  id = "mv_3_yes",
 				  next = "mv_3_yes_action",
@@ -188,24 +185,23 @@ let
 				   action = settlement_move_unit,
 				   )
 	 BinaryCondition(
-					id = "mv_3_movement_remains",
-					condition = """
-					An army die was used and it have one move remaining.
-					""",
-					next_true = "mv_3",
-					next_false = "mv_3_end",
-					)
+					 id = "mv_3_movement_remains",
+					 condition = """
+					 An army die was used and it have one move remaining.
+					 """,
+					 next_true = "mv_3",
+					 next_false = "mv_3_end",
+					 )
 	 EndNode(id = "mv_3_end")
 
 
-
-
+	 ########################################
 	 BinaryCondition(
-					id = "mv_4",
-					condition = merge_cond,
-					next_true = "mv_4_yes",
-					next_false = "mv_5",
-					)
+					 id = "mv_4",
+					 condition = merge_cond,
+					 next_true = "mv_4_yes",
+					 next_false = "mv_5",
+					 )
 	 UseActiveDie(
 				  id = "mv_4_yes",
 				  next = "mv_4_action",
@@ -216,29 +212,29 @@ let
 				   action = merge_move,
 				   )
 	 BinaryCondition(
-					id = "mv_4_movement_remains",
-					condition = """
-					An army die was used and it have one move remaining.
-					""",
-					next_true = "mv_4",
-					next_false = "mv_4_end",
-					)
+					 id = "mv_4_movement_remains",
+					 condition = """
+					 An army die was used and it have one move remaining.
+					 """,
+					 next_true = "mv_4",
+					 next_false = "mv_4_end",
+					 )
 	 EndNode(id = "mv_4_end")
 
 
 
-
+	 ################################################################################
 	 StartNode(
 			   id = "movement_attack_basic",
 			   text = "Movement and Attack:\n Basic",
 			   next = "mv_5",
 			   )
 	 BinaryCondition(
-					id = "mv_5",
-					condition = move_target_cond,
-					next_true = "mv_5_yes",
-					next_false = "mv_6",
-					)
+					 id = "mv_5",
+					 condition = move_target_cond,
+					 next_true = "mv_5_yes",
+					 next_false = "mv_6",
+					 )
 	 UseActiveDie(
 				  id = "mv_5_yes",
 				  next = "mv_5_action",
@@ -249,22 +245,23 @@ let
 				   action = move_target,
 				   )
 	 BinaryCondition(
-					id = "mv_5_movement_remains",
-					condition = """
-					An army die was used and it have one move remaining.
-					""",
-					next_true = "mv_5",
-					next_false = "mv_5_end",
-					)
+					 id = "mv_5_movement_remains",
+					 condition = """
+					 An army die was used and it have one move remaining.
+					 """,
+					 next_true = "mv_5",
+					 next_false = "mv_5_end",
+					 )
 	 EndNode(id = "mv_5_end")
 
 
+	 ########################################
 	 BinaryCondition(
-					id = "mv_6",
-					condition = basic_move_cond,
-					next_true = "mv_6_yes",
-					next_false = "mv_return",
-					)
+					 id = "mv_6",
+					 condition = basic_move_cond,
+					 next_true = "mv_6_yes",
+					 next_false = "mv_return",
+					 )
 	 ReturnFromGraph(
 					 id = "mv_return"
 					 )
@@ -278,19 +275,19 @@ let
 				   action = basic_move,
 				   )
 	 BinaryCondition(
-					id = "mv_6_movement_remains",
-					condition = """
-					An army die was used and it have one move remaining.
-					""",
-					next_true = "mv_6",
-					next_false = "mv_6_end",
-					)
+					 id = "mv_6_movement_remains",
+					 condition = """
+					 An army die was used and it have one move remaining.
+					 """,
+					 next_true = "mv_6",
+					 next_false = "mv_6_end",
+					 )
 	 EndNode(id = "mv_6_end")
 
 
 
 
-################################################################################
+	 ################################################################################
 	 StartNode(
 			   id = "movement_attack_card",
 			   text = "Movement and Attack:\n Card",
@@ -298,17 +295,17 @@ let
 			   )
 
 	 BinaryCondition(
-					id = "mv_c_1",
-					condition = settlement_cond,
-					next_true = "mv_c_1_1",
-					next_false = "mv_c_2",
-					)
+					 id = "mv_c_1",
+					 condition = settlement_cond,
+					 next_true = "mv_c_1_1",
+					 next_false = "mv_c_2",
+					 )
 	 BinaryCondition(
-					id = "mv_c_1_1",
-					condition = settlement_cond_2,
-					next_true = "mv_c_1_army",
-					next_false = "mv_c_1_unit",
-					)
+					 id = "mv_c_1_1",
+					 condition = settlement_cond_2,
+					 next_true = "mv_c_1_army",
+					 next_false = "mv_c_1_unit",
+					 )
 	 PerformAction(
 				   id = "mv_c_1_army",
 				   next = "mv_c_1_army_end",
@@ -323,12 +320,13 @@ let
 	 EndNode(id = "mv_c_1_unit_end")
 
 
+
 	 BinaryCondition(
-					id = "mv_c_2",
-					condition = merge_cond,
-					next_true = "mv_c_2_move",
-					next_false = "mv_c_3",
-					)
+					 id = "mv_c_2",
+					 condition = merge_cond,
+					 next_true = "mv_c_2_move",
+					 next_false = "mv_c_3",
+					 )
 	 PerformAction(
 				   id = "mv_c_2_move",
 				   next = "mv_c_2_end",
@@ -339,11 +337,11 @@ let
 
 
 	 BinaryCondition(
-					id = "mv_c_3",
-					condition = move_target_cond,
-					next_true = "mv_c_3_move",
-					next_false = "mv_c_4_move",
-					)
+					 id = "mv_c_3",
+					 condition = move_target_cond,
+					 next_true = "mv_c_3_move",
+					 next_false = "mv_c_4_move",
+					 )
 	 PerformAction(
 				   id = "mv_c_3_move",
 				   next = "mv_c_3_end",
