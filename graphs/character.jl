@@ -67,7 +67,7 @@ let
 	 BinaryCondition(
 					 id = "lc_1",
 					 condition = """
-					 *Aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
+					 An *aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
 					 """,
 					 next_true = "lc_1_yes",
 					 next_false = "lc_2",
@@ -88,7 +88,7 @@ let
 	 BinaryCondition(
 					 id = "lc_2",
 					 condition = """
-					 *Mobile* army with leadership and a valid move/attack towards *target*.
+					 A *mobile* army with leadership and a valid move/attack towards *target* exists.
 					 """,
 					 next_true = "lc_2_yes",
 					 next_false = "lc_3",

@@ -15,8 +15,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a1", next = "a1_1")
 	 SetActiveDie(
-				  id = "a1",
+				  id = "a1_1",
 				  next = "a1_cond",
 				  next_no_die = "a2",
 				  die = 'C',
@@ -39,8 +40,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a2", next = "a2_1")
 	 SetActiveDie(
-				  id = "a2",
+				  id = "a2_1",
 				  next = "a2_jump",
 				  next_no_die = "a3",
 				  die = 'M',
@@ -55,8 +57,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a3", next = "a3_1")
 	 SetActiveDie(
-				  id = "a3",
+				  id = "a3_1",
 				  next = "a3_jump",
 				  next_no_die = "a4",
 				  die = 'M',
@@ -70,15 +73,16 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a4", next = "a4_1")
 	 SetActiveDie(
-				  id = "a4",
-				  next = "a4_1",
+				  id = "a4_1",
+				  next = "a4_2",
 				  next_no_die = "a5",
 				  die = 'C',
 				  may_use_ring = true,
 				  )
 	 SetActiveDie(
-				  id = "a4_1",
+				  id = "a4_2",
 				  next = "a4_cond",
 				  next_no_die = "a5",
 				  die = 'P',
@@ -112,15 +116,16 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a5", next = "a5_1")
 	 SetActiveDie(
-				  id = "a5",
-				  next = "a5_1",
+				  id = "a5_1",
+				  next = "a5_2",
 				  next_no_die = "a6",
 				  die = 'C',
 				  may_use_ring = true,
 				  )
 	 SetActiveDie(
-				  id = "a5_1",
+				  id = "a5_2",
 				  next = "a5_cond",
 				  next_no_die = "a6",
 				  die = 'A',
@@ -148,8 +153,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a6", next = "a6_1")
 	 SetActiveDie(
-				  id = "a6",
+				  id = "a6_1",
 				  next = "a6_cond",
 				  next_no_die = "a7",
 				  die = 'M',
@@ -195,8 +201,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a7", next = "a7_1")
 	 BinaryCondition(
-					 id = "a7",
+					 id = "a7_1",
 					 condition = "The Shadow player is allowed to pass.",
 					 next_true = "a7_action",
 					 next_false = "a8",
@@ -212,8 +219,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a8", next = "a8_1")
 	 SetActiveDie(
-				  id = "a8",
+				  id = "a8_1",
 				  next = "a8_jump_1",
 				  next_no_die = "a9",
 				  die = 'P',
@@ -233,14 +241,15 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a9", next = "a9_1")
 	 SetActiveDie(
-				  id = "a9",
-				  next = "a9_1",
+				  id = "a9_1",
+				  next = "a9_2",
 				  next_no_die = "a10",
 				  die = 'C',
 				  )
 	 SetActiveDie(
-				  id = "a9_1",
+				  id = "a9_2",
 				  next = "a9_cond",
 				  next_no_die = "a10",
 				  die = 'A',
@@ -262,8 +271,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a10", next = "a10_1")
 	 SetActiveDie(
-				  id = "a10",
+				  id = "a10_1",
 				  next = "a10_action",
 				  next_no_die = "a11",
 				  die = 'A',
@@ -277,8 +287,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a11", next = "a11_1")
 	 SetActiveDie(
-				  id = "a11",
+				  id = "a11_1",
 				  next = "a11_action",
 				  next_no_die = "a12",
 				  die = 'C',
@@ -292,8 +303,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a12", next = "a12_start")
 	 SetActiveDie(
-				  id = "a12",
+				  id = "a12_start",
 				  next = "a12_1",
 				  next_no_die = "a13",
 				  die = 'M',
@@ -319,8 +331,9 @@ let
 
 
 	 ########################################
+	 DummyNode(id = "a13", next = "a13_1")
 	 SetRandomDie(
-				  id = "a13",
+				  id = "a13_1",
 				  next = "a13_die",
 				  )
 	 UseActiveDie(

@@ -39,6 +39,14 @@ struct EndNode <: GraphNode
 end
 children(n::EndNode) = []
 
+struct DummyNode <: GraphNode
+	id::String
+	next::String
+
+	DummyNode(;id, next) = new(valid_id(id), valid_id(next))
+end
+children(n::DummyNode) = [n.next]
+
 
 ################################################################################
 
@@ -186,6 +194,7 @@ children(n::SetRandomDie) = [n.next]
 struct QuellerGraph
 	root_node::String
 	nodes::Dict{String,GraphNode}
+	source_file::String
 end
 
 function unique_node_ids(nodes)
@@ -208,12 +217,12 @@ end
 function load_graphs(file)
 	nodes = include(file)
 	!unique_node_ids(nodes) && error("Error loading nodes, not all ids are unique.")
-	# !all_children_exists(nodes) && error("Error loading nodes, not all child nodes exists.")
+	!all_children_exists(nodes) && error("Error loading nodes, not all child nodes exists.")
 	nodes_d = Dict(n.id => n for n in nodes)
 
 	start_nodes = filter(n -> isa(n, StartNode), nodes)
 
-	return [QuellerGraph(start.id, nodes_d) for start in start_nodes]
+	return [QuellerGraph(start.id, nodes_d, file) for start in start_nodes]
 end
 
 function load_graphs(files...)
@@ -225,6 +234,14 @@ end
 ################################################################################
 
 include("graphviz.jl")
+
+################################################################################
+
+
+
+
+
+
 
 
 end

@@ -42,6 +42,13 @@ node2dot(n::EndNode) =
 
 	"""
 
+node2dot(n::DummyNode) =
+	"""
+		$(n.id) [shape=ellipse, style=filled, fillcolor=lightblue];
+		$(n.id) -> $(n.next);
+
+	"""
+
 node2dot(n::JumpToGraph) =
 	"""
 		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.text))\n($(escape_string(n.jump_graph)))"];
