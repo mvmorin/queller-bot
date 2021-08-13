@@ -1,11 +1,13 @@
 module Queller
 
-export load_graphs
-
+export load_graphs,
+	check_queller_graphs
 
 
 ################################################################################
-allunique(v) = length(v) == length(unique(v))
+not_unique(v, f=isequal) = filter(e -> (count(f.([e],v)) > 1), v)
+
+strvec2str(v) = mapreduce(s -> s*'\n', *, v)
 
 ################################################################################
 
@@ -198,36 +200,74 @@ struct QuellerGraph
 end
 
 function unique_node_ids(nodes)
-	ids = getfield.(nodes, :id)
-	return allunique(ids)
-end
-
-function unique_root_ids(graphs)
-	ids = get_field.(graphs, :root_node)
-	return allunique(ids)
+	conflicts = not_unique(nodes)
+	return isempty(conflicts), getfield.(conflicts, :id)
 end
 
 function all_children_exists(nodes)
 	child_ids = mapreduce(children, vcat, nodes)
 	ids = getfield.(nodes, :id)
-	id_exists(id) = id in ids
-	return all(id_exists.(child_ids))
+	id_not_exists(id) = !(id in ids)
+	conflicts = filter(id_not_exists, child_ids)
+	return isempty(conflicts), conflicts
+end
+
+function unique_root_ids(graphs)
+	conflicts = not_unique(graphs, (g,j) -> (g.root_node == j.root_node))
+	return isempty(conflicts), map(g -> g.root_node*" : "*g.source_file, conflicts)
+end
+
+function all_jump_points_exists(graphs)
+	function get_jump_points(g)
+		nodes = collect(values(g.nodes))
+		jump_nodes = filter(n -> isa(n, JumpToGraph), nodes)
+		return tuple.(getfield.(jump_nodes, :jump_graph),[ g.source_file])
+	end
+
+	jump_points = mapreduce(get_jump_points, vcat, graphs)
+	root_nodes = getfield.(graphs, :root_node)
+	jump_not_exists(j) = !(j[1] in root_nodes)
+	conflicts = filter(jump_not_exists, jump_points)
+
+	return isempty(conflicts), map(c -> c[1]*" : "*c[2], conflicts)
+end
+
+function get_graphs_not_jumped_to(graphs)
+	function get_jump_points(g)
+		nodes = collect(values(g.nodes))
+		jump_nodes = filter(n -> isa(n, JumpToGraph), nodes)
+		return getfield.(jump_nodes, :jump_graph)
+	end
+	jump_points = mapreduce(get_jump_points, vcat, graphs)
+	root_not_jumped_to(g) = !(g.root_node in jump_points)
+	unjumped = filter(root_not_jumped_to, collect(graphs))
+	return map(g -> g.root_node*" : "*g.source_file, unjumped)
 end
 
 function load_graphs(file)
 	nodes = include(file)
-	!unique_node_ids(nodes) && error("Error loading nodes, not all ids are unique.")
-	!all_children_exists(nodes) && error("Error loading nodes, not all child nodes exists.")
+
+	unique, conflicts = unique_node_ids(nodes)
+	!unique && error("Error loading nodes from file $(file). Not all ids are unique. Conflicting ids:\n$(strvec2str(conflicts))")
+
+	all_exists, conflicts = all_children_exists(nodes)
+	!all_exists && error("Error loading nodes from file $(file). Not all child nodes exists. Non-existing child ids:\n$(strvec2str(conflicts))")
+
 	nodes_d = Dict(n.id => n for n in nodes)
 
 	start_nodes = filter(n -> isa(n, StartNode), nodes)
-
 	return [QuellerGraph(start.id, nodes_d, file) for start in start_nodes]
 end
 
 function load_graphs(files...)
-	graphs = mapreduce(load_graph, vcat, files)
-	!unique_root_ids(graphs) && error("Error loading graphs, not all root node ids are unique.")
+	graphs = mapreduce(load_graphs, vcat, files)
+
+	unique, conflicts = unique_root_ids(graphs)
+	!unique && error("Error loading graphs, not all root node ids are unique. Conflictings graphs:\n$(strvec2str(conflicts))")
+
+	jumps_exists, conflicts = all_jump_points_exists(graphs)
+	!jumps_exists && @warn ("Warning, not all jumps exists. Non-existing jumps:\n$(strvec2str(conflicts))")
+
 	return Dict(g.root_node => g for g in graphs)
 end
 
@@ -237,8 +277,37 @@ include("graphviz.jl")
 
 ################################################################################
 
+pkg_dir = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
+
+graph_sources = [
+	"$(pkg_dir)/graphs/phase-1.jl"
+	"$(pkg_dir)/graphs/phase-2.jl"
+	"$(pkg_dir)/graphs/phase-3.jl"
+	"$(pkg_dir)/graphs/phase-4.jl"
+	"$(pkg_dir)/graphs/select-action-corr.jl"
+	"$(pkg_dir)/graphs/select-action-mili.jl"
+	"$(pkg_dir)/graphs/threat-exposed.jl"
+	"$(pkg_dir)/graphs/battle.jl"
+	"$(pkg_dir)/graphs/character.jl"
+	"$(pkg_dir)/graphs/event-cards.jl"
+	"$(pkg_dir)/graphs/movement-attack.jl"
+	"$(pkg_dir)/graphs/muster.jl"
+	]
 
 
+
+function check_queller_graphs()
+	graph_output(f) = joinpath(pkg_dir, "graph_output", basename(f)*".ps")
+	for f in graph_sources
+		graph2ps(f, graph_output(f))
+	end
+	println("All graphs in PostScript can be found in Queller/graph_output")
+
+	graphs = load_graphs(graph_sources...)
+
+	unjumped = get_graphs_not_jumped_to(values(graphs))
+	println("Graphs that are not jumped to from another graph:\n$(strvec2str(unjumped))")
+end
 
 
 
