@@ -33,7 +33,7 @@
 	- would turn a non-aggressive siege aggressive when it reach its target; or
 	- has hit the stacking limit.
 
-- Target: The region closest to an army containing one of the following. When tied for distance, the priority is from top to bottom.
+- Target: Each army has a target. The target is the region closest to an army containing one of the following. When tied for distance, the priority is from top to bottom.
 	1. Conquered Shadow stronghold.
 	2. Free Peoples' army creating threat.
 	3. Free Peoples' stronghold not currently under siege by a mobile Shadow army in a:
