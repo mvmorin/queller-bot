@@ -96,7 +96,7 @@ end
 
 function node2dot(n::SetStrategy)
 	text = """
-	Use the $(n.strategy) strategy
+	Use the $(string(n.strategy)) strategy
 	until prompted otherwise.
 	"""
 	return """
@@ -108,7 +108,7 @@ end
 
 function node2dot(n::CheckStrategy)
 	text = """
-	The $(n.strategy) strategy is used.
+	The $(string(n.strategy)) strategy is used.
 	"""
 	return """
 		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(text))"];
@@ -135,17 +135,17 @@ node2dot(n::AvailableModifiers) =
 	"""
 
 function node2dot(n::SetActiveDie)
-	prio_list = [DICE[n.die]]
-	if n.die == 'A'
-		push!(prio_list, "$(DICE['H']) as $(DICE['A'])")
-		push!(prio_list, "$(DICE['M']) and Messenger of the Dark Tower as $(DICE['A'])")
-	elseif n.die == 'M'
-		push!(prio_list, "$(DICE['H']) as a $(DICE['M'])")
-		push!(prio_list, "$(DICE['A']) and Messenger of the Dark Tower as $(DICE['M'])")
+	prio_list = [string(n.die)]
+	if n.die == Die.Army
+		push!(prio_list, "$(string(Die.ArmyMuster)) as $(string(Die.Army))")
+		push!(prio_list, "$(string(Die.Muster)) and Messenger of the Dark Tower as $(string(Die.Army))")
+	elseif n.die == Die.Muster
+		push!(prio_list, "$(string(Die.ArmyMuster)) as a $(string(Die.Muster))")
+		push!(prio_list, "$(string(Die.Army)) and Messenger of the Dark Tower as $(string(Die.Muster))")
 	end
 
 	if n.may_use_ring
-		push!(prio_list, "A random non-*preferred* die and an Elven Ring as $(DICE[n.die])")
+		push!(prio_list, "A random non-*preferred* die and an Elven Ring as $(string(n.die))")
 	end
 
 
