@@ -17,9 +17,17 @@ function valid_id(id::String)
 end
 
 
+
 ################################################################################
 
 abstract type GraphNode end
+
+children(n::GraphNode) = error("Not implemented.")
+getopt(n::GraphNode) = error("Not implemented.")
+getnext(n::GraphNode, opt) = error("Not implemented.")
+Base.string(n::GraphNode) = error("Not implemented.")
+
+
 
 ################################################################################
 
@@ -31,6 +39,10 @@ struct StartNode <: GraphNode
 	StartNode(;id, text, next) = new(NodeID(id), text, NodeID(next))
 end
 children(n::StartNode) = [n.next]
+getopt(n::StartNode) = Vector{CMD.Command}()
+getnext(n::StartNode, opt) = n.next
+Base.string(n::StartNode) = n.text
+
 
 struct EndNode <: GraphNode
 	id::NodeID
@@ -39,6 +51,10 @@ struct EndNode <: GraphNode
 	EndNode(;id, text="End of Action") = new(NodeID(id), text)
 end
 children(n::EndNode) = []
+getopt(n::EndNode) = Vector{CMD.Command}()
+getnext(n::EndNode, opt) = nothing
+Base.string(n::EndNode) = n.text
+
 
 struct DummyNode <: GraphNode
 	id::NodeID
@@ -47,6 +63,10 @@ struct DummyNode <: GraphNode
 	DummyNode(;id, next) = new(NodeID(id), NodeID(next))
 end
 children(n::DummyNode) = [n.next]
+getopt(n::DummyNode) = Vector{CMD.Command}()
+getnext(n::DummyNode, opt) = n.next
+Base.string(n::DummyNode) = ""
+
 
 
 ################################################################################
@@ -61,6 +81,11 @@ struct JumpToGraph <: GraphNode
 		new(NodeID(id), text, NodeID(next), NodeID(jump_graph))
 end
 children(n::JumpToGraph) = [n.next]
+getopt(n::JumpToGraph) = Vector{CMD.Command}()
+getnext(n::JumpToGraph, opt) = n.next
+getjump(n::JumpToGraph) = n.jump_graph
+Base.string(n::JumpToGraph) = n.text
+
 
 struct ReturnFromGraph <: GraphNode
 	id::NodeID
@@ -69,6 +94,10 @@ struct ReturnFromGraph <: GraphNode
 	ReturnFromGraph(;id, jump_text="Continue from where\nyou jumped to this\n graph.") = new(NodeID(id), jump_text)
 end
 children(n::ReturnFromGraph) = []
+getopt(n::ReturnFromGraph) = Vector{CMD.Command}()
+getnext(n::ReturnFromGraph, opt) = nothing
+Base.string(n::ReturnFromGraph) = n.jump_text
+
 
 
 ################################################################################
@@ -82,6 +111,10 @@ struct PerformAction <: GraphNode
 		new(NodeID(id), action, NodeID(next))
 end
 children(n::PerformAction) = [n.next]
+getopt(n::PerformAction) = Vector{CMD.Command}()
+getnext(n::PerformAction, opt) = n.next
+Base.string(n::PerformAction) = n.action
+
 
 struct BinaryCondition <: GraphNode
 	id::NodeID
@@ -93,6 +126,11 @@ struct BinaryCondition <: GraphNode
 		new(NodeID(id), condition, NodeID(next_true), NodeID(next_false))
 end
 children(n::BinaryCondition) = [n.next_true, n.next_false]
+getopt(n::BinaryCondition) = [CMD.True(), CMD.False()]
+getnext(n::BinaryCondition, opt::CMD.True) = n.next_true
+getnext(n::BinaryCondition, opt::CMD.False) = n.next_false
+Base.string(n::BinaryCondition) = n.condition
+
 
 struct MultipleChoice <: GraphNode
 	id::NodeID
@@ -103,6 +141,10 @@ struct MultipleChoice <: GraphNode
 		new(NodeID(id), conditions, NodeID.(nexts))
 end
 children(n::MultipleChoice) = n.nexts
+getopt(n::MultipleChoice) = CMD.Option.(1:length(n.nexts))
+getnext(n::MultipleChoice, opt::CMD.Option) = n.nexts[opt.opt]
+Base.string(n::MultipleChoice) = n.conditions
+
 
 
 ################################################################################
@@ -115,6 +157,10 @@ struct SetStrategy <: GraphNode
 	SetStrategy(;id, strategy, next) = new(NodeID(id), StrategyChoice(strategy), NodeID(next))
 end
 children(n::SetStrategy) = [n.next]
+getopt(n::SetStrategy) = Vector{CMD.Command}()
+getnext(n::SetStrategy, opt) = n.next
+Base.string(n::SetStrategy) = ""
+
 
 struct CheckStrategy <: GraphNode
 	id::NodeID
@@ -126,6 +172,11 @@ struct CheckStrategy <: GraphNode
 	new(NodeID(id), StrategyChoice(strategy), NodeID(next_true), NodeID(next_false))
 end
 children(n::CheckStrategy) = [n.next_true, n.next_false]
+getopt(n::CheckStrategy) = CMD.Option.(insances(Strategy.Choice))
+getnext(n::CheckStrategy, opt::CMD.Option) = (opt.opt == n.strategy ? n.next_true : n.next_false)
+Base.string(n::CheckStrategy) = ""
+
+
 
 ################################################################################
 
@@ -136,6 +187,10 @@ struct RollActionDice <: GraphNode
 	RollActionDice(;id, next) = new(NodeID(id), NodeID(next))
 end
 children(n::RollActionDice) = [n.next]
+getopt(n::RollActionDice) = Vector{CMD.Command}()
+getnext(n::RollActionDice, opt) = n.next
+Base.string(n::RollActionDice) = ""
+
 
 struct AvailableModifiers <: GraphNode
 	id::NodeID
@@ -144,6 +199,10 @@ struct AvailableModifiers <: GraphNode
 	AvailableModifiers(;id, next) = new(NodeID(id), NodeID(next))
 end
 children(n::AvailableModifiers) = [n.next]
+getopt(n::AvailableModifiers) = Vector{CMD.Command}()
+getnext(n::AvailableModifiers, opt) = n.next
+Base.string(n::AvailableModifiers) = ""
+
 
 struct SetActiveDie <: GraphNode
 	id::NodeID
@@ -157,6 +216,11 @@ struct SetActiveDie <: GraphNode
 		new(NodeID(id), NodeID(next), NodeID(next_no_die), DieFace(die), may_use_ring)
 end
 children(n::SetActiveDie) = [n.next, n.next_no_die]
+getopt(n::SetActiveDie) = [CMD.True(), CMD.False()]
+getnext(n::SetActiveDie, opt::CMD.True) = n.next
+getnext(n::SetActiveDie, opt::CMD.False) = n.next_no_die
+Base.string(n::SetActiveDie) = ""
+
 
 struct UseActiveDie <: GraphNode
 	id::NodeID
@@ -165,14 +229,11 @@ struct UseActiveDie <: GraphNode
 	UseActiveDie(;id, next) = new(NodeID(id), NodeID(next))
 end
 children(n::UseActiveDie) = [n.next]
+getopt(n::UseActiveDie) = Vector{CMD.Command}()
+getnext(n::UseActiveDie, opt) = n.next
+Base.string(n::UseActiveDie) = ""
 
-struct SetRandomDie <: GraphNode
-	id::NodeID
-	next::NodeID
 
-	SetRandomDie(;id, next) = new(NodeID(id), NodeID(next))
-end
-children(n::SetRandomDie) = [n.next]
 
 ################################################################################
 
@@ -181,6 +242,7 @@ struct QuellerGraph
 	nodes::Dict{NodeID,GraphNode}
 	source_file::String
 end
+
 
 function unique_node_ids(nodes)
 	conflicts = not_unique(nodes)
@@ -226,6 +288,7 @@ function get_graphs_not_jumped_to(graphs)
 	unjumped = filter(root_not_jumped_to, collect(graphs))
 	return map(g -> g.root_node*" : "*g.source_file, unjumped)
 end
+
 
 function load_graphs(file)
 	nodes = include(file)

@@ -86,7 +86,7 @@ let
 				   id = "m_2_1_reserve",
 				   next = "m_2_1_return",
 				   action = """
-				   Reserve one muster die to use for recruiting a minion as a last action.
+				   Set aside the die (and ring if necessary). Use this die as an last action to recruit a minion. Minion selection and placement can be made from the main menu.
 				   """,
 				   )
 	 ReturnFromGraph(

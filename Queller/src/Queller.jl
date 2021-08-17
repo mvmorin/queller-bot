@@ -16,7 +16,7 @@ include("graph.jl")
 
 ################################################################################
 
-function read_command(options; cmds = CMD.basecmds)
+function read_command(options; cmds=[])
 	prompt = isempty(options) ?
 		"> " : "["*strvec2str(string.(options), '/')*"] > "
 

@@ -332,17 +332,9 @@ let
 
 	 ########################################
 	 DummyNode(id = "a13", next = "a13_1")
-	 SetRandomDie(
-				  id = "a13_1",
-				  next = "a13_die",
-				  )
-	 UseActiveDie(
-				  id = "a13_die",
-				  next = "a13_action",
-				  )
 	 PerformAction(
-				   id = "a13_action",
-				   action = "Discard die and do nothing. (Queller failed to find an action.)",
+				   id = "a13_1",
+				   action = "Queller failed to find an action. Discard a random non-*preferred* die (this can be done in the main menu).",
 				   next = "a_end",
 				   )
 	 EndNode(id = "a_end")

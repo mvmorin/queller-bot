@@ -12,6 +12,7 @@ struct False <: Command end
 struct Debug <: Command end
 struct Reset <: Command end
 struct ResetPhase <: Command end
+struct Help <: Command end
 struct Option <: Command opt end
 
 Base.string(o::Option) = string(o.opt)
