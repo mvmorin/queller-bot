@@ -11,8 +11,9 @@ strvec2str(v,sep='\n') = reduce((s,t) -> s*sep*t, v)
 ################################################################################
 
 include("commands.jl")
-include("dice_and_strat_enums.jl")
+include("dice_and_strategy.jl")
 include("graph.jl")
+include("crawler.jl")
 
 ################################################################################
 
@@ -95,13 +96,14 @@ end
 include("graphviz.jl")
 
 function check_queller_graphs()
+	graphs = load_graphs(GRAPH_SOURCES...)
+
+	println("\nAll graphs in PostScript can be found in Queller/graph_output.")
 	graph_output(f) = joinpath(pkg_dir, "graph_output", basename(f)*".ps")
 	for f in GRAPH_SOURCES
 		graph2ps(f, graph_output(f))
 	end
-	println("All graphs in PostScript can be found in Queller/graph_output.\n")
 
-	graphs = load_graphs(GRAPH_SOURCES...)
 
 	unjumped = get_graphs_not_jumped_to(values(graphs))
 	println("\nGraphs that are not jumped to from another graph:\n$(strvec2str(unjumped))")

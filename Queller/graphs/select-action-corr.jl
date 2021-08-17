@@ -89,7 +89,7 @@ let
 	 JumpToGraph(
 				 id = "a3_jump",
 				 text = "Character: Which King",
-				 jump_graph = "characters_which_king",
+				 jump_graph = "character_which_king",
 				 next = "a4",
 				 )
 

@@ -242,7 +242,7 @@ let
 	 JumpToGraph(
 				 id = "tx_use_remaining_movement",
 				 text = "Movement and Attack:\nCorruption",
-				 jump_graph = "movement_attack_corruption",
+				 jump_graph = "movement_attack_corr",
 				 next = "tx_m",
 				 )
 	 EndNode(id = "tx_move_end")
@@ -291,7 +291,7 @@ let
 	 JumpToGraph(
 				 id = "tx_c_1",
 				 text = "Characters:\nCharacter Movement",
-				 jump_graph = "characters_move",
+				 jump_graph = "character_move",
 				 next = "tx_return",
 				 )
 

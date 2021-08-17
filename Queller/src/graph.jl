@@ -312,7 +312,7 @@ function load_graphs(files...)
 	!unique && error("Error loading graphs, not all root node ids are unique. Conflictings graphs:\n$(strvec2str(conflicts))")
 
 	jumps_exists, conflicts = all_jump_points_exists(graphs)
-	!jumps_exists && @warn ("Warning, not all jumps exists. Non-existing jumps:\n$(strvec2str(conflicts))")
+	!jumps_exists && error("Warning, not all jumps exists. Non-existing jumps:\n$(strvec2str(conflicts))")
 
 	return Dict(g.root_node => g for g in graphs)
 end

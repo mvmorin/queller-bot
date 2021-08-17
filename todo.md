@@ -5,8 +5,6 @@
 * corruption strategy should try to use a ring as a last resort but this isn't
   added yet. only add actions that weren't allowed to use a ring already.
 
-* there are a few typos when jumping between graphs.
-
 * things to have in the main menu of phase 5
 	- decide action die and action
 	- resolve card
