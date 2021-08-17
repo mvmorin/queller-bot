@@ -171,10 +171,3 @@ node2dot(n::UseActiveDie) =
 		$(n.id) -> $(n.next);
 
 	"""
-
-node2dot(n::SetRandomDie) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Set a random die as the Active Die"];
-		$(n.id) -> $(n.next);
-
-	"""
