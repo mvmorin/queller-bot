@@ -13,7 +13,7 @@ function Base.string(s::Choice)
 	return nothing
 end
 
-function parse(s::String)
+function parse(s::AbstractString)
 	for strat in instances(Choice)
 		s == string(strat) && return strat
 	end
@@ -22,7 +22,7 @@ end
 
 end
 
-function StrategyChoice(s::String)
+function StrategyChoice(s::AbstractString)
 	strat = Strategy.parse(s)
 	isnothing(strat) && error("\"$(s)\" is not a valid strategy.")
 	return strat
@@ -38,8 +38,8 @@ module Die
 	Muster
 	ArmyMuster
 	Event
-	Eye
-	# WillOfTheWest
+	# Eye # Not really used
+	# WillOfTheWest # Not used
 end
 
 struct FaceInfo
@@ -53,21 +53,22 @@ const FaceInfos = Dict(
 	Muster => FaceInfo("Muster Die",'M'),
 	ArmyMuster => FaceInfo("Muster/Army Die",'H'),
 	Event => FaceInfo("Event Die",'P'),
-	Eye => FaceInfo("Eye",'E'),
-	# WillOfTheWest => FaceInfo("Will of the West",'W'), # Never used
+	# Eye => FaceInfo("Eye",'E'),
+	# WillOfTheWest => FaceInfo("Will of the West",'W'),
 	)
 
 Base.string(f::Face) = FaceInfos[f].str
 char(f::Face) = FaceInfos[f].c
 
 function parse(c::Char)
+	c = uppercase(c)
 	for f in instances(Face)
 		c == char(f) && return f
 	end
 	return nothing
 end
 
-function parse(s::String)
+function parse(s::AbstractString)
 	fs = parse.(collect(s))
 	any(isnothing.(fs)) && return nothing
 	return fs

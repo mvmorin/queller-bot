@@ -2,3 +2,6 @@ name = "Queller"
 uuid = "ff664aa8-59ba-40cb-ba19-90d2a2c4cb9b"
 authors = ["Martin Morin <martin.morin@control.lth.se>"]
 version = "0.1.0"
+
+[deps]
+TextWrap = "b718987f-49a8-5099-9789-dcd902bef87d"

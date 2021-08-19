@@ -149,19 +149,6 @@ Base.string(n::MultipleChoice) = n.conditions
 
 ################################################################################
 
-struct SetStrategy <: GraphNode
-	id::NodeID
-	strategy::Strategy.Choice
-	next::NodeID
-
-	SetStrategy(;id, strategy, next) = new(NodeID(id), StrategyChoice(strategy), NodeID(next))
-end
-children(n::SetStrategy) = [n.next]
-getopt(n::SetStrategy) = Vector{CMD.Command}()
-getnext(n::SetStrategy, opt) = n.next
-Base.string(n::SetStrategy) = ""
-
-
 struct CheckStrategy <: GraphNode
 	id::NodeID
 	strategy::Strategy.Choice
@@ -175,33 +162,6 @@ children(n::CheckStrategy) = [n.next_true, n.next_false]
 getopt(n::CheckStrategy) = CMD.Option.(insances(Strategy.Choice))
 getnext(n::CheckStrategy, opt::CMD.Option) = (opt.opt == n.strategy ? n.next_true : n.next_false)
 Base.string(n::CheckStrategy) = ""
-
-
-
-################################################################################
-
-struct RollActionDice <: GraphNode
-	id::NodeID
-	next::NodeID
-
-	RollActionDice(;id, next) = new(NodeID(id), NodeID(next))
-end
-children(n::RollActionDice) = [n.next]
-getopt(n::RollActionDice) = Vector{CMD.Command}()
-getnext(n::RollActionDice, opt) = n.next
-Base.string(n::RollActionDice) = ""
-
-
-struct AvailableModifiers <: GraphNode
-	id::NodeID
-	next::NodeID
-
-	AvailableModifiers(;id, next) = new(NodeID(id), NodeID(next))
-end
-children(n::AvailableModifiers) = [n.next]
-getopt(n::AvailableModifiers) = Vector{CMD.Command}()
-getnext(n::AvailableModifiers, opt) = n.next
-Base.string(n::AvailableModifiers) = ""
 
 
 struct SetActiveDie <: GraphNode
