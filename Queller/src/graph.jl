@@ -8,8 +8,9 @@ end
 Base.show(io::IO, id::NodeID) = print(io, id.id)
 Base.escape_string(id::NodeID) = escape_string(id.id)
 Base.:*(id::NodeID, t::AbstractString) = id.id*t
+Base.convert(::Type{NodeID},s::AbstractString) = NodeID(s)
 
-function valid_id(id::String)
+function valid_id(id::AbstractString)
 	valid_char(c) = islowercase(c) | (c == '_') | isdigit(c)
 	islowercase(id[1]) || error("First character in Node ID needs to be lower case character.")
 	all(valid_char, id) || error("Node ID can only contain lower case letters, digits and underscores.")
@@ -39,7 +40,7 @@ struct StartNode <: GraphNode
 	StartNode(;id, text, next) = new(NodeID(id), text, NodeID(next))
 end
 children(n::StartNode) = [n.next]
-getopt(n::StartNode) = Vector{CMD.Command}()
+getopt(n::StartNode) = nothing
 getnext(n::StartNode, opt) = n.next
 Base.string(n::StartNode) = n.text
 
@@ -51,7 +52,7 @@ struct EndNode <: GraphNode
 	EndNode(;id, text="End of Action") = new(NodeID(id), text)
 end
 children(n::EndNode) = []
-getopt(n::EndNode) = Vector{CMD.Command}()
+getopt(n::EndNode) = nothing
 getnext(n::EndNode, opt) = nothing
 Base.string(n::EndNode) = n.text
 
@@ -63,7 +64,7 @@ struct DummyNode <: GraphNode
 	DummyNode(;id, next) = new(NodeID(id), NodeID(next))
 end
 children(n::DummyNode) = [n.next]
-getopt(n::DummyNode) = Vector{CMD.Command}()
+getopt(n::DummyNode) = nothing
 getnext(n::DummyNode, opt) = n.next
 Base.string(n::DummyNode) = ""
 
@@ -81,7 +82,7 @@ struct JumpToGraph <: GraphNode
 		new(NodeID(id), text, NodeID(next), NodeID(jump_graph))
 end
 children(n::JumpToGraph) = [n.next]
-getopt(n::JumpToGraph) = Vector{CMD.Command}()
+getopt(n::JumpToGraph) = nothing
 getnext(n::JumpToGraph, opt) = n.next
 getjump(n::JumpToGraph) = n.jump_graph
 Base.string(n::JumpToGraph) = n.text
@@ -94,7 +95,7 @@ struct ReturnFromGraph <: GraphNode
 	ReturnFromGraph(;id, jump_text="Continue from where\nyou jumped to this\n graph.") = new(NodeID(id), jump_text)
 end
 children(n::ReturnFromGraph) = []
-getopt(n::ReturnFromGraph) = Vector{CMD.Command}()
+getopt(n::ReturnFromGraph) = nothing
 getnext(n::ReturnFromGraph, opt) = nothing
 Base.string(n::ReturnFromGraph) = n.jump_text
 
@@ -111,7 +112,7 @@ struct PerformAction <: GraphNode
 		new(NodeID(id), action, NodeID(next))
 end
 children(n::PerformAction) = [n.next]
-getopt(n::PerformAction) = Vector{CMD.Command}()
+getopt(n::PerformAction) = [CMD.Blank()]
 getnext(n::PerformAction, opt) = n.next
 Base.string(n::PerformAction) = n.action
 
@@ -159,7 +160,7 @@ struct CheckStrategy <: GraphNode
 	new(NodeID(id), StrategyChoice(strategy), NodeID(next_true), NodeID(next_false))
 end
 children(n::CheckStrategy) = [n.next_true, n.next_false]
-getopt(n::CheckStrategy) = CMD.Option.(insances(Strategy.Choice))
+getopt(n::CheckStrategy) = CMD.Option.(instances(Strategy.Choice))
 getnext(n::CheckStrategy, opt::CMD.Option) = (opt.opt == n.strategy ? n.next_true : n.next_false)
 Base.string(n::CheckStrategy) = ""
 
@@ -189,7 +190,7 @@ struct UseActiveDie <: GraphNode
 	UseActiveDie(;id, next) = new(NodeID(id), NodeID(next))
 end
 children(n::UseActiveDie) = [n.next]
-getopt(n::UseActiveDie) = Vector{CMD.Command}()
+getopt(n::UseActiveDie) = nothing
 getnext(n::UseActiveDie, opt) = n.next
 Base.string(n::UseActiveDie) = ""
 

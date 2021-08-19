@@ -18,7 +18,6 @@ include("dice_and_strategy.jl")
 include("graph.jl")
 include("crawler.jl")
 
-
 ################################################################################
 
 const PKG_DIR = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
@@ -63,7 +62,7 @@ handle_general_command(state,cmd::CMD.Debug) = (state.debug_mode = !state.debug_
 handle_general_command(state,cmd::CMD.ResetAll) = (state.reset = true)
 handle_general_command(state,cmd::CMD.ResetPhase) = (state.reset_phase = true)
 handle_general_command(state,cmd::CMD.Exit) = (state.exit = true)
-handle_general_command(state,cmd::CMD.Repeat) = nothing
+handle_general_command(state,cmd::CMD.Command) = nothing
 
 function main()
 	state = ProgramState()
@@ -79,6 +78,22 @@ end
 
 
 function phase1(state)
+	state.strategy == Strategy.Military && (graph = "phase_1_mili")
+	state.strategy == Strategy.Corruption && (graph = "phase_1_corr")
+
+	gc = GraphCrawler(graph,state.graphs,state.strategy,state.dice)
+
+	# while !at_end()
+	# 	msg, options = getcurrent(gc)
+
+	# 	display_message(state.iop, msg)
+	# 	input = read_input(state.iop, options)
+
+	# 	input in options && (step!(gc,input); continue)
+	# 	input isa CMD.Repeat && (continue)
+	# 	input isa CMD.Command && handle_general_command(state,input)
+	# 	input isa CMD.AbortingCommand && return nothing
+	# end
 
 end
 
@@ -123,8 +138,8 @@ function phase4(state)
 
 	display_message(state.iop, msg)
 	while true
-		dice = read_dice(state.iop)
-		dice isa Vector{Die.Face} && return state.dice = dice
+		dice = read_input(state.iop, [CMD.Dice()])
+		dice isa CMD.Dice && return state.dice = dice.dice
 
 		dice isa CMD.Command && handle_general_command(state,dice)
 		dice isa CMD.AbortingCommand && return nothing

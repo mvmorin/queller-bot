@@ -69,8 +69,9 @@ function parse(c::Char)
 end
 
 function parse(s::AbstractString)
-	fs = parse.(collect(s))
-	any(isnothing.(fs)) && return nothing
+	s = filter(!isspace, collect(s)) # remove any spaces
+	fs = parse.(s)
+	(isempty(s) || any(isnothing.(fs))) && return nothing
 	return fs
 end
 

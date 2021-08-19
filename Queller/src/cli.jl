@@ -2,6 +2,8 @@
 
 module CMD
 
+using ..Die
+
 abstract type Command end
 abstract type AbortingCommand <: Command end
 abstract type InputCommand <: Command end
@@ -20,29 +22,36 @@ struct Help <: Command end
 struct True <: InputCommand end
 struct False <: InputCommand end
 struct Option <: InputCommand opt end
+struct Blank <: InputCommand end
+struct Dice <: InputCommand dice end
+Dice() = Dice(nothing)
 
 Base.string(o::Option) = string(o.opt)
 
 minmatch(::Debug) = 0
 minmatch(::ResetAll) = 0
-minmatch(::ResetPhase) = 7
+minmatch(::ResetPhase) = 0
 minmatch(::Exit) = 0
 minmatch(::Option) = 0
 
-function match(s, cmd)
+function parse(cmd::Command, s::AbstractString)
 	str = string(cmd)
-	length(s) > length(str) && return false
+	length(s) > length(str) && return nothing
 	matchlen = minmatch(cmd) == 0 ? length(str) : max(length(s), minmatch(cmd))
-	s == str[1:matchlen]
+	s == str[1:matchlen] ? cmd : nothing
 end
+parse(cmds::Dice, s::AbstractString) = (d = Die.parse(s); isnothing(d) ? nothing : Dice(d))
+parse(cmds::Blank, s::AbstractString) = (isempty(lstrip(s)) ? Blank() : nothing)
 
-function parse(cmds, s::AbstractString)
+function parse(cmds::Vector{T}, s::AbstractString) where {T <: Command}
 	s = lowercase(s)
 
 	for cmd in cmds
-		match(s, cmd) && return cmd
+		match = parse(cmd, s)
+		!isnothing(match) && return match
 	end
 end
+
 
 end
 
@@ -65,38 +74,32 @@ function Base.readline(iop::IOParser)
 	return lstrip(str)
 end
 
-function read_input(iop::IOParser, inputs::Vector{T}) where {T <: CMD.Command}
-	prompt = isempty(inputs) ?
-		"> " : "["*strvec2str(string.(inputs), '/')*"] > "
+function read_input(iop::IOParser, options, prompt)
 	print(iop, prompt)
 
 	str = readline(iop)
 
-	isempty(inputs) && isempty(str) && return nothing
+	cmd = CMD.parse(iop.cmds,str)
+	!isnothing(cmd) && return cmd
 
-	cmd = CMD.parse([inputs; iop.cmds], str)
+	cmd = CMD.parse(options, str)
 	!isnothing(cmd) && return cmd
 
 	!isempty(str) && println(iop,"Invalid input.")
-	read_input(iop, inputs)
+	read_input(iop, options, prompt)
 end
 
-function read_dice(iop::IOParser)
+function read_input(iop::IOParser, options::Vector{T}) where {T <: CMD.Command}
+	prompt = "["*strvec2str(string.(options), '/')*"] > "
+	read_input(iop, options, prompt)
+end
+
+function read_input(iop::IOParser, options::Vector{CMD.Dice})
 	prompt = "[$(strvec2str(Die.char.(instances(Die.Face)),','))] > "
-	print(iop, prompt)
-
-	str = readline(iop)
-	str = String(filter(!isspace, collect(str))) # remove any spaces
-
-	cmd = CMD.parse(iop.cmds, str)
-	!isnothing(cmd) && return cmd
-
-	dice = Die.parse(str)
-	!isnothing(dice) && return dice
-
-	println(iop, "Invalid input.")
-	read_dice(iop)
+	read_input(iop, options, prompt)
 end
+
+read_input(iop::IOParser, options::Vector{CMD.Blank}) = read_input(iop, options, "> ")
 
 function display_message(iop::IOParser,msg,header="-"^10)
 	println(iop, header)
