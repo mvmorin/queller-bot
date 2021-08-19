@@ -94,18 +94,6 @@ end
 
 ################################################################################
 
-function node2dot(n::SetStrategy)
-	text = """
-	Use the $(string(n.strategy)) strategy
-	until prompted otherwise.
-	"""
-	return """
-		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(text))"];
-		$(n.id) -> $(n.next);
-
-	"""
-end
-
 function node2dot(n::CheckStrategy)
 	text = """
 	The $(string(n.strategy)) strategy is used.
@@ -118,21 +106,6 @@ function node2dot(n::CheckStrategy)
 	"""
 end
 
-################################################################################
-
-node2dot(n::RollActionDice) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=purple, label="Roll the action dice."];
-		$(n.id) -> $(n.next);
-
-	"""
-
-node2dot(n::AvailableModifiers) =
-	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="Check if an elven ring\n or Messenger of the Dark\n Tower is available."];
-		$(n.id) -> $(n.next);
-
-	"""
 
 function node2dot(n::SetActiveDie)
 	prio_list = [string(n.die)]

@@ -48,8 +48,8 @@ function read_input(iop::IOParser, inputs::Vector{T}) where {T <: CMD.Command}
 	cmd = CMD.parse([inputs; iop.cmds], str)
 	!isnothing(cmd) && return cmd
 
-	println(iop,"Invalid input.")
-	read_command(iop, inputs)
+	!isempty(str) && println(iop,"Invalid input.")
+	read_input(iop, inputs)
 end
 
 function read_dice(iop::IOParser)
@@ -69,10 +69,8 @@ function read_dice(iop::IOParser)
 	read_dice(iop)
 end
 
-function display_message(iop::IOParser,msg)
-	header = "-"^10
+function display_message(iop::IOParser,msg,header="-"^10)
 	println(iop, header)
-
 	msg = lstrip(rstrip(msg))
 	for p in split(msg, '\n')
 		println(iop, wrap(p, width=50))
@@ -101,32 +99,15 @@ end
 
 function ProgramState()
 	phase = 1
-	phases = [
-		# phase1
-		phase2
-		# phase3
-		phase4
-		# phase5
-		]
-	graphs = load_graphs([
-		"$(PKG_DIR)/graphs/phase-1.jl"
-		"$(PKG_DIR)/graphs/phase-3.jl"
-		"$(PKG_DIR)/graphs/select-action-corr.jl"
-		"$(PKG_DIR)/graphs/select-action-mili.jl"
-		"$(PKG_DIR)/graphs/threat-exposed.jl"
-		"$(PKG_DIR)/graphs/battle.jl"
-		"$(PKG_DIR)/graphs/character.jl"
-		"$(PKG_DIR)/graphs/event-cards.jl"
-		"$(PKG_DIR)/graphs/movement-attack.jl"
-		"$(PKG_DIR)/graphs/muster.jl"
-		]...)
+	phases = [phase1,phase2,phase3,phase4,phase5]
+	graphs = load_graphs(readdir("$(PKG_DIR)/graphs", join=true)...)
 
 	strategy = rand(instances(Strategy.Choice))
 	dice = Vector{Die.Face}()
 
 	iop = IOParser([
 		CMD.Debug()
-		CMD.Reset()
+		CMD.ResetAll()
 		CMD.ResetPhase()
 		CMD.Exit()
 		CMD.Repeat()
@@ -137,7 +118,7 @@ function ProgramState()
 end
 
 handle_general_command(state,cmd::CMD.Debug) = (state.debug_mode = !state.debug_mode)
-handle_general_command(state,cmd::CMD.Reset) = (state.reset = true)
+handle_general_command(state,cmd::CMD.ResetAll) = (state.reset = true)
 handle_general_command(state,cmd::CMD.ResetPhase) = (state.reset_phase = true)
 handle_general_command(state,cmd::CMD.Exit) = (state.exit = true)
 handle_general_command(state,cmd::CMD.Repeat) = nothing

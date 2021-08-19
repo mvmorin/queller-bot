@@ -9,7 +9,7 @@ abstract type InputCommand <: Command end
 minmatch(::Command) = 1
 Base.string(c::Command) = split(lowercase(string(typeof(c))), '.')[end]
 
-struct Reset <: AbortingCommand end
+struct ResetAll <: AbortingCommand end
 struct ResetPhase <: AbortingCommand end
 struct Exit <: AbortingCommand end
 
@@ -23,10 +23,10 @@ struct Option <: InputCommand opt end
 
 Base.string(o::Option) = string(o.opt)
 
-minmatch(::Debug) = 5
-minmatch(::Reset) = 5
-minmatch(::ResetPhase) = 6
-minmatch(::Exit) = 4
+minmatch(::Debug) = 0
+minmatch(::ResetAll) = 0
+minmatch(::ResetPhase) = 7
+minmatch(::Exit) = 0
 minmatch(::Option) = 0
 
 function match(s, cmd)
