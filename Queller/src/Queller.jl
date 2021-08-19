@@ -13,69 +13,11 @@ strvec2str(v,sep='\n') = reduce((s,t) -> s*sep*t, v)
 
 ################################################################################
 
-include("commands.jl")
+include("cli.jl")
 include("dice_and_strategy.jl")
 include("graph.jl")
 include("crawler.jl")
 
-################################################################################
-
-struct IOParser
-	cmds::Vector{CMD.Command}
-	in::IO
-	out::IO
-
-	IOParser(cmds) = new(cmds, stdin, stdout)
-end
-
-Base.print(iop::IOParser,a...) = print(iop.out, a...)
-Base.println(iop::IOParser,a...) = println(iop.out, a...)
-function Base.readline(iop::IOParser)
-	str = readline(iop.in)
-	!isopen(iop.in) && error("Input stream closed")
-	return lstrip(str)
-end
-
-function read_input(iop::IOParser, inputs::Vector{T}) where {T <: CMD.Command}
-	prompt = isempty(inputs) ?
-		"> " : "["*strvec2str(string.(inputs), '/')*"] > "
-	print(iop, prompt)
-
-	str = readline(iop)
-
-	isempty(inputs) && isempty(str) && return nothing
-
-	cmd = CMD.parse([inputs; iop.cmds], str)
-	!isnothing(cmd) && return cmd
-
-	!isempty(str) && println(iop,"Invalid input.")
-	read_input(iop, inputs)
-end
-
-function read_dice(iop::IOParser)
-	prompt = "[$(strvec2str(Die.char.(instances(Die.Face)),','))] > "
-	print(iop, prompt)
-
-	str = readline(iop)
-	str = String(filter(!isspace, collect(str))) # remove any spaces
-
-	cmd = CMD.parse(iop.cmds, str)
-	!isnothing(cmd) && return cmd
-
-	dice = Die.parse(str)
-	!isnothing(dice) && return dice
-
-	println(iop, "Invalid input.")
-	read_dice(iop)
-end
-
-function display_message(iop::IOParser,msg,header="-"^10)
-	println(iop, header)
-	msg = lstrip(rstrip(msg))
-	for p in split(msg, '\n')
-		println(iop, wrap(p, width=50))
-	end
-end
 
 ################################################################################
 

@@ -17,5 +17,4 @@ mutable struct GraphCrawler
 
 	ring_available
 	modt_available
-
 end
