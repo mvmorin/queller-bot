@@ -25,8 +25,8 @@ end
 function get_active_die(die, available_dice, may_use_modt, may_use_ring, discardable_dice)
 	die in available_dice && return ActiveDie(die,die,false,false)
 
-	Die.ArmyMuster in available_dice && (die == Die.Army || die == Die.Muster) && return ActiveDie(Die.ArmyMuster,die,false,false)
-	Die.Muster in available_dice && (die = Die.Army && may_use_modt) && return ActiveDie(Die.Muster,die,true,false)
+	(Die.ArmyMuster in available_dice) && (die == Die.Army || die == Die.Muster) && return ActiveDie(Die.ArmyMuster,die,false,false)
+	(Die.Muster in available_dice) && (die == Die.Army && may_use_modt) && return ActiveDie(Die.Muster,die,true,false)
 
 	discardable_dice = intersect(available_dice, discardable_dice)
 	may_use_ring && !isempty(discardable_dice) && return ActiveDie(rand(discardable_dice),die,false,true)
@@ -53,8 +53,7 @@ mutable struct GraphCrawler
 
 	msg_buf::String
 
-	function GraphCrawler(startgraph, graphs, strategy, available_dice; ring_available=false, modt_available=false)
-
+	function GraphCrawler(startgraph::NodeID, graphs, strategy, available_dice; ring_available=false, modt_available=false)
 		graph = graphs[startgraph]
 		current = graph[startgraph]
 
@@ -72,6 +71,8 @@ mutable struct GraphCrawler
 		return gc
 	end
 end
+GraphCrawler(startgraph::AbstractString, graphs, strategy, available_dice; ring_available=false, modt_available=false) =
+	GraphCrawler(NodeID(startgraph), graphs, strategy, available_dice, ring_available=ring_available, modt_available=modt_available)
 
 function autocrawl!(gc)
 	# crawls the graph until it encounters node that requires interaction
@@ -100,7 +101,7 @@ function autonext!(gc, node::JumpToGraph, graph)
 	# sets the current node to the start node of the graph that is jumped to
 
 	push!(gc.jump_stack, (node, graph))
-	gc.graph = node.jump_graph
+	gc.graph = gc.all_graphs[node.jump_graph]
 	gc.current = gc.graph[node.jump_graph]
 end
 
@@ -118,10 +119,10 @@ function autonext!(gc, node::CheckStrategy, graph)
 end
 
 function autonext!(gc, node::SetActiveDie, graph)
-	gc.active_die.used && error("Trying to set an active die when a die already have been used.")
+	!isnothing(gc.active_die) && gc.active_die.used && error("Trying to set an active die when a die already have been used.")
 
 	gc.strategy == Strategy.Military && (discardable_dice = [Die.Character, Die.Event])
-	gc.strategy == Strategy.Strategy && (discardable_dice = [Die.Army, Die.Muster, Die.ArmyMuster, Die.Event])
+	gc.strategy == Strategy.Corruption && (discardable_dice = [Die.Army, Die.Muster, Die.ArmyMuster, Die.Event])
 
 	active_die = get_active_die(node.die, gc.available_dice, gc.modt_available, gc.ring_available && node.may_use_ring, discardable_dice)
 	if isnothing(active_die)

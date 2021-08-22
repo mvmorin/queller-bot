@@ -11,7 +11,7 @@ const PKG_DIR = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
 ################################################################################
 
 not_unique(v, f=isequal) = filter(e -> (count(f.([e],v)) > 1), v)
-strvec2str(v,sep='\n') = reduce((s,t) -> s*sep*t, v)
+strvec2str(v,sep='\n') = isempty(v) ? "" : reduce((s,t) -> s*sep*t, v)
 
 ################################################################################
 
@@ -59,11 +59,41 @@ function ProgramState()
 	return ProgramState(phase,phases,graphs,strategy,dice,iop,false,false,false,false)
 end
 
+
 handle_general_command(state,cmd::CMD.Debug) = (state.debug_mode = !state.debug_mode)
 handle_general_command(state,cmd::CMD.ResetAll) = (state.reset = true)
 handle_general_command(state,cmd::CMD.ResetPhase) = (state.reset_phase = true)
 handle_general_command(state,cmd::CMD.Exit) = (state.exit = true)
 handle_general_command(state,cmd::CMD.Command) = nothing
+
+function print_read_process(state, msg, options, callback)
+	display_message(state.iop, msg)
+
+	while true
+		cmd = read_input(state.iop, options)
+		cmd in options && (callback(cmd); return true)
+
+		cmd isa CMD.Command && handle_general_command(state,cmd)
+		cmd isa CMD.Repeat && return print_read_process(state, msg, options, callback)
+		cmd isa CMD.AbortingCommand && return false
+	end
+end
+
+function resolve_decision_graph(state,graph;modt_available=false,ring_available=false)
+	gc = GraphCrawler(graph, state.graphs, state.strategy, state.dice, modt_available=modt_available, ring_available=ring_available)
+
+	callback(cmd) = proceed!(gc, cmd)
+
+	while !at_end(gc)
+		msg, options = getinteraction(gc)
+		!print_read_process(state, msg, options, callback) && return
+	end
+
+	return gc
+end
+
+
+################################################################################
 
 function main()
 	state = ProgramState()
@@ -77,37 +107,9 @@ function main()
 	end
 end
 
-function read_and_process(state,options)
-	# read and handle general commands until something that requires the output
-	# to be updated is received
-	input = read_input(state.iop, options)
-
-	input in options && return input
-	input isa CMD.Command && handle_general_command(state,input)
-	input isa Union{CMD.AbortingCommand,CMD.Repeat} && return input
-
-	read_and_process(state, options)
-end
-
-function resolve_decision_graph(state,graph)
-	# returns nothing if was aborted, otherwise it returns the graph crawler
-	gc = GraphCrawler(graph,state.graphs,state.strategy,state.dice)
-
-	while !at_end(gc)
-		msg, options = getinteraction(gc)
-		display_message(state.iop, msg)
-
-		cmd = read_and_process(state, options)
-		cmd in options && proceed!(gc,cmd)
-		cmd isa CMD.AbortingCommand && return
-	end
-
-	return gc
-end
-
 function phase1(state)
-	state.strategy == Strategy.Military && (graph = NodeID("phase_1_mili"))
-	state.strategy == Strategy.Corruption && (graph = NodeID("phase_1_corr"))
+	state.strategy == Strategy.Military && (graph = "phase_1_mili")
+	state.strategy == Strategy.Corruption && (graph = "phase_1_corr")
 
 	resolve_decision_graph(state, graph)
 end
@@ -125,17 +127,14 @@ function phase2(state)
 		change_strategy = Strategy.Military
 	end
 
-	display_message(state.iop, condition)
-	cmd = read_and_process(state, [CMD.True(),CMD.False()])
-	cmd isa CMD.False && return nothing
-	cmd isa CMD.True && return state.strategy = change_strategy
-	cmd isa CMD.AbortingCommand && return
-	cmd isa CMD.Repeat && return phase2(state)
+	callback(cmd::CMD.False) = nothing
+	callback(cmd::CMD.True) = (state.strategy = change_strategy)
+	!print_read_process(state, condition, [CMD.True(),CMD.False()], callback) && return
 end
 
 function phase3(state)
-	state.strategy == Strategy.Military && (graph = NodeID("phase_3_mili"))
-	state.strategy == Strategy.Corruption && (graph = NodeID("phase_3_corr"))
+	state.strategy == Strategy.Military && (graph = "phase_3_mili")
+	state.strategy == Strategy.Corruption && (graph = "phase_3_corr")
 
 	resolve_decision_graph(state, graph)
 end
@@ -150,15 +149,96 @@ function phase4(state)
 	$(strvec2str(legends))
 	"""
 
-	display_message(state.iop, msg)
-	cmd = read_and_process(state, [CMD.Dice()])
-	cmd isa CMD.Dice && state.dice = cmd.dice
-	cmd isa CMD.Repeat && return phase4(state)
+	callback(cmd) = (state.dice = cmd.dice)
+	!print_read_process(state, msg, [CMD.Dice()], callback) && return
 end
 
 function phase5(state)
+	menu = """
+	Available Dice: $(strvec2str(sort(Die.char.(state.dice)),','))
 
+	Select phase 5 action.
 
+	1. Choose Shadow action
+	2. Resolve a card effect
+	3. Resolve a battle
+	4. Recruit a minion as Shadow's final action with die set aside earlier
+	5. Change the available dice (use this if the bot's available dice do not match reality)
+	6. End turn and go to phase 1
+	"""
+	choice = Ref(0)
+	menu_callback(cmd) = (choice[] = cmd.opt)
+	!print_read_process(state, menu, CMD.Option.(1:6), menu_callback) && return
+
+	if choice[] == 1
+		ret = phase5_action(state)
+		isnothing(ret) && return
+
+	elseif choice[] == 2
+		ret = resolve_decision_graph(state, "event_cards_resolve_effect")
+		isnothing(ret) && return
+
+	elseif choice[] == 3
+		ret = resolve_decision_graph(state, "battle")
+		isnothing(ret) && return
+
+	elseif choice[] == 4
+		ret = resolve_decision_graph(state, "muster_minion_selection")
+		isnothing(ret) && return
+
+	elseif choice[] == 5
+		diefaces = instances(Die.Face)
+		legends = Die.char.(diefaces).*": ".*string.(diefaces)
+
+		msg = """
+		Input the available action dice.
+
+		$(strvec2str(legends))
+		"""
+		dice_callback(cmd) = (state.dice = cmd.dice)
+		!print_read_process(state, msg, [CMD.Dice()], dice_callback) && return
+	elseif choice[] == 6
+		# Confirm exit
+		msg = "Exit phase 5 and return to phase 1."
+		exit = Ref(false)
+
+		exit_callback(cmd::CMD.False) = (exit[] = false)
+		exit_callback(cmd::CMD.True) = (exit[] = true)
+
+		!print_read_process(state, msg, [CMD.True(), CMD.False()], exit_callback) && return
+
+		exit[] && return
+	end
+
+	phase5(state)
+end
+
+function phase5_action(state)
+	state.strategy == Strategy.Military && (graph = "select_action_mili")
+	state.strategy == Strategy.Corruption && (graph = "select_action_corr")
+
+	msg = "The Shadow have an Elven ring."
+	ring_available = Ref(false)
+	ring_callback(cmd::CMD.False) = (ring_available[] = false)
+	ring_callback(cmd::CMD.True) = (ring_available[] = true)
+	!print_read_process(state, msg, [CMD.True(), CMD.False()], ring_callback) && return
+
+	msg = """
+	The Mouth of Sauron is recruited and his "Messenger of the Dark Tower" ability have not been used this turn.
+	"""
+	modt_available = Ref(false)
+	modt_callback(cmd::CMD.False) = (modt_available[] = false)
+	modt_callback(cmd::CMD.True) = (modt_available[] = true)
+	!print_read_process(state, msg, [CMD.True(), CMD.False()], modt_callback) && return
+
+	gc = resolve_decision_graph(state, graph, modt_available=modt_available[], ring_available=ring_available[])
+
+	isnothing(gc) && return
+	if !isnothing(gc.active_die) && gc.active_die.used
+		i = findfirst(==(gc.active_die.die), state.dice)
+		deleteat!(state.dice, i)
+	end
+	return true
 end
 
 
