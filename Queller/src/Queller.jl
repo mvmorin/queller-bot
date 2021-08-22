@@ -6,6 +6,8 @@ export load_graphs,
 	check_queller_graphs,
 	main
 
+const PKG_DIR = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
+
 ################################################################################
 
 not_unique(v, f=isequal) = filter(e -> (count(f.([e],v)) > 1), v)
@@ -13,14 +15,13 @@ strvec2str(v,sep='\n') = reduce((s,t) -> s*sep*t, v)
 
 ################################################################################
 
-include("cli.jl")
 include("dice_and_strategy.jl")
+include("cli.jl")
 include("graph.jl")
 include("crawler.jl")
 
 ################################################################################
 
-const PKG_DIR = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
 
 mutable struct ProgramState
 	phase::Int
@@ -41,7 +42,7 @@ end
 function ProgramState()
 	phase = 1
 	phases = [phase1,phase2,phase3,phase4,phase5]
-	graphs = load_graphs(readdir("$(PKG_DIR)/graphs", join=true)...)
+	graphs = load_graphs(filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))...)
 
 	strategy = rand(instances(Strategy.Choice))
 	dice = Vector{Die.Face}()
@@ -76,25 +77,39 @@ function main()
 	end
 end
 
+function read_and_process(state,options)
+	# read and handle general commands until something that requires the output
+	# to be updated is received
+	input = read_input(state.iop, options)
 
-function phase1(state)
-	state.strategy == Strategy.Military && (graph = "phase_1_mili")
-	state.strategy == Strategy.Corruption && (graph = "phase_1_corr")
+	input in options && return input
+	input isa CMD.Command && handle_general_command(state,input)
+	input isa Union{CMD.AbortingCommand,CMD.Repeat} && return input
 
+	read_and_process(state, options)
+end
+
+function resolve_decision_graph(state,graph)
+	# returns nothing if was aborted, otherwise it returns the graph crawler
 	gc = GraphCrawler(graph,state.graphs,state.strategy,state.dice)
 
-	# while !at_end()
-	# 	msg, options = getcurrent(gc)
+	while !at_end(gc)
+		msg, options = getinteraction(gc)
+		display_message(state.iop, msg)
 
-	# 	display_message(state.iop, msg)
-	# 	input = read_input(state.iop, options)
+		cmd = read_and_process(state, options)
+		cmd in options && proceed!(gc,cmd)
+		cmd isa CMD.AbortingCommand && return
+	end
 
-	# 	input in options && (step!(gc,input); continue)
-	# 	input isa CMD.Repeat && (continue)
-	# 	input isa CMD.Command && handle_general_command(state,input)
-	# 	input isa CMD.AbortingCommand && return nothing
-	# end
+	return gc
+end
 
+function phase1(state)
+	state.strategy == Strategy.Military && (graph = NodeID("phase_1_mili"))
+	state.strategy == Strategy.Corruption && (graph = NodeID("phase_1_corr"))
+
+	resolve_decision_graph(state, graph)
 end
 
 function phase2(state)
@@ -111,19 +126,18 @@ function phase2(state)
 	end
 
 	display_message(state.iop, condition)
-	while true
-		input = read_input(state.iop, [CMD.True(), CMD.False()])
-		input isa CMD.False && return nothing
-		input isa CMD.True && return state.strategy = change_strategy
-
-		input isa CMD.Command && handle_general_command(state,input)
-		input isa CMD.AbortingCommand && return nothing
-		input isa CMD.Repeat && return phase2(state)
-	end
+	cmd = read_and_process(state, [CMD.True(),CMD.False()])
+	cmd isa CMD.False && return nothing
+	cmd isa CMD.True && return state.strategy = change_strategy
+	cmd isa CMD.AbortingCommand && return
+	cmd isa CMD.Repeat && return phase2(state)
 end
 
 function phase3(state)
+	state.strategy == Strategy.Military && (graph = NodeID("phase_3_mili"))
+	state.strategy == Strategy.Corruption && (graph = NodeID("phase_3_corr"))
 
+	resolve_decision_graph(state, graph)
 end
 
 function phase4(state)
@@ -137,17 +151,13 @@ function phase4(state)
 	"""
 
 	display_message(state.iop, msg)
-	while true
-		dice = read_input(state.iop, [CMD.Dice()])
-		dice isa CMD.Dice && return state.dice = dice.dice
-
-		dice isa CMD.Command && handle_general_command(state,dice)
-		dice isa CMD.AbortingCommand && return nothing
-		dice isa CMD.Repeat && return phase4(state)
-	end
+	cmd = read_and_process(state, [CMD.Dice()])
+	cmd isa CMD.Dice && state.dice = cmd.dice
+	cmd isa CMD.Repeat && return phase4(state)
 end
 
 function phase5(state)
+
 
 end
 

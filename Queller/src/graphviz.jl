@@ -31,14 +31,14 @@ end
 
 node2dot(n::StartNode) =
 	"""
-		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(n.text))\n($(escape_string(n.id)))"];
+		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(string(n)))\n($(escape_string(n.id)))"];
 		$(n.id) -> $(n.next);
 
 	"""
 
 node2dot(n::EndNode) =
 	"""
-		$(n.id) [shape=diamond, style=filled, fillcolor=red, label="$(escape_string(n.text))"];
+		$(n.id) [shape=diamond, style=filled, fillcolor=red, label="$(escape_string(string(n)))"];
 
 	"""
 
@@ -51,14 +51,14 @@ node2dot(n::DummyNode) =
 
 node2dot(n::JumpToGraph) =
 	"""
-		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.text))\n($(escape_string(n.jump_graph)))"];
+		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(string(n)))\n($(escape_string(n.jump_graph)))"];
 		$(n.id) -> $(n.next);
 
 	"""
 
 node2dot(n::ReturnFromGraph) =
 	"""
-		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(n.jump_text))"];
+		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(string(n)))"];
 
 	"""
 
@@ -66,14 +66,14 @@ node2dot(n::ReturnFromGraph) =
 
 node2dot(n::PerformAction) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(n.action))"];
+		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(string(n)))"];
 		$(n.id) -> $(n.next);
 
 	"""
 
 node2dot(n::BinaryCondition) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.condition))"];
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(string(n)))"];
 		$(n.id) -> $(n.next_true) [label = "True"];
 		$(n.id) -> $(n.next_false) [label = "False"];
 
@@ -81,7 +81,7 @@ node2dot(n::BinaryCondition) =
 
 function node2dot(n::MultipleChoice)
 	dot_node = """
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(n.conditions))"];
+		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(string(n)))"];
 	"""
 
 	for (i, nx) in enumerate(n.nexts)
@@ -94,53 +94,25 @@ end
 
 ################################################################################
 
-function node2dot(n::CheckStrategy)
-	text = """
-	The $(string(n.strategy)) strategy is used.
+node2dot(n::CheckStrategy) =
 	"""
-	return """
-		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(text))"];
+		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(string(n)))"];
 		$(n.id) -> $(n.next_true) [label="True"];
 		$(n.id) -> $(n.next_false) [label="False"];
 
 	"""
-end
 
-
-function node2dot(n::SetActiveDie)
-	prio_list = [string(n.die)]
-	if n.die == Die.Army
-		push!(prio_list, "$(string(Die.ArmyMuster)) as $(string(Die.Army))")
-		push!(prio_list, "$(string(Die.Muster)) and Messenger of the Dark Tower as $(string(Die.Army))")
-	elseif n.die == Die.Muster
-		push!(prio_list, "$(string(Die.ArmyMuster)) as a $(string(Die.Muster))")
-		push!(prio_list, "$(string(Die.Army)) and Messenger of the Dark Tower as $(string(Die.Muster))")
-	end
-
-	if n.may_use_ring
-		push!(prio_list, "A random non-*preferred* die and an Elven Ring as $(string(n.die))")
-	end
-
-
-	text = """
-	Set the first matching die as the Active Die:
-
+node2dot(n::SetActiveDie) =
 	"""
-	for (i, d) in enumerate(prio_list)
-		text *= "$(i). $(d)\n"
-	end
-
-	return """
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(text))"];
+		$(n.id) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(string(n)))"];
 		$(n.id) -> $(n.next) [label="Die Available"];
 		$(n.id) -> $(n.next_no_die) [label="No Matching Die"];
 
 	"""
-end
 
 node2dot(n::UseActiveDie) =
 	"""
-		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="Use the Active Die to:"];
+		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="$(escape_string(string(n)))"];
 		$(n.id) -> $(n.next);
 
 	"""
