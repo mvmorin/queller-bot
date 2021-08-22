@@ -17,7 +17,7 @@
 16. Use cards “in play” at the first opportunity.
 
 # Characters
-20. In this document, the term Nazgûl excludes the Witch King.
+20. In this bot, the term Nazgûl excludes the Witch King.
 21. Do not use a character’s ability if it would have no effect.
 
 # Dice

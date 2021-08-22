@@ -188,7 +188,7 @@ let
 	 BinaryCondition(
 					 id = "ec_3",
 					 condition = """
-					 Holding less than 4 cards?
+					 Holding less than 4 cards.
 					 """,
 					 next_true = "ec_3_yes",
 					 next_false = "ec_return",

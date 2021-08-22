@@ -16,7 +16,7 @@ let
 	"""
 
 	move_exposed_cond = """
-	Army/armies can move towards an *exposed* region?
+	Army/armies can move towards an *exposed* region.
 	"""
 
 	muster_cond = """

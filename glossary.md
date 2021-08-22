@@ -64,10 +64,10 @@
 		  strongest units.
 	- +1 for each combat die including Captain of the West (maximum of +5)
 	- +1 for each point of leadership (maximum of +X where X is the lower of 5 or the number of army units)
+		- If an army is mobile, exclude Saruman from the value calculation.
 	- +1 for each Captain of the West
 	- +1 for defending in a fortification or city region
 	- x1.5 (rounded down) if
 		- defending in a stronghold; or
 		- army is mobile and a threat.
 	- x0.5 if considered or performing a sortie (rounded down)
-	- If an army is mobile, exclude Saruman from the value calculation.
