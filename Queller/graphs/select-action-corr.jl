@@ -1,417 +1,154 @@
-let
-	[
-	 ################################################################################
-	 StartNode(
-			   id = "select_action_corr",
-			   text = "Select Action:\nCorruption Strategy",
-			   next = "threat_check",
-			   )
-	 JumpToGraph(
-				 id = "threat_check",
-				 text = "Threat or Exposed",
-				 jump_graph = "threat_exposed",
-				 next = "a1",
-				 )
+@graphs begin
+	################################################################################
+	@node select_action_corr = Start("Select Action:\nCorruption Strategy") -> threat_check
+	@node threat_check = JumpToGraph("Threat or Exposed",
+									 "threat_exposed") -> a1
 
 
-	 ########################################
-	 DummyNode(id = "a1", next = "a1_1")
-	 SetActiveDie(
-				  id = "a1_1",
-				  next = "a1_2",
-				  next_no_die = "a2",
-				  die = 'C',
-				  may_use_ring = true,
-				  )
-	 SetActiveDie(
-				  id = "a1_2",
-				  next = "a1_cond",
-				  next_no_die = "a2",
-				  die = 'P',
-				  may_use_ring = true,
-				  )
-	 BinaryCondition(
-					 id = "a1_cond",
-					 condition = """
-					 The Fellowship is on the Mordor track or is revealed.
-					 And, a character card is held.
-					 """,
-					 next_true = "a1_jump",
-					 next_false = "a2",
-					 )
-	 JumpToGraph(
-				 id = "a1_jump",
-				 next = "a2",
-				 text = "Event Cards: Corruption",
-				 jump_graph = "event_cards_corruption",
-				 )
+	########################################
+	@node a1 = Dummy() -> a1_1
+	@node a1_1 = SetActiveDie('C', may_use_ring = true) -> [next = a1_2, no_die = a2]
+	@node a1_2 = SetActiveDie('P', may_use_ring = true) -> [next = a1_cond, no_die = a2]
+	@node a1_cond = BinaryCondition("""
+									The Fellowship is on the Mordor track or is revealed.
+									And, a character card is held.
+									""") -> [n_true = a1_jump, n_false = a2]
+	@node a1_jump = JumpToGraph("Event Cards: Corruption",
+								"event_cards_corruption") -> a2
 
-	 #######################################
-	 DummyNode(id = "a2", next = "a2_1")
-	 SetActiveDie(
-				  id = "a2_1",
-				  next = "a2_cond",
-				  next_no_die = "a3",
-				  die = 'C',
-				  )
-	 BinaryCondition(
-					 id = "a2_cond",
-					 condition = """
-					 The Fellowship is in a region with no Nazgûl and which Nazgûl can move to.
-					 """,
-					 next_true = "a2_jump",
-					 next_false = "a3",
-					 )
-	 JumpToGraph(
-				 id = "a2_jump",
-				 text = "Character: Movement",
-				 jump_graph = "character_move",
-				 next = "a3",
-				 )
+	#######################################
+	@node a2 = Dummy() -> a2_1
+	@node a2_1 = SetActiveDie('C') -> [next = a2_cond, no_die = a3]
+	@node a2_cond = BinaryCondition("""
+									The Fellowship is in a region with no Nazgûl and which Nazgûl can move to.
+									""") -> [n_true = a2_jump, n_false = a3]
+	@node a2_jump = JumpToGraph("Character: Movement",
+								"character_move") -> a3
 
-	 #######################################
-	 DummyNode(id = "a3", next = "a3_1")
-	 SetActiveDie(
-				  id = "a3_1",
-				  next = "a3_cond",
-				  next_no_die = "a4",
-				  die = 'C',
-				  may_use_ring = true,
-				  )
-	 BinaryCondition(
-					 id = "a3_cond",
-					 condition = """
-					 The Which King is in play and not in a *mobile* army but is able to create or join one.
-					 """,
-					 next_true = "a3_jump",
-					 next_false = "a4",
-					 )
-	 JumpToGraph(
-				 id = "a3_jump",
-				 text = "Character: Which King",
-				 jump_graph = "character_which_king",
-				 next = "a4",
-				 )
+	#######################################
+	@node a3 = Dummy() -> a3_1
+	@node a3_1 = SetActiveDie('C', may_use_ring = true) -> [next = a3_cond, no_die = a4]
+	@node a3_cond = BinaryCondition("""
+									The Which King is in play and not in a *mobile* army but is able to create or join one.
+									""") -> [n_true = a3_jump, n_false = a4]
+	@node a3_jump = JumpToGraph("Character: Which King",
+								"character_which_king") -> a4
 
 
-	 ########################################
-	 DummyNode(id = "a4", next = "a4_1")
-	 SetActiveDie(
-				  id = "a4_1",
-				  next = "a4_jump",
-				  next_no_die = "a5",
-				  die = 'M',
-				  may_use_ring = true,
-				  )
-	 JumpToGraph(
-				 id = "a4_jump",
-				 text = "Muster: Minion",
-				 jump_graph = "muster_minion",
-				 next = "a5",
-				 )
+	########################################
+	@node a4 = Dummy() -> a4_1
+	@node a4_1 = SetActiveDie('M', may_use_ring = true) -> [next = a4_jump, no_die = a5]
+	@node a4_jump = JumpToGraph("Muster: Minion",
+								"muster_minion") -> a5
 
 
-	 ########################################
-	 DummyNode(id = "a5", next = "a5_1")
-	 SetActiveDie(
-				  id = "a5_1",
-				  next = "a5_jump",
-				  next_no_die = "a6",
-				  die = 'M',
-				  )
-	 JumpToGraph(
-				 id = "a5_jump",
-				 text = "Muster: Politics",
-				 jump_graph = "muster_politics",
-				 next = "a6",
-				 )
+	########################################
+	@node a5 = Dummy() -> a5_1
+	@node a5_1 = SetActiveDie('M') -> [next = a5_jump, no_die = a6]
+	@node a5_jump = JumpToGraph("Muster: Politics",
+								"muster_politics") -> a6
 
 
-	 ########################################
-	 DummyNode(id = "a6", next = "a6_1_ring")
-	 SetActiveDie(
-				  id = "a6_1_ring",
-				  next = "a6_cond_ring",
-				  next_no_die = "a6_2_ring",
-				  die = 'C',
-				  may_use_ring = true,
-				  )
-	 SetActiveDie(
-				  id = "a6_2_ring",
-				  next = "a6_cond_ring",
-				  next_no_die = "a7",
-				  die = 'A',
-				  may_use_ring = true,
-				  )
-	 BinaryCondition(
-					 id = "a6_cond_ring",
-					 condition = """
-					 A *mobile* army is adjacent to its *target*.
-					 And, the *target* gives enough points to win or the Fellowship is on the Mordor track.
-					 """,
-					 next_true = "a6_jump_1_die_ring",
-					 next_false = "a6_1_no_ring",
-					 )
-	 SetActiveDie(
-				  id = "a6_jump_1_die_ring",
-				  next = "a6_jump_1_ring",
-				  next_no_die = "a6_jump_2_die_ring",
-				  die = 'C',
-				  may_use_ring = true,
-				  )
-	 JumpToGraph(
-				 id = "a6_jump_1_ring",
-				 text = "Character: Army Movement",
-				 jump_graph = "character_army",
-				 next = "a6_jump_2_die_ring",
-				 )
-	 SetActiveDie(
-				  id = "a6_jump_2_die_ring",
-				  next = "a6_jump_2_ring",
-				  next_no_die = "a7",
-				  die = 'A',
-				  may_use_ring = true,
-				  )
-	 JumpToGraph(
-				 id = "a6_jump_2_ring",
-				 text = "Movement and Attack: Basic",
-				 jump_graph = "movement_attack_basic",
-				 next = "a7",
-				 )
+	########################################
+	@node a6 = Dummy() -> a6_1_ring
+	@node a6_1_ring = SetActiveDie('C', may_use_ring = true) -> [next = a6_cond_ring, no_die = a6_2_ring]
+	@node a6_2_ring = SetActiveDie('A', may_use_ring = true) -> [next = a6_cond_ring, no_die = a7]
+	@node a6_cond_ring = BinaryCondition("""
+										 A *mobile* army is adjacent to its *target*.
+										 And, the *target* gives enough points to win or the Fellowship is on the Mordor track.
+										 """) -> [n_true = a6_jump_1_die_ring, n_false = a6_1_no_ring]
+	@node a6_jump_1_die_ring = SetActiveDie('C', may_use_ring = true) -> [next = a6_jump_1_ring, no_die = a6_jump_2_die_ring]
+	@node a6_jump_1_ring = JumpToGraph("Character: Army Movement",
+									   "character_army") -> a6_jump_2_die_ring
+	@node a6_jump_2_die_ring = SetActiveDie('A', may_use_ring = true) -> [next = a6_jump_2_ring, no_die = a7]
+	@node a6_jump_2_ring = JumpToGraph("Movement and Attack: Basic",
+									   "movement_attack_basic") -> a7
+
+
+	@node a6_1_no_ring = SetActiveDie('C') -> [next = a6_cond_no_ring, no_die = a6_2_no_ring]
+	@node a6_2_no_ring = SetActiveDie('A') -> [next = a6_cond_no_ring, no_die = a7]
+	@node a6_cond_no_ring = BinaryCondition("""
+											A *mobile* army is adjacent to its *target*.
+											And, the *target* is in a nation at war and not under siege.
+											""") -> [n_true = a6_jump_1_die_no_ring, n_false = a7]
+	@node a6_jump_1_die_no_ring = SetActiveDie('C') -> [next = a6_jump_1_no_ring, no_die = a6_jump_2_die_no_ring]
+	@node a6_jump_1_no_ring = JumpToGraph("Character: Army Movement",
+										  "character_army") -> a6_jump_2_die_no_ring
+	@node a6_jump_2_die_no_ring = SetActiveDie('A') -> [next = a6_jump_2_no_ring, no_die = a7]
+	@node a6_jump_2_no_ring = JumpToGraph("Movement and Attack: Basic",
+										  "movement_attack_basic") -> a7
+
+
+	########################################
+	@node a7 = Dummy() -> a7_1
+	@node a7_1 = BinaryCondition("The Shadow player is allowed to pass.") -> [n_true = a7_action, n_false = a8]
+	@node a7_action = PerformAction("Pass") -> a7_end
+	@node a7_end = End() -> []
+
+
+	########################################
+	@node a8 = Dummy() -> a8_1
+	@node a8_1 = SetActiveDie('C') -> [next = a8_jump_1, no_die = a8_2]
+	@node a8_jump_1 = JumpToGraph("Event Cards: Preferred",
+								  "event_cards_preferred") -> a8_2
+	@node a8_2 = SetActiveDie('P') -> [next = a8_jump_2, no_die = a9]
+	@node a8_jump_2 = JumpToGraph("Event Cards: Preferred",
+								  "event_cards_preferred") -> a9
+
+
+	########################################
+	@node a9 = Dummy() -> a9_1
+	@node a9_1 = SetActiveDie('C') -> [next = a9_cond, no_die = a9_2]
+	@node a9_2 = SetActiveDie('A') -> [next = a9_cond, no_die = a10]
+	@node a9_cond = BinaryCondition("""
+									A *mobile* army is adjacent to its *target* that is not under siege.
+									""") -> [n_true = a9_jump_1_die, n_false = a10]
+	@node a9_jump_1_die = SetActiveDie('C') -> [next = a9_jump_1, no_die = a9_jump_2_die]
+	@node a9_jump_1 = JumpToGraph("Character: Army Movement",
+								  "character_army") -> a9_jump_2_die
+	@node a9_jump_2_die = SetActiveDie('A') -> [next = a9_jump_2, no_die = a10]
+	@node a9_jump_2 = JumpToGraph("Movement and Attack: Basic",
+								  "movement_attack_basic") -> a10
+
+
+	#######################################
+	@node a10 = Dummy() -> a10_start
+	@node a10_start = SetActiveDie('P') -> [next = a10_1, no_die = a11]
+	@node a10_1 = JumpToGraph("Event Cards: Preferred",
+							  "event_cards_preferred") -> a10_2
+	@node a10_2 = JumpToGraph("Event Cards: General",
+							 "event_cards_general") -> a11
 
 
 
-	 SetActiveDie(
-				  id = "a6_1_no_ring",
-				  next = "a6_cond_no_ring",
-				  next_no_die = "a6_2_no_ring",
-				  die = 'C',
-				  )
-	 SetActiveDie(
-				  id = "a6_2_no_ring",
-				  next = "a6_cond_no_ring",
-				  next_no_die = "a7",
-				  die = 'A',
-				  )
-	 BinaryCondition(
-					 id = "a6_cond_no_ring",
-					 condition = """
-					 A *mobile* army is adjacent to its *target*.
-					 And, the *target* is in a nation at war and not under siege.
-					 """,
-					 next_true = "a6_jump_1_die_no_ring",
-					 next_false = "a7",
-					 )
-	 SetActiveDie(
-				  id = "a6_jump_1_die_no_ring",
-				  next = "a6_jump_1_no_ring",
-				  next_no_die = "a6_jump_2_die_no_ring",
-				  die = 'C',
-				  )
-	 JumpToGraph(
-				 id = "a6_jump_1_no_ring",
-				 text = "Character: Army Movement",
-				 jump_graph = "character_army",
-				 next = "a6_jump_2_die_no_ring",
-				 )
-	 SetActiveDie(
-				  id = "a6_jump_2_die_no_ring",
-				  next = "a6_jump_2_no_ring",
-				  next_no_die = "a7",
-				  die = 'A',
-				  )
-	 JumpToGraph(
-				 id = "a6_jump_2_no_ring",
-				 text = "Movement and Attack: Basic",
-				 jump_graph = "movement_attack_basic",
-				 next = "a7",
-				 )
+	########################################
+	@node a11 = Dummy() -> a11_1
+	@node a11_1 = SetActiveDie('A') -> [next = a11_action, no_die = a12]
+	@node a11_action = JumpToGraph("Movement and Attack:\nCorruption",
+								   "movement_attack_corr") -> a12
 
 
-	 ########################################
-	 DummyNode(id = "a7", next = "a7_1")
-	 BinaryCondition(
-					 id = "a7_1",
-					 condition = "The Shadow player is allowed to pass.",
-					 next_true = "a7_action",
-					 next_false = "a8",
-					 )
-	 PerformAction(
-				   id = "a7_action",
-				   action = """
-				   Pass
-				   """,
-				   next = "a7_end",
-				   )
-	 EndNode(id = "a7_end")
+	########################################
+	@node a12 = Dummy() -> a12_start
+	@node a12_start = SetActiveDie('C') -> [next = a12_1, no_die = a13]
+	@node a12_1 = JumpToGraph("Character: Army Movement",
+							  "character_army") -> a13
 
+	########################################
+	@node a13 = Dummy() -> a13_start
+	@node a13_start = SetActiveDie('M') -> [next = a13_1, no_die = a14]
+	@node a13_1 = JumpToGraph("Muster: Minion",
+							  "muster_minion") -> a13_2
+	@node a13_2 = JumpToGraph("Muster: Politics",
+							  "muster_politics") -> a13_3
+	@node a13_3 = JumpToGraph("Muster: Muster",
+							  "muster_muster") -> a14
 
-	 ########################################
-	 DummyNode(id = "a8", next = "a8_1")
-	 SetActiveDie(
-				  id = "a8_1",
-				  next = "a8_jump_1",
-				  next_no_die = "a8_2",
-				  die = 'C',
-				  )
-	 JumpToGraph(
-				 id = "a8_jump_1",
-				 text = "Event Cards: Preferred",
-				 jump_graph = "event_cards_preferred",
-				 next = "a8_2",
-				 )
-	 SetActiveDie(
-				  id = "a8_2",
-				  next = "a8_jump_2",
-				  next_no_die = "a9",
-				  die = 'P',
-				  )
-	 JumpToGraph(
-				 id = "a8_jump_2",
-				 text = "Event Cards: Preferred",
-				 jump_graph = "event_cards_preferred",
-				 next = "a9",
-				 )
+	########################################
+	@node a14 = Dummy() -> a14_1
+	@node a14_1 = PerformAction("""
+								Queller failed to find an action. Discard a random non-*preferred* die (this can be done in the main menu).
+								""") -> a_end
+	@node a_end = End() -> []
 
-
-	 ########################################
-	 DummyNode(id = "a9", next = "a9_1")
-	 SetActiveDie(
-				  id = "a9_1",
-				  next = "a9_cond",
-				  next_no_die = "a9_2",
-				  die = 'C',
-				  )
-	 SetActiveDie(
-				  id = "a9_2",
-				  next = "a9_cond",
-				  next_no_die = "a10",
-				  die = 'A',
-				  )
-	 BinaryCondition(
-					 id = "a9_cond",
-					 condition = """
-					 A *mobile* army is adjacent to its *target* that is not under siege.
-					 """,
-					 next_true = "a9_jump_1_die",
-					 next_false = "a10",
-					 )
-	 SetActiveDie(
-				  id = "a9_jump_1_die",
-				  next = "a9_jump_1",
-				  next_no_die = "a9_jump_2_die",
-				  die = 'C',
-				  )
-	 JumpToGraph(
-				 id = "a9_jump_1",
-				 text = "Character: Army Movement",
-				 jump_graph = "character_army",
-				 next = "a9_jump_2_die",
-				 )
-	 SetActiveDie(
-				  id = "a9_jump_2_die",
-				  next = "a9_jump_2",
-				  next_no_die = "a10",
-				  die = 'A',
-				  )
-	 JumpToGraph(
-				 id = "a9_jump_2",
-				 text = "Movement and Attack: Basic",
-				 jump_graph = "movement_attack_basic",
-				 next = "a10",
-				 )
-
-
-	 #######################################
-	 DummyNode(id = "a10", next = "a10_start")
-	 SetActiveDie(
-				  id = "a10_start",
-				  next = "a10_1",
-				  next_no_die = "a11",
-				  die = 'P',
-				  )
-	 JumpToGraph(
-				 id = "a10_1",
-				 text = "Event Cards: Preferred",
-				 jump_graph = "event_cards_preferred",
-				 next = "a10_2",
-				 )
-	 JumpToGraph(
-				 id = "a10_2",
-				 text = "Event Cards: General",
-				 jump_graph = "event_cards_general",
-				 next = "a11",
-				 )
-
-
-
-	 ########################################
-	 DummyNode(id = "a11", next = "a11_1")
-	 SetActiveDie(
-				  id = "a11_1",
-				  next = "a11_action",
-				  next_no_die = "a12",
-				  die = 'A',
-				  )
-	 JumpToGraph(
-				 id = "a11_action",
-				 text = "Movement and Attack:\nCorruption",
-				 jump_graph = "movement_attack_corr",
-				 next = "a12",
-				 )
-
-
-	 ########################################
-	 DummyNode(id = "a12", next = "a12_start")
-	 SetActiveDie(
-				  id = "a12_start",
-				  next = "a12_1",
-				  next_no_die = "a13",
-				  die = 'C',
-				  )
-	 JumpToGraph(
-				 id = "a12_1",
-				 text = "Character: Army Movement",
-				 jump_graph = "character_army",
-				 next = "a13",
-				 )
-
-	 ########################################
-	 DummyNode(id = "a13", next = "a13_start")
-	 SetActiveDie(
-				  id = "a13_start",
-				  next = "a13_1",
-				  next_no_die = "a14",
-				  die = 'M',
-				  )
-	 JumpToGraph(
-				 id = "a13_1",
-				 text = "Muster: Minion",
-				 jump_graph = "muster_minion",
-				 next = "a13_2",
-				 )
-	 JumpToGraph(
-				 id = "a13_2",
-				 text = "Muster: Politics",
-				 jump_graph = "muster_politics",
-				 next = "a13_3",
-				 )
-	 JumpToGraph(
-				 id = "a13_3",
-				 text = "Muster: Muster",
-				 jump_graph = "muster_muster",
-				 next = "a14",
-				 )
-
-
-	 ########################################
-	 DummyNode(id = "a14", next = "a14_1")
-	 PerformAction(
-				   id = "a14_1",
-				   action = "Queller failed to find an action. Discard a random non-*preferred* die (this can be done in the main menu).",
-				   next = "a_end",
-				   )
-	 EndNode(id = "a_end")
-
-	 ]
 end

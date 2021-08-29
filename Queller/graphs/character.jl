@@ -1,4 +1,4 @@
-let
+@graphs begin
 	move_wk_cond = """
 	The Witch King is not in an *mobile* army but is able to join or create one.
 	"""
@@ -56,257 +56,96 @@ let
 	6. Random
 	"""
 
-	[
-	 ################################################################################
-	 StartNode(
-			   id = "character_army",
-			   text = "Character:\n Army Movement",
-			   next = "lc_1",
-			   )
+	################################################################################
+	@node character_army = Start("Character:\n Army Movement") -> lc_1
 
-	 BinaryCondition(
-					 id = "lc_1",
-					 condition = """
-					 An *aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
-					 """,
-					 next_true = "lc_1_yes",
-					 next_false = "lc_2",
-					 )
-	 UseActiveDie(
-				  id = "lc_1_yes",
-				  next = "lc_1_action",
-				  )
-	 PerformAction(
-				   id = "lc_1_action",
-				   next = "lc_1_end",
-				   action = """
-				   Attack: Select army at random if severl armies satisfy the considered attack.
-				   """
-				   )
-	 EndNode(id = "lc_1_end")
+	@node lc_1 = BinaryCondition("""
+								 An *aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
+								 """) -> [n_true = lc_1_yes, n_false = lc_2]
+	@node lc_1_yes = UseActiveDie() -> lc_1_action
+	@node lc_1_action = PerformAction("""
+									  Attack: Select army at random if severl armies satisfy the considered attack.
+									  """) -> lc_1_end
+	@node lc_1_end = End() -> []
 
-	 BinaryCondition(
-					 id = "lc_2",
-					 condition = """
-					 A *mobile* army with leadership and a valid move/attack towards *target* exists.
-					 """,
-					 next_true = "lc_2_yes",
-					 next_false = "lc_3",
-					 )
-	 JumpToGraph(
-				 id = "lc_2_yes",
-				 text = "Movement and Attack:\n Basic",
-				 jump_graph = "movement_attack_basic",
-				 next = "lc_3",
-				 )
+	@node lc_2 = BinaryCondition("""
+								 A *mobile* army with leadership and a valid move/attack towards *target* exists.
+								 """) -> [n_true = lc_2_yes, n_false = lc_3]
+	@node lc_2_yes = JumpToGraph("Movement and Attack:\n Basic",
+								 "movement_attack_basic") -> lc_3
 
 
-	 ################################################################################
-	 StartNode(
-			   id = "character_move",
-			   text = "Character:\n Movement",
-			   next = "lc_3",
-			   )
-	 BinaryCondition(
-					 id = "lc_3",
-					 condition = """
-					 A Nazgûl or the Witch King is in play.
-					 """,
-					 next_true = "lc_wk",
-					 next_false = "lc_3_no",
-					 )
-	 JumpToGraph(
-				 id = "lc_3_no",
-				 text = "Event Cards: Preferred",
-				 jump_graph = "event_cards_preferred",
-				 next = "lc_3_return",
-				 )
-	 ReturnFromGraph(
-					 id = "lc_3_return",
-					 )
+	################################################################################
+	@node character_move = Start("Character:\n Movement") -> lc_3
+	@node lc_3 = BinaryCondition("""
+								 A Nazgûl or the Witch King is in play.
+								 """) -> [n_true = lc_wk, n_false = lc_3_no]
+	@node lc_3_no = JumpToGraph("Event Cards: Preferred",
+								"event_cards_preferred") -> lc_3_return
+	@node lc_3_return = ReturnFromGraph() -> []
 
 
-	 ########################################
-	 StartNode(
-			   id = "character_which_king",
-			   text = "Character:\n Which King",
-			   next = "lc_wk_yes",
-			   )
+	########################################
+	@node character_which_king = Start("Character:\n Which King") -> lc_wk_yes
 
-	 BinaryCondition(
-					 id = "lc_wk",
-					 condition = move_wk_cond,
-					 next_true = "lc_wk_yes",
-					 next_false = "lc_naz_1",
-					 )
-	 UseActiveDie(
-				  id = "lc_wk_yes",
-				  next = "lc_wk_action",
-				  )
-	 PerformAction(
-				   id = "lc_wk_action",
-				   next = "lc_naz_2",
-				   action = wk_prio,
-				   )
+	@node lc_wk = BinaryCondition(move_wk_cond) -> [n_true = lc_wk_yes, n_false = lc_naz_1]
+	@node lc_wk_yes = UseActiveDie() -> lc_wk_action
+	@node lc_wk_action = PerformAction(wk_prio) -> lc_naz_2
 
 
-	 ########################################
-	 BinaryCondition(
-					 id = "lc_naz_1",
-					 condition = move_nazgul_cond,
-					 next_true = "lc_naz_1_yes",
-					 next_false = "lc_mos_1",
-					 )
-	 UseActiveDie(
-				  id = "lc_naz_1_yes",
-				  next = "lc_naz_1_action",
-				  )
-	 PerformAction(
-				   id = "lc_naz_1_action",
-				   next = "lc_mos_2",
-				   action = nazgul_prio,
-				   )
+	########################################
+	@node lc_naz_1 = BinaryCondition(move_nazgul_cond) -> [n_true = lc_naz_1_yes, n_false = lc_mos_1]
+	@node lc_naz_1_yes = UseActiveDie() -> lc_naz_1_action
+	@node lc_naz_1_action = PerformAction(nazgul_prio) -> lc_mos_2
+
+	@node lc_naz_2 = BinaryCondition(move_nazgul_cond) -> [n_true = lc_naz_2_yes, n_false = lc_mos_3]
+	@node lc_naz_2_yes = UseActiveDie() -> lc_naz_2_action
+	@node lc_naz_2_action = PerformAction(nazgul_prio) -> lc_mos_4
 
 
-	 BinaryCondition(
-					 id = "lc_naz_2",
-					 condition = move_nazgul_cond,
-					 next_true = "lc_naz_2_yes",
-					 next_false = "lc_mos_3",
-					 )
-	 UseActiveDie(
-				  id = "lc_naz_2_yes",
-				  next = "lc_naz_2_action",
-				  )
-	 PerformAction(
-				   id = "lc_naz_2_action",
-				   next = "lc_mos_4",
-				   action = nazgul_prio,
-				   )
+	########################################
+	@node lc_mos_1 = BinaryCondition(move_mos_cond) -> [n_true = lc_mos_1_yes, n_false = lc_play_card]
+	@node lc_mos_1_yes = UseActiveDie() -> lc_mos_1_action
+	@node lc_mos_1_action = PerformAction(mos_prio) -> lc_mos_end_1
+
+	@node lc_mos_2 = BinaryCondition(move_mos_cond) -> [n_true = lc_mos_2_yes, n_false = lc_mos_end_2]
+	@node lc_mos_2_yes = UseActiveDie() -> lc_mos_2_action
+	@node lc_mos_2_action = PerformAction(mos_prio) -> lc_mos_end_2
+
+	@node lc_mos_3 = BinaryCondition(move_mos_cond) -> [n_true = lc_mos_3_yes, n_false = lc_mos_end_3]
+	@node lc_mos_3_yes = UseActiveDie() -> lc_mos_3_action
+	@node lc_mos_3_action = PerformAction(mos_prio) -> lc_mos_end_3
+
+	@node lc_mos_4 = BinaryCondition(move_mos_cond) -> [n_true = lc_mos_4_yes, n_false = lc_mos_end_4]
+	@node lc_mos_4_yes = UseActiveDie() -> lc_mos_4_action
+	@node lc_mos_4_action = PerformAction(mos_prio) -> lc_mos_end_4
+
+	@node lc_mos_end_1 = End() -> []
+	@node lc_mos_end_2 = End() -> []
+	@node lc_mos_end_3 = End() -> []
+	@node lc_mos_end_4 = End() -> []
 
 
-	 ########################################
-	 BinaryCondition(
-					 id = "lc_mos_1",
-					 condition = move_mos_cond,
-					 next_true = "lc_mos_1_yes",
-					 next_false = "lc_play_card",
-					 )
-	 UseActiveDie(
-				  id = "lc_mos_1_yes",
-				  next = "lc_mos_1_action",
-				  )
-	 PerformAction(
-				   id = "lc_mos_1_action",
-				   next = "lc_mos_end_1",
-				   action = mos_prio,
-				   )
-
-	 BinaryCondition(
-					 id = "lc_mos_2",
-					 condition = move_mos_cond,
-					 next_true = "lc_mos_2_yes",
-					 next_false = "lc_mos_end_2",
-					 )
-	 UseActiveDie(
-				  id = "lc_mos_2_yes",
-				  next = "lc_mos_2_action",
-				  )
-	 PerformAction(
-				   id = "lc_mos_2_action",
-				   next = "lc_mos_end_2",
-				   action = mos_prio,
-				   )
-
-	 BinaryCondition(
-					 id = "lc_mos_3",
-					 condition = move_mos_cond,
-					 next_true = "lc_mos_3_yes",
-					 next_false = "lc_mos_end_3",
-					 )
-	 UseActiveDie(
-				  id = "lc_mos_3_yes",
-				  next = "lc_mos_3_action",
-				  )
-	 PerformAction(
-				   id = "lc_mos_3_action",
-				   next = "lc_mos_end_3",
-				   action = mos_prio,
-				   )
-
-	 BinaryCondition(
-					 id = "lc_mos_4",
-					 condition = move_mos_cond,
-					 next_true = "lc_mos_4_yes",
-					 next_false = "lc_mos_end_4",
-					 )
-	 UseActiveDie(
-				  id = "lc_mos_4_yes",
-				  next = "lc_mos_4_action",
-				  )
-	 PerformAction(
-				   id = "lc_mos_4_action",
-				   next = "lc_mos_end_4",
-				   action = mos_prio,
-				   )
-
-	 EndNode(id = "lc_mos_end_1")
-	 EndNode(id = "lc_mos_end_2")
-	 EndNode(id = "lc_mos_end_3")
-	 EndNode(id = "lc_mos_end_4")
+	########################################
+	@node lc_play_card = JumpToGraph("Event Cards: Preferred",
+									 "event_cards_preferred") -> lc_play_card_return
+	@node lc_play_card_return = ReturnFromGraph() -> []
 
 
-	 ########################################
-	 JumpToGraph(
-				 id = "lc_play_card",
-				 text = "Event Cards: Preferred",
-				 jump_graph = "event_cards_preferred",
-				 next = "lc_play_card_return",
-				 )
-	 ReturnFromGraph(
-					 id = "lc_play_card_return",
-					 )
+	################################################################################
+	@node character_wk_prio = Start("Character:\n Witch King Priority") -> lc_wk_prio
+	@node lc_wk_prio = PerformAction(wk_prio) -> lc_wk_prio_end
+	@node lc_wk_prio_end = End() -> []
 
 
-	 ################################################################################
-	 StartNode(
-			   id = "character_wk_prio",
-			   text = "Character:\n Witch King Priority",
-			   next = "lc_wk_prio",
-			   )
-	 PerformAction(
-				   id = "lc_wk_prio",
-				   next = "lc_wk_prio_end",
-				   action = wk_prio,
-				   )
-	 EndNode(id = "lc_wk_prio_end")
+	################################################################################
+	@node character_nazgul_prio = Start("Character:\n Nazgûl Priority") -> lc_nazgul_prio
+	@node lc_nazgul_prio = PerformAction(wk_prio) -> lc_nazgul_prio_end
+	@node lc_nazgul_prio_end = End() -> []
 
 
-	 ################################################################################
-	 StartNode(
-			   id = "character_nazgul_prio",
-			   text = "Character:\n Nazgûl Priority",
-			   next = "lc_nazgul_prio",
-			   )
-	 PerformAction(
-				   id = "lc_nazgul_prio",
-				   next = "lc_nazgul_prio_end",
-				   action = wk_prio,
-				   )
-	 EndNode(id = "lc_nazgul_prio_end")
-
-
-	 ################################################################################
-	 StartNode(
-			   id = "character_mos_prio",
-			   text = "Character:\n Mouth of Sauron Priority",
-			   next = "lc_mos_prio",
-			   )
-	 PerformAction(
-				   id = "lc_mos_prio",
-				   next = "lc_mos_prio_end",
-				   action = wk_prio,
-				   )
-	 EndNode(id = "lc_mos_prio_end")
-	 ]
+	################################################################################
+	@node character_mos_prio = Start("Character:\n Mouth of Sauron Priority") -> lc_mos_prio
+	@node lc_mos_prio = PerformAction(wk_prio) -> lc_mos_prio_end
+	@node lc_mos_prio_end = End() -> []
 end

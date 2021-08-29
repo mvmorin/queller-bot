@@ -1,14 +1,18 @@
-################################################################################
+abstract type Node end
 
-struct NodeID
-	id::String
+setid!(n::Node, id::Symbol) = setid!(n, valid_id(string(id)))
+setid!(n::Node, id::String) = error("Not implemented!")
+getid(n::Node) = error("Not implemented!")
 
-	NodeID(id) = new(valid_id(id))
-end
-Base.show(io::IO, id::NodeID) = print(io, id.id)
-Base.escape_string(id::NodeID) = escape_string(id.id)
-Base.:*(id::NodeID, t::AbstractString) = id.id*t
-Base.convert(::Type{NodeID},s::AbstractString) = NodeID(s)
+getopt(n::Node) = error("Not implemented!")
+getnext(n::Node, opt) = error("Not implemented!")
+
+setnext!(n::Node, next::Node) = error("'$(getid(n)) = $(typeof(n))(...) -> next' not implemented for $(typeof(n))")
+setnext!(n::Node, nexts::Vector{<:Node}) = error("'$(getid(n)) = $(typeof(n))(...) -> [next_1, ..., next_n]' not implemented for $(typeof(n))")
+setnext!(n::Node, name::Symbol, next::Node) = error("'$(getid(n)) = $(typeof(n))(...) -> [next_kw = next, ...]' not implemented for $(typeof(n))")
+
+getmsg(n::Node) = error("Not implemented!")
+
 
 function valid_id(id::AbstractString)
 	valid_char(c) = islowercase(c) | (c == '_') | isdigit(c)
@@ -17,169 +21,188 @@ function valid_id(id::AbstractString)
 	return id
 end
 
+################################################################################
+
+mutable struct Start <: Node
+	id::String
+	text::String
+	next::Node
+
+	Start(text) = (obj = new(); obj.text = strip(text); obj)
+end
+setid!(n::Start, id::String) = (n.id = id)
+getid(n::Start) = n.id
+
+getopt(n::Start) = nothing
+getnext(n::Start, opt::Nothing) = n.next
+setnext!(n::Start, next::Node) = (n.next = next)
+
+getmsg(n::Start) = n.text
+
+
+mutable struct End <: Node
+	id::String
+	text::String
+
+	End(text="End of Action") = (obj = new(); obj.text = strip(text); obj)
+end
+setid!(n::End, id::String) = (n.id = id)
+getid(n::End) = n.id
+
+getopt(n::End) = nothing
+getnext(n::End, opt::Nothing) = nothing
+
+getmsg(n::End) = n.text
+
+
+mutable struct Dummy <: Node
+	id::String
+	next::Node
+
+	Dummy() = new()
+end
+setid!(n::Dummy, id::String) = (n.id = id)
+getid(n::Dummy) = n.id
+
+getopt(n::Dummy) = nothing
+getnext(n::Dummy, opt::Nothing) = n.next
+setnext!(n::Dummy, next::Node) = (n.next = next)
+
+getmsg(n::Dummy) = ""
+
 
 
 ################################################################################
 
-abstract type QuellerNode end
-
-children(n::QuellerNode) = error("Not implemented.")
-getopt(n::QuellerNode) = error("Not implemented.") # returns nothing if no interaction is necessary, otherwise it returns a vector of CMD.InputCommands that getnext accept
-getnext(n::QuellerNode, opt) = error("Not implemented.")
-Base.string(n::QuellerNode) = error("Not implemented.")
-
-
-
-################################################################################
-
-struct StartNode <: QuellerNode
-	id::NodeID
+mutable struct JumpToGraph <: Node
+	id::String
 	text::String
-	next::NodeID
+	next::Node
+	jump_graph::String
 
-	StartNode(;id, text, next) = new(NodeID(id), strip(text), NodeID(next))
+	JumpToGraph(text,jump_graph) = (obj = new(); obj.text = strip(text); obj.jump_graph = jump_graph; obj)
 end
-children(n::StartNode) = [n.next]
-getopt(n::StartNode) = nothing
-getnext(n::StartNode, opt::Nothing) = n.next
-Base.string(n::StartNode) = n.text
+setid!(n::JumpToGraph, id::String) = (n.id = id)
+getid(n::JumpToGraph) = n.id
 
-
-struct EndNode <: QuellerNode
-	id::NodeID
-	text::String
-
-	EndNode(;id, text="End of Action") = new(NodeID(id), strip(text))
-end
-children(n::EndNode) = []
-getopt(n::EndNode) = nothing
-getnext(n::EndNode, opt::Nothing) = nothing
-Base.string(n::EndNode) = n.text
-
-
-struct DummyNode <: QuellerNode
-	id::NodeID
-	next::NodeID
-
-	DummyNode(;id, next) = new(NodeID(id), NodeID(next))
-end
-children(n::DummyNode) = [n.next]
-getopt(n::DummyNode) = nothing
-getnext(n::DummyNode, opt::Nothing) = n.next
-Base.string(n::DummyNode) = ""
-
-
-
-################################################################################
-
-struct JumpToGraph <: QuellerNode
-	id::NodeID
-	text::String
-	next::NodeID
-	jump_graph::NodeID
-
-	JumpToGraph(;id, text, next, jump_graph) =
-		new(NodeID(id), strip(text), NodeID(next), NodeID(jump_graph))
-end
-children(n::JumpToGraph) = [n.next]
 getopt(n::JumpToGraph) = nothing
 getnext(n::JumpToGraph, opt::Nothing) = n.next
-Base.string(n::JumpToGraph) = n.text
+setnext!(n::JumpToGraph, next::Node) = (n.next = next)
+
+getmsg(n::JumpToGraph) = n.text
 
 
-struct ReturnFromGraph <: QuellerNode
-	id::NodeID
+mutable struct ReturnFromGraph <: Node
+	id::String
 	jump_text::String
 
-	ReturnFromGraph(;id, jump_text="Continue from where\nyou jumped to this\n graph.") = new(NodeID(id), strip(jump_text))
+	ReturnFromGraph(jump_text="Continue from where\nyou jumped to this\n graph.") = (obj = new(); obj.jump_text = strip(jump_text); obj)
 end
-children(n::ReturnFromGraph) = []
+setid!(n::ReturnFromGraph, id::String) = (n.id = id)
+getid(n::ReturnFromGraph) = n.id
+
 getopt(n::ReturnFromGraph) = nothing
 getnext(n::ReturnFromGraph, opt::Nothing) = nothing
-Base.string(n::ReturnFromGraph) = n.jump_text
+
+getmsg(n::ReturnFromGraph) = n.jump_text
 
 
 
 ################################################################################
 
-struct PerformAction <: QuellerNode
-	id::NodeID
+mutable struct PerformAction <: Node
+	id::String
 	action::String
-	next::NodeID
+	next::Node
 
-	PerformAction(;id, action, next) =
-		new(NodeID(id), strip(action), NodeID(next))
+	PerformAction(action="Continue from where\nyou jumped to this\n graph.") = (obj = new(); obj.action = strip(action); obj)
 end
-children(n::PerformAction) = [n.next]
+setid!(n::PerformAction, id::String) = (n.id = id)
+getid(n::PerformAction) = n.id
+
 getopt(n::PerformAction) = [CMD.Blank()]
 getnext(n::PerformAction, opt) = n.next
-Base.string(n::PerformAction) = n.action
+setnext!(n::PerformAction, next::Node) = (n.next = next)
+
+getmsg(n::PerformAction) = n.action
 
 
-struct BinaryCondition <: QuellerNode
-	id::NodeID
+mutable struct BinaryCondition <: Node
+	id::String
 	condition::String
-	next_true::NodeID
-	next_false::NodeID
+	n_true::Node
+	n_false::Node
 
-	BinaryCondition(;id, condition, next_true, next_false) =
-		new(NodeID(id), strip(condition), NodeID(next_true), NodeID(next_false))
+	BinaryCondition(condition) = (obj = new(); obj.condition = strip(condition); obj)
 end
-children(n::BinaryCondition) = [n.next_true, n.next_false]
+setid!(n::BinaryCondition, id::String) = (n.id = id)
+getid(n::BinaryCondition) = n.id
+
 getopt(n::BinaryCondition) = [CMD.True(), CMD.False()]
-getnext(n::BinaryCondition, opt::CMD.True) = n.next_true
-getnext(n::BinaryCondition, opt::CMD.False) = n.next_false
-Base.string(n::BinaryCondition) = n.condition
+getnext(n::BinaryCondition, opt::CMD.True) = n.n_true
+getnext(n::BinaryCondition, opt::CMD.False) = n.n_false
+setnext!(n::BinaryCondition, name::Symbol,next::Node) = setfield!(n,name,next)
+
+getmsg(n::BinaryCondition) = n.condition
 
 
-struct MultipleChoice <: QuellerNode
-	id::NodeID
+mutable struct MultipleChoice <: Node
+	id::String
 	conditions::String
-	nexts::Vector{NodeID}
+	nexts::Vector{<:Node}
 
-	MultipleChoice(;id, conditions, nexts) =
-		new(NodeID(id), strip(conditions), NodeID.(nexts))
+	MultipleChoice(conditions) = (obj = new(); obj.conditions = strip(conditions); obj)
 end
-children(n::MultipleChoice) = n.nexts
+setid!(n::MultipleChoice, id::String) = (n.id = id)
+getid(n::MultipleChoice) = n.id
+
 getopt(n::MultipleChoice) = CMD.Option.(1:length(n.nexts))
 getnext(n::MultipleChoice, opt::CMD.Option) = n.nexts[opt.opt]
-Base.string(n::MultipleChoice) = n.conditions
+setnext!(n::MultipleChoice, nexts::Vector{<:Node}) = (n.nexts = nexts)
+
+getmsg(n::MultipleChoice) = n.conditions
 
 
 
 ################################################################################
 
-struct CheckStrategy <: QuellerNode
-	id::NodeID
+mutable struct CheckStrategy <: Node
+	id::String
 	strategy::Strategy.Choice
-	next_true::NodeID
-	next_false::NodeID
+	n_true::Node
+	n_false::Node
 
-	CheckStrategy(;id, strategy, next_true, next_false) =
-	new(NodeID(id), StrategyChoice(strategy), NodeID(next_true), NodeID(next_false))
+	CheckStrategy(strategy) = (obj = new(); obj.strategy = StrategyChoice(strategy); obj)
 end
-children(n::CheckStrategy) = [n.next_true, n.next_false]
+setid!(n::CheckStrategy, id::String) = (n.id = id)
+getid(n::CheckStrategy) = n.id
+
 getopt(n::CheckStrategy) = CMD.Option.(instances(Strategy.Choice))
-getnext(n::CheckStrategy, opt::CMD.Option) = (opt.opt == n.strategy ? n.next_true : n.next_false)
-Base.string(n::CheckStrategy) = "The $(string(n.strategy)) strategy is used."
+getnext(n::CheckStrategy, opt::CMD.Option) = (opt.opt == n.strategy ? n.n_true : n.n_false)
+setnext!(n::CheckStrategy, name::Symbol, next::Node) = setfield!(n,name,next)
+
+getmsg(n::CheckStrategy) = "The $(string(n.strategy)) strategy is used."
 
 
-struct SetActiveDie <: QuellerNode
-	id::NodeID
-	next::NodeID
-	next_no_die::NodeID
+mutable struct SetActiveDie <: Node
+	id::String
+	next::Node
+	no_die::Node
 
 	die::Die.Face
 	may_use_ring::Bool
 
-	SetActiveDie(;id, next, next_no_die, die, may_use_ring=false) =
-		new(NodeID(id), NodeID(next), NodeID(next_no_die), DieFace(die), may_use_ring)
+	SetActiveDie(die; may_use_ring=false) = (obj = new(); obj.die = DieFace(die); obj.may_use_ring = may_use_ring; obj)
 end
-children(n::SetActiveDie) = [n.next, n.next_no_die]
+setid!(n::SetActiveDie, id::String) = (n.id = id)
+getid(n::SetActiveDie) = n.id
+
 getopt(n::SetActiveDie) = [CMD.True(), CMD.False()]
 getnext(n::SetActiveDie, opt::CMD.True) = n.next
-getnext(n::SetActiveDie, opt::CMD.False) = n.next_no_die
-function Base.string(n::SetActiveDie)
+getnext(n::SetActiveDie, opt::CMD.False) = n.no_die
+setnext!(n::SetActiveDie, name::Symbol, next::Node) = setfield!(n,name,next)
+
+function getmsg(n::SetActiveDie)
 	prio_list = [string(n.die)]
 	if n.die == Die.Army
 		push!(prio_list, "$(string(Die.ArmyMuster)) as $(string(Die.Army))")
@@ -204,50 +227,44 @@ function Base.string(n::SetActiveDie)
 end
 
 
-struct UseActiveDie <: QuellerNode
-	id::NodeID
-	next::NodeID
+mutable struct UseActiveDie <: Node
+	id::String
+	next::Node
 
-	UseActiveDie(;id, next) = new(NodeID(id), NodeID(next))
+	UseActiveDie() = new()
 end
-children(n::UseActiveDie) = [n.next]
+setid!(n::UseActiveDie, id::String) = (n.id = id)
+getid(n::UseActiveDie) = n.id
+
 getopt(n::UseActiveDie) = nothing
 getnext(n::UseActiveDie, opt::Nothing) = n.next
-Base.string(n::UseActiveDie) = "Use the Active Die to:"
+setnext!(n::UseActiveDie, next::Node) = (n.next = next)
+
+getmsg(n::UseActiveDie) = "Use the Active Die to:"
 
 
+
+
+################################################################################
+fieldsdefined(obj) = all(i -> isdefined(obj,i), 1:nfields(obj))
 
 ################################################################################
 
 struct QuellerGraph
-	root_node::NodeID
-	nodes::Dict{NodeID,QuellerNode}
+	root_node::Node
+	nodes::Vector{<:Node}
 	source_file::String
 end
 
-Base.getindex(g::QuellerGraph,n::AbstractString) = g[NodeID(n)]
-Base.getindex(g::QuellerGraph,n::NodeID) = g.nodes[n]
+getid(g::QuellerGraph) = getid(g.root_node)
 
-
-################################################################################
-
-function load_graphs(file)
-	nodes = include(file)
-
-	unique, conflicts = unique_node_ids(nodes)
-	!unique && error("Error loading nodes from file $(file). Not all ids are unique. Conflicting ids:\n$(strvec2str(conflicts))")
-
-	all_exists, conflicts = all_children_exists(nodes)
-	!all_exists && error("Error loading nodes from file $(file). Not all child nodes exists. Non-existing child ids:\n$(strvec2str(conflicts))")
-
-	nodes_d = Dict(n.id => n for n in nodes)
-
-	start_nodes = filter(n -> isa(n, StartNode), nodes)
-	return [QuellerGraph(start.id, nodes_d, file) for start in start_nodes]
+function load_graphs_from_file(file)
+	starts, nodes = include(file)
+	return [QuellerGraph(start, nodes, file) for start in starts]
 end
 
 function load_graphs(files...)
-	graphs = mapreduce(load_graphs, vcat, files)
+	graphs = mapreduce(load_graphs_from_file, vcat, files)
 
 	unique, conflicts = unique_root_ids(graphs)
 	!unique && error("Error loading graphs, not all root node ids are unique. Conflictings graphs:\n$(strvec2str(conflicts))")
@@ -255,53 +272,123 @@ function load_graphs(files...)
 	jumps_exists, conflicts = all_jump_points_exists(graphs)
 	!jumps_exists && error("Warning, not all jumps exists. Non-existing jumps:\n$(strvec2str(conflicts))")
 
-	return Dict(g.root_node => g for g in graphs)
-end
-
-################################################################################
-
-function unique_node_ids(nodes)
-	conflicts = not_unique(nodes)
-	return isempty(conflicts), getfield.(conflicts, :id)
-end
-
-function all_children_exists(nodes)
-	child_ids = mapreduce(children, vcat, nodes)
-	ids = getfield.(nodes, :id)
-	id_not_exists(id) = !(id in ids)
-	conflicts = filter(id_not_exists, child_ids)
-	return isempty(conflicts), conflicts
+	return Dict(getid(g) => g for g in graphs)
 end
 
 function unique_root_ids(graphs)
-	conflicts = not_unique(graphs, (g,j) -> (g.root_node == j.root_node))
-	return isempty(conflicts), map(g -> g.root_node*" : "*g.source_file, conflicts)
+	conflicts = not_unique(graphs, (g,j) -> (getid(g) == getid(j)) )
+	return isempty(conflicts), map(g -> getid(g)*" : "*g.source_file, conflicts)
+end
+
+function get_jump_points(g)
+	jump_nodes = filter(n -> isa(n, JumpToGraph), g.nodes)
+	return tuple.(getfield.(jump_nodes, :jump_graph),[ g.source_file])
 end
 
 function all_jump_points_exists(graphs)
-	function get_jump_points(g)
-		nodes = collect(values(g.nodes))
-		jump_nodes = filter(n -> isa(n, JumpToGraph), nodes)
-		return tuple.(getfield.(jump_nodes, :jump_graph),[ g.source_file])
-	end
-
 	jump_points = mapreduce(get_jump_points, vcat, graphs)
-	root_nodes = getfield.(graphs, :root_node)
-	jump_not_exists(j) = !(j[1] in root_nodes)
+	graph_ids = getid.(graphs)
+	jump_not_exists(j) = !(j[1] in graph_ids)
 	conflicts = filter(jump_not_exists, jump_points)
-
 	return isempty(conflicts), map(c -> c[1]*" : "*c[2], conflicts)
 end
 
 function get_graphs_not_jumped_to(graphs)
-	function get_jump_points(g)
-		nodes = collect(values(g.nodes))
-		jump_nodes = filter(n -> isa(n, JumpToGraph), nodes)
-		return getfield.(jump_nodes, :jump_graph)
-	end
-	jump_points = mapreduce(get_jump_points, vcat, graphs)
-	root_not_jumped_to(g) = !(g.root_node in jump_points)
-	unjumped = filter(root_not_jumped_to, collect(graphs))
-	return map(g -> g.root_node*" : "*g.source_file, unjumped)
+	jump_points = getindex.(mapreduce(get_jump_points, vcat, graphs),1)
+	graph_not_jumped_to(g) = !(getid(g) in jump_points)
+	unjumped = filter(graph_not_jumped_to, collect(graphs))
+	return map(g -> getid(g)*" : "*g.source_file, unjumped)
 end
 
+
+################################################################################
+
+macro graphs(node_block)
+	return quote
+		__nodes = Dict{Symbol, Node}()
+
+		__edges_single = Vector{Tuple{Node,Symbol}}()
+		__edges_multi = Vector{Tuple{Node,Vector{Symbol}}}()
+		__edges_named = Vector{Tuple{Node,Symbol,Symbol}}()
+
+		$node_block
+
+		try
+			for (n,next) in __edges_single
+				setnext!(n, __nodes[next])
+			end
+			for (n,nexts) in __edges_multi
+				setnext!(n, [__nodes[next] for next in nexts])
+			end
+			for (n,name,next) in __edges_named
+				setnext!(n, name, __nodes[next])
+			end
+		catch e
+			e isa KeyError && error("Can't link to node '$(string(e.key))', node not found.")
+			rethrow()
+		end
+
+		nodes = collect(values(__nodes))
+		starts = filter(n -> n isa Start, nodes)
+
+		undef_nodes = filter(!(fieldsdefined), nodes)
+		for n in undef_nodes
+			error("Not all edges set on node '$(getid(n))' (or it have another un-initialized field).")
+		end
+
+		(starts, nodes)
+	end
+end
+
+macro node(exp)
+	err_msg = """
+	Invalid node format. Valid formats are:
+		@node id = NodeType(...) -> []
+		@node id = NodeType(...) -> next
+		@node id = NodeType(...) -> [next_1, ..., next_n]
+		@node id = NodeType(...) -> [next_kw = next, ...]
+	"""
+	exp.head != :(=) && error(err_msg)
+	exp.args[2].head != :(->) && error(err_msg)
+
+	id = exp.args[1]
+	node = exp.args[2].args[1]
+	next = exp.args[2].args[2].args[2]
+
+
+	isa_vecexpr(e) = e isa Expr && e.head in [:vect, :hcat, :vcat]
+
+	if next isa Symbol
+		edge_push = :(push!(__edges_single, (n, $(Meta.quot(next)))))
+
+	elseif isa_vecexpr(next) && isempty(next.args)
+		edge_push = :()
+
+	elseif isa_vecexpr(next) && all(a -> (a isa Symbol), next.args)
+		next = [s for s in next.args]
+		edge_push = :(push!(__edges_multi, (n, $(Meta.quot(next)))))
+
+	elseif isa_vecexpr(next) && all(a -> a isa Expr, next.args) && all(a -> a.head == :(=), next.args)
+		edge_push = :()
+		for ass in next.args
+			name = ass.args[1]
+			next = ass.args[2]
+			edge_push = :($edge_push; push!(__edges_named, (n, $(Meta.quot(name)), $(Meta.quot(next)))) )
+		end
+
+	else
+		error(err_msg)
+	end
+
+
+	return quote
+		id = $(Meta.quot(id))
+		id in keys(__nodes) && error("Node '$(string(id))' already exists.")
+
+		n = $node
+		setid!(n,id)
+		__nodes[id] = n
+
+		$edge_push
+	end
+end

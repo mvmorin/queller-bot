@@ -1,4 +1,6 @@
 # Do
+* update crawler to the new node spec
+
 * remove *preferred* keyword from graphs. user won't know what strategy is used
   so need to create explicit branches in each case. however, only the
   event-cards graph seem to be affected.
@@ -10,8 +12,6 @@
 
 # Maybe
 * some sort of debug output (node ids of the nodes at least)
-
-* have graph nodes carry actual refernces to next node
 
 * have a state aware nodes so all game logic, even the state related game logic,
   can be represented in the graph

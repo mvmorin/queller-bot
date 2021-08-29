@@ -7,7 +7,7 @@ graph2ps(file_in, file_out="out.ps") = graph2format(file_in, "ps", file_out)
 graph2pdf(file_in, file_out="out.pdf") = graph2format(file_in, "pdf", file_out)
 
 function graph2format(file_in, format, file_out)
-	g = load_graphs(file_in)[1] # Only take the first start point of the graph
+	g = load_graphs_from_file(file_in)[1] # Only take the first start point of the graph
 	s = graph2dot(g)
 
 	open(`dot -T$(format) -o $(file_out)`, write = true) do io
@@ -16,7 +16,7 @@ function graph2format(file_in, format, file_out)
 end
 
 function graph2dot(g::QuellerGraph)
-	body = mapreduce(node2dot, *, values(g.nodes))
+	body = mapreduce(node2dot, *, g.nodes)
 
 	return """
 		digraph {
@@ -29,36 +29,36 @@ end
 
 ################################################################################
 
-node2dot(n::StartNode) =
+node2dot(n::Start) =
 	"""
-		$(n.id) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(string(n)))\n($(escape_string(n.id)))"];
-		$(n.id) -> $(n.next);
+		$(getid(n)) [shape=ellipse, style=filled, fillcolor=green, label="$(escape_string(getmsg(n)))\n($(escape_string(getid(n))))"];
+		$(getid(n)) -> $(getid(n.next));
 
 	"""
 
-node2dot(n::EndNode) =
+node2dot(n::End) =
 	"""
-		$(n.id) [shape=diamond, style=filled, fillcolor=red, label="$(escape_string(string(n)))"];
+		$(getid(n)) [shape=diamond, style=filled, fillcolor=red, label="$(escape_string(getmsg(n)))"];
 
 	"""
 
-node2dot(n::DummyNode) =
+node2dot(n::Dummy) =
 	"""
-		$(n.id) [shape=ellipse, style=filled, fillcolor=lightblue];
-		$(n.id) -> $(n.next);
+		$(getid(n)) [shape=ellipse, style=filled, fillcolor=lightblue];
+		$(getid(n)) -> $(getid(n.next));
 
 	"""
 
 node2dot(n::JumpToGraph) =
 	"""
-		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(string(n)))\n($(escape_string(n.jump_graph)))"];
-		$(n.id) -> $(n.next);
+		$(getid(n)) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(getmsg(n)))\n($(escape_string(n.jump_graph)))"];
+		$(getid(n)) -> $(getid(n.next));
 
 	"""
 
 node2dot(n::ReturnFromGraph) =
 	"""
-		$(n.id) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(string(n)))"];
+		$(getid(n)) [shape=octagon, style=filled, fillcolor=grey, label="$(escape_string(getmsg(n)))"];
 
 	"""
 
@@ -66,27 +66,27 @@ node2dot(n::ReturnFromGraph) =
 
 node2dot(n::PerformAction) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(string(n)))"];
-		$(n.id) -> $(n.next);
+		$(getid(n)) [shape=box, style=filled, fillcolor=purple, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) -> $(getid(n.next));
 
 	"""
 
 node2dot(n::BinaryCondition) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(string(n)))"];
-		$(n.id) -> $(n.next_true) [label = "True"];
-		$(n.id) -> $(n.next_false) [label = "False"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) -> $(getid(n.n_true)) [label = "True"];
+		$(getid(n)) -> $(getid(n.n_false)) [label = "False"];
 
 	"""
 
 function node2dot(n::MultipleChoice)
 	dot_node = """
-		$(n.id) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(string(n)))"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=yellow, label="$(escape_string(getmsg(n)))"];
 	"""
 
 	for (i, nx) in enumerate(n.nexts)
 		dot_node *= """
-			$(n.id) -> $(nx) [label = "$(i)"];
+			$(getid(n)) -> $(getid(nx)) [label = "$(i)"];
 		"""
 	end
 	return dot_node*'\n'
@@ -96,23 +96,23 @@ end
 
 node2dot(n::CheckStrategy) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(string(n)))"];
-		$(n.id) -> $(n.next_true) [label="True"];
-		$(n.id) -> $(n.next_false) [label="False"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) -> $(getid(n.n_true)) [label="True"];
+		$(getid(n)) -> $(getid(n.n_false)) [label="False"];
 
 	"""
 
 node2dot(n::SetActiveDie) =
 	"""
-		$(n.id) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(string(n)))"];
-		$(n.id) -> $(n.next) [label="Die Available"];
-		$(n.id) -> $(n.next_no_die) [label="No Matching Die"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) -> $(getid(n.next)) [label="Die Available"];
+		$(getid(n)) -> $(getid(n.no_die)) [label="No Matching Die"];
 
 	"""
 
 node2dot(n::UseActiveDie) =
 	"""
-		$(n.id) [shape=hexagon, style=filled, fillcolor=pink, label="$(escape_string(string(n)))"];
-		$(n.id) -> $(n.next);
+		$(getid(n)) [shape=hexagon, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) -> $(getid(n.next));
 
 	"""

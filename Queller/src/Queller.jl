@@ -18,7 +18,7 @@ strvec2str(v,sep='\n') = isempty(v) ? "" : reduce((s,t) -> s*sep*t, v)
 include("dice_and_strategy.jl")
 include("cli.jl")
 include("graph.jl")
-include("crawler.jl")
+# include("crawler.jl")
 
 ################################################################################
 
@@ -26,7 +26,7 @@ include("crawler.jl")
 mutable struct ProgramState
 	phase::Int
 	phases::Vector{Function}
-	graphs::Dict{NodeID,QuellerGraph}
+	graphs::Dict{String,QuellerGraph}
 
 	strategy::Strategy.Choice
 	dice::Vector{Die.Face}
@@ -42,7 +42,10 @@ end
 function ProgramState()
 	phase = 1
 	phases = [phase1,phase2,phase3,phase4,phase5]
-	graphs = load_graphs(filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))...)
+
+	# Load all graphs in Queller/graphs directory
+	graph_files = filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))
+	graphs = load_graphs(graph_files...)
 
 	strategy = rand(instances(Strategy.Choice))
 	dice = Vector{Die.Face}()
@@ -249,17 +252,18 @@ include("graphviz.jl")
 function check_queller_graphs()
 	state = ProgramState()
 	graphs = state.graphs
-	# graphs = load_graphs(GRAPH_SOURCES...)
 
 	println("\nAll graphs in PostScript can be found in Queller/graph_output.")
-	graph_output(f) = joinpath(PKG_DIR, "graph_output", splitext(basename(f))[1]*".ps")
+	graph_output_file(f) = joinpath(PKG_DIR, "graph_output", splitext(basename(f))[1]*".ps")
 
 	for f in getfield.(values(graphs),:source_file)
-		graph2ps(f, graph_output(f))
+		graph2ps(f, graph_output_file(f))
 	end
 
 	unjumped = get_graphs_not_jumped_to(values(graphs))
 	println("\nGraphs that are not jumped to from another graph:\n$(strvec2str(unjumped))")
+
+	return
 end
 
 

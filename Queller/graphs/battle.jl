@@ -1,4 +1,4 @@
-let
+@graphs begin
 	def_card_prio = """
 	After the Free People's player have selected combat card, select and play a card. If no card is matching the 4 first items in the priority list, do not play any card.
 
@@ -57,53 +57,21 @@ let
 
 
 	################################################################################
-	[
-	 StartNode(
-			   id = "battle",
-			   next = "rearguard",
-			   text = "Battle",
-			   )
-	 PerformAction(
-				   id = "rearguard",
-				   next = "army_attacking",
-				   action = "All units from nations not at war form the rearguard."
-				   )
-	 BinaryCondition(
-					 id = "army_attacking",
-					 condition = "The Shadow army is attacking.",
-					 next_true = "is_sortie",
-					 next_false = "def_in_stronghold",
-					 )
+	 @node battle = Start("Battle") -> rearguard
+	 @node rearguard = PerformAction("All units from nations not at war form the rearguard.") -> army_attacking
+	 @node army_attacking = BinaryCondition("The Shadow army is attacking.") -> [n_true = is_sortie, n_false = def_in_stronghold]
 
 	 ########################################
-	 BinaryCondition(
-					 id = "def_in_stronghold",
-					 condition = """
+	 @node def_in_stronghold = BinaryCondition("""
 					 The Shadow army is defending in a region with a stronghold.
-					 """,
-					 next_true = "should_retreat_to_stronghold",
-					 next_false = "field_def_card_prio",
-					 )
-	 PerformAction(
-				   id = "field_def_card_prio",
-				   action = def_card_prio,
-				   next = "field_def_resolve",
-				   )
-	 JumpToGraph(
-				 id = "field_def_resolve",
-				 text = "Battle: Resolve",
-				 next = "field_attacking_fp_continues",
-				 jump_graph = "battle_resolve",
-				 )
-	 BinaryCondition(
-					 id = "field_attacking_fp_continues",
-					 condition = " The Free People's player is continuing the attack.",
-					 next_true = "retreat_prio",
-					 next_false = "field_def_end",
-					 )
-	 PerformAction(
-				   id = "retreat_prio",
-				   action = """
+					 """) -> [n_true = should_retreat_to_stronghold, n_false = field_def_card_prio]
+	 @node field_def_card_prio = PerformAction(def_card_prio) -> field_def_resolve
+	 @node field_def_resolve = JumpToGraph("Battle: Resolve",
+										   "battle_resolve") -> field_attacking_fp_continues
+	 @node field_attacking_fp_continues = BinaryCondition("""
+														  The Free People's player is continuing the attack.
+														  """) -> [n_true = retreat_prio, n_false = field_def_end]
+	 @node retreat_prio = PerformAction("""
 				   Retreat from combat into region accroding to the following prioirty.
 
 				   Priority:
@@ -115,169 +83,64 @@ let
 				   6. Contains the highest *value* army
 				   7. Adjacent to the highest *value* army
 				   8. Random
-				   """,
-				   next = "field_def_end",
-				   )
-	 EndNode(
-			 id = "field_def_end",
-			 text = "End of Battle",
-			 )
+				   """) -> field_def_end
+	 @node field_def_end = End("End of Battle") -> []
 
 
 	 ########################################
-	 BinaryCondition(
-					 id = "should_retreat_to_stronghold",
-					 condition = """
+	 @node should_retreat_to_stronghold = BinaryCondition("""
 					 The Shadow army is not under siege.
 					 And, the *value* is less or equal to the attacking army's.
 					 And, the number of units is less than 8.
-					 """,
-					 next_true = "retreat_to_stronghold",
-					 next_false = "def_card_prio",
-					 )
-	 PerformAction(
-				   id = "def_card_prio",
-				   action = def_card_prio,
-				   next = "def_resolve",
-				   )
-	 JumpToGraph(
-				 id = "def_resolve",
-				 text = "Battle: Resolve",
-				 next = "attacking_fp_continues",
-				 jump_graph = "battle_resolve",
-				 )
-	 BinaryCondition(
-					 id = "attacking_fp_continues",
-					 condition = " The Free People's player is continuing the attack.",
-					 next_true = "should_retreat_to_stronghold",
-					 next_false = "def_end",
-					 )
-	 EndNode(
-			 id = "def_end",
-			 text = "End of Battle",
-			 )
+					 """) -> [n_true = retreat_to_stronghold, n_false = def_card_prio]
+	 @node def_card_prio = PerformAction(def_card_prio) -> def_resolve
+	 @node def_resolve = JumpToGraph("Battle: Resolve",
+									 "battle_resolve") -> attacking_fp_continues
+	 @node attacking_fp_continues = BinaryCondition("""
+													The Free People's player is continuing the attack.
+													""") -> [n_true = should_retreat_to_stronghold, n_false = def_end]
+	 @node def_end = End("End of Battle") -> []
 
-	 PerformAction(
-				   id = "retreat_to_stronghold",
-				   action = "Retreat into stronghold.",
-				   next = "retreat_stronghold_end",
-				   )
-	 EndNode(
-			 id = "retreat_stronghold_end",
-			 text = "End of Battle",
-			 )
-
-
-
-
+	 @node retreat_to_stronghold = PerformAction("Retreat into stronghold.") -> retreat_stronghold_end
+	 @node retreat_stronghold_end = End("End of Battle") -> []
 
 
 	 ########################################
-	 BinaryCondition(
-					 id = "is_sortie",
-					 condition = "Battle is a sortie.",
-					 next_true = "sortie_card_prio",
-					 next_false = "army_with_wk",
-					 )
-	 PerformAction(
-				   id = "sortie_card_prio",
-				   action = sortie_card_prio,
-				   next = "sortie_resolve",
-				   )
-	 JumpToGraph(
-				 id = "sortie_resolve",
-				 text = "Battle: Resolve",
-				 next = "sortie_round_end",
-				 jump_graph = "battle_resolve",
-				 )
-	 JumpToGraph(
-				 id = "sortie_round_end",
-				 text = "Battle: Round End",
-				 next = "sortie_card_prio",
-				 jump_graph = "battle_round_end",
-				 )
-
+	 @node is_sortie = BinaryCondition("Battle is a sortie.") -> [n_true = sortie_card_prio, n_false = army_with_wk]
+	 @node sortie_card_prio = PerformAction(sortie_card_prio) -> sortie_resolve
+	 @node sortie_resolve = JumpToGraph("Battle: Resolve",
+										"battle_resolve") -> sortie_round_end
+	 @node sortie_round_end = JumpToGraph("Battle: Round End",
+										  "battle_round_end") -> sortie_card_prio
 
 
 	 ########################################
-	 BinaryCondition(
-					 id = "army_with_wk",
-					 condition = "Army include the Witch King.",
-					 next_true = "wk_card_prio",
-					 next_false = "should_play_card",
-					 )
-	 PerformAction(
-				   id = "wk_card_prio",
-				   action = wk_card_prio,
-				   next = "wk_resolve",
-				   )
-	 JumpToGraph(
-				 id = "wk_resolve",
-				 text = "Battle: Resolve",
-				 next = "wk_round_end",
-				 jump_graph = "battle_resolve",
-				 )
-	 JumpToGraph(
-				 id = "wk_round_end",
-				 text = "Battle: Round End",
-				 next = "should_play_card",
-				 jump_graph = "battle_round_end",
-				 )
-
+	 @node army_with_wk = BinaryCondition("Army include the Witch King.") -> [n_true = wk_card_prio, n_false = should_play_card]
+	 @node wk_card_prio = PerformAction(wk_card_prio) -> wk_resolve
+	 @node wk_resolve = JumpToGraph("Battle: Resolve",
+									"battle_resolve") -> wk_round_end
+	 @node wk_round_end = JumpToGraph("Battle: Round End",
+									  "battle_round_end") -> should_play_card
 
 
 	 ########################################
-	 BinaryCondition(
-					 id = "should_play_card",
-					 condition = """
+	 @node should_play_card = BinaryCondition("""
 					 The Shadow is conducting a siege.
 					 Or, the Shadow is holding more than 4 cards.
-					 """,
-					 next_true = "attack_card_prio",
-					 next_false = "attack_play_no_card",
-					 )
+					 """) -> [n_true = attack_card_prio, n_false = attack_play_no_card]
 
-	 PerformAction(
-				   id = "attack_card_prio",
-				   action = attack_card_prio,
-				   next = "attack_resolve",
-				   )
-	 PerformAction(
-				   id = "attack_play_no_card",
-				   action = "Do not play a combat card.",
-				   next = "attack_resolve",
-				   )
-	 JumpToGraph(
-				 id = "attack_resolve",
-				 text = "Battle: Resolve",
-				 next = "attack_round_end",
-				 jump_graph = "battle_resolve",
-				 )
-	 JumpToGraph(
-				 id = "attack_round_end",
-				 text = "Battle: Round End",
-				 next = "should_play_card",
-				 jump_graph = "battle_round_end",
-				 )
-
-
+	 @node attack_card_prio = PerformAction(attack_card_prio) -> attack_resolve
+	 @node attack_play_no_card = PerformAction("Do not play a combat card.") -> attack_resolve
+	 @node attack_resolve = JumpToGraph("Battle: Resolve",
+										"battle_resolve") -> attack_round_end
+	 @node attack_round_end = JumpToGraph("Battle: Round End",
+										  "battle_round_end") -> should_play_card
 
 
 	 ################################################################################
-	 StartNode(
-			   id = "battle_resolve",
-			   text = "Battle: Resolve",
-			   next = "roll",
-			   )
-	 PerformAction(
-				   id = "roll",
-				   next = "casualties",
-				   action = "Roll for combat and reroll misses.",
-				   )
-	 PerformAction(
-				   id = "casualties",
-				   next = "battle_resolve_return",
-				   action = """
+	 @node battle_resolve = Start("Battle: Resolve") -> roll
+	 @node roll = PerformAction("Roll for combat and reroll misses.") -> casualties
+	 @node casualties = PerformAction("""
 				   Remove casualties.
 
 				   Priority:
@@ -285,122 +148,49 @@ let
 				   2. Retains highest army *value* with lowest number of units
 				   3. Keeps one unit of each nation
 				   4. Random
-				   """,
-				   )
-	 ReturnFromGraph(id = "battle_resolve_return")
+				   """) -> battle_resolve_return
+	 @node battle_resolve_return = ReturnFromGraph() -> []
 
 
 
 
 	 ################################################################################
-	 StartNode(
-			   id = "battle_round_end",
-			   text = "Battle: Round End",
-			   next = "is_fp_dead",
-			   )
-	 BinaryCondition(
-					 id = "is_fp_dead",
-					 condition = "There are Free People's units remaining.",
-					 next_true = "press_on",
-					 next_false = "no_fp_left",
-					 )
-	 BinaryCondition(
-					 id = "no_fp_left",
-					 condition = """
+	 @node battle_round_end = Start("Battle: Round End") -> is_fp_dead
+	 @node is_fp_dead = BinaryCondition("There are Free People's units remaining.") -> [n_true = press_on, n_false = no_fp_left]
+	 @node no_fp_left = BinaryCondition("""
 					 Moving in to the conquered region would:
 					 - win the game; or
 					 - decrease distance to *target*; or
 					 - remove a threat.
-					 """,
-					 next_true = "move_into_conquered",
-					 next_false = "end_without_moving",
-					 )
+					 """) -> [n_true = move_into_conquered, n_false = end_without_moving]
 
-	 PerformAction(
-				   id = "move_into_conquered",
-				   action = "Move the largest *value* possible into the conquered region.",
-				   next = "move_into_conquered_end",
-				   )
-	 EndNode(
-			 id = "move_into_conquered_end",
-			 text = "End of Battle",
-			 )
+	 @node move_into_conquered = PerformAction("Move the largest *value* possible into the conquered region.") -> move_into_conquered_end
+	 @node move_into_conquered_end = End("End of Battle") -> []
 
 
-	 PerformAction(
-				   id = "end_without_moving",
-				   action = "Do not move any units into the conquered region.",
-				   next = "end_without_moving_end",
-				   )
-	 EndNode(
-			 id = "end_without_moving_end",
-			 text = "End of Battle",
-			 )
+	 @node end_without_moving = PerformAction("Do not move any units into the conquered region.") -> end_without_moving_end
+	 @node end_without_moving_end = End("End of Battle") -> []
 
 
-	 BinaryCondition(
-					 id = "press_on",
-					 condition = """
+	 @node press_on = BinaryCondition("""
 					 A field battle was fought.
-					 """,
-					 next_true = "aggressive_if_continue",
-					 next_false = "mili_strat",
-					 )
-	 CheckStrategy(
-				   id = "mili_strat",
-				   strategy = "military",
-				   next_true = "aggressive_if_continue",
-				   next_false = "press_on_2",
-				   )
-	 BinaryCondition(
-					 id = "press_on_2",
-					 condition = """
+					 """) -> [n_true = aggressive_if_continue, n_false = mili_strat]
+	 @node mili_strat = CheckStrategy("military") -> [n_true = aggressive_if_continue, n_false = press_on_2]
+	 @node press_on_2 = BinaryCondition("""
 					 The Fellowship is on the Mordor track.
-					 """,
-					 next_true = "another_round_if_possible",
-					 next_false = "no_more_round",
-					 )
-	 BinaryCondition(
-					 id = "aggressive_if_continue",
-					 condition = """
+					 """) -> [n_true = another_round_if_possible, n_false = no_more_round]
+	 @node aggressive_if_continue = BinaryCondition("""
 					 The Shadow army is *aggressive* and, if a siege battle is fought, would remain *aggressive* after an Elite downgrade to continue the battle.
-					 """,
-					 next_true = "another_round_if_possible",
-					 next_false = "no_more_round_2",
-					 )
-	 BinaryCondition(
-					 id = "another_round_if_possible",
-					 condition = "A siege battle is fought and the Shadow army have no Elites left",
-					 next_true = "no_more_round_2",
-					 next_false = "one_more_round",
-					 )
-	 PerformAction(
-				   id = "one_more_round",
-				   action = "Continue the battle, downgrade an Elite if necessary.",
-				   next = "one_more_round_return",
-				   )
-	 ReturnFromGraph(id = "one_more_round_return")
+					 """) -> [n_true = another_round_if_possible, n_false = no_more_round_2]
+	 @node another_round_if_possible = BinaryCondition("A siege battle is fought and the Shadow army have no Elites left") -> [n_true = no_more_round_2, n_false = one_more_round]
+	 @node one_more_round = PerformAction("Continue the battle, downgrade an Elite if necessary.") -> one_more_round_return
+	 @node one_more_round_return = ReturnFromGraph() -> []
 
 
-	 PerformAction(
-				   id = "no_more_round",
-				   action = "End battle",
-				   next = "no_more_round_end",
-				   )
-	 EndNode(
-			 id = "no_more_round_end",
-			 text = "End of Battle",
-			 )
+	 @node no_more_round = PerformAction("End battle") -> no_more_round_end
+	 @node no_more_round_end = End("End of Battle") -> []
 
-	 PerformAction(
-				   id = "no_more_round_2",
-				   action = "End battle",
-				   next = "no_more_round_end_2",
-				   )
-	 EndNode(
-			 id = "no_more_round_end_2",
-			 text = "End of Battle",
-			 )
+	 @node no_more_round_2 = PerformAction("End battle") -> no_more_round_end_2
+	 @node no_more_round_end_2 = End("End of Battle") -> []
 
-	 ]
 end
