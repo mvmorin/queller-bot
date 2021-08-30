@@ -256,7 +256,8 @@ struct QuellerGraph
 	source_file::String
 end
 
-getid(g::QuellerGraph) = getid(g.root_node)
+getid(g::QuellerGraph) = getid(root(g))
+root(g::QuellerGraph) = g.root_node
 
 function load_graphs_from_file(file)
 	starts, nodes = include(file)

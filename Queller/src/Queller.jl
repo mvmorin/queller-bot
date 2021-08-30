@@ -18,7 +18,7 @@ strvec2str(v,sep='\n') = isempty(v) ? "" : reduce((s,t) -> s*sep*t, v)
 include("dice_and_strategy.jl")
 include("cli.jl")
 include("graph.jl")
-# include("crawler.jl")
+include("crawler.jl")
 
 ################################################################################
 

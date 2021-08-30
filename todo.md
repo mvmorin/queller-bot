@@ -1,6 +1,4 @@
 # Do
-* update crawler to the new node spec
-
 * remove *preferred* keyword from graphs. user won't know what strategy is used
   so need to create explicit branches in each case. however, only the
   event-cards graph seem to be affected.

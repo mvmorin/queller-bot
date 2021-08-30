@@ -37,11 +37,10 @@ end
 ################################################################################
 
 mutable struct GraphCrawler
-	current::QuellerNode
-	graph::QuellerGraph
+	current::Node
+	jump_stack::Vector{Node}
 
-	jump_stack::Vector{Tuple{QuellerNode,QuellerGraph}}
-	all_graphs::Dict{NodeID,QuellerGraph}
+	graphs::Dict{String,QuellerGraph}
 
 	strategy::Strategy.Choice
 
@@ -53,26 +52,22 @@ mutable struct GraphCrawler
 
 	msg_buf::String
 
-	function GraphCrawler(startgraph::NodeID, graphs, strategy, available_dice; ring_available=false, modt_available=false)
-		graph = graphs[startgraph]
-		current = graph[startgraph]
+	function GraphCrawler(startgraph::String, graphs, strategy, available_dice; ring_available=false, modt_available=false)
+		current = root(graphs[startgraph])
 
-		jump_stack = Vector{Tuple{QuellerNode,QuellerGraph}}()
+		jump_stack = Vector{Node}()
 		sizehint!(jump_stack, 10)
-		all_graphs = graphs
 
 		active_die = nothing
 
 		msg_buf = ""
 
-		gc = new(current,graph,jump_stack,all_graphs,strategy,active_die,available_dice,ring_available,modt_available,msg_buf)
+		gc = new(current,jump_stack,graphs,strategy,active_die,available_dice,ring_available,modt_available,msg_buf)
 
 		autocrawl!(gc)
 		return gc
 	end
 end
-GraphCrawler(startgraph::AbstractString, graphs, strategy, available_dice; ring_available=false, modt_available=false) =
-	GraphCrawler(NodeID(startgraph), graphs, strategy, available_dice, ring_available=ring_available, modt_available=modt_available)
 
 function autocrawl!(gc)
 	# crawls the graph until it encounters node that requires interaction
@@ -85,40 +80,37 @@ function autocrawl!(gc)
 	while !at_end(gc)
 		gc.msg_buf = add2msgbuf(gc.msg_buf, gc.current)
 		gc.current isa interactive_node && break
-		autonext!(gc, gc.current, gc.graph)
+		gc.current = autonext!(gc, gc.current)
 	end
 end
 
-function autonext!(gc, node::Union{StartNode,DummyNode}, graph)
+function autonext!(gc, node::Union{Start,Dummy})
 	# sets the current node to the next node, these nodes have no choices and do
 	# not change the graph that is parsed.
 
-	gc.current =  graph[getnext(node,nothing)]
-	gc.graph = graph
+	return getnext(node,nothing)
 end
 
-function autonext!(gc, node::JumpToGraph, graph)
+function autonext!(gc, node::JumpToGraph)
 	# sets the current node to the start node of the graph that is jumped to
 
-	push!(gc.jump_stack, (node, graph))
-	gc.graph = gc.all_graphs[node.jump_graph]
-	gc.current = gc.graph[node.jump_graph]
+	push!(gc.jump_stack, node)
+	return root(gc.graphs[node.jump_graph])
 end
 
 function autonext!(gc, ::ReturnFromGraph, _)
 	# set the current node to the node after the JumpToGraph node from which the
 	# jump was made
 
-	node, gc.graph = pop!(gc.jump_stack)
-	gc.current = gc.graph[getnext(node,nothing)]
+	node = pop!(gc.jump_stack)
+	return getnext(node,nothing)
 end
 
 function autonext!(gc, node::CheckStrategy, graph)
-	gc.current =  graph[getnext(node,CMD.Option(gc.strategy))]
-	gc.graph = graph
+	return getnext(node,CMD.Option(gc.strategy))
 end
 
-function autonext!(gc, node::SetActiveDie, graph)
+function autonext!(gc, node::SetActiveDie)
 	!isnothing(gc.active_die) && gc.active_die.used && error("Trying to set an active die when a die already have been used.")
 
 	gc.strategy == Strategy.Military && (discardable_dice = [Die.Character, Die.Event])
@@ -126,12 +118,10 @@ function autonext!(gc, node::SetActiveDie, graph)
 
 	active_die = get_active_die(node.die, gc.available_dice, gc.modt_available, gc.ring_available && node.may_use_ring, discardable_dice)
 	if isnothing(active_die)
-		gc.current =  graph[getnext(node,CMD.False())]
-		gc.graph = graph
+		return getnext(node,CMD.False())
 	else
 		gc.active_die = active_die
-		gc.current =  graph[getnext(node,CMD.True())]
-		gc.graph = graph
+		return getnext(node,CMD.True())
 	end
 end
 
@@ -139,27 +129,26 @@ function autonext!(gc, node::UseActiveDie, graph)
 	isnothing(gc.active_die) && error("No active die have been set before it is used.")
 
 	gc.active_die = use_active_die(gc.active_die)
-	gc.current = graph[getnext(node,nothing)]
-	gc.graph = graph
+	return getnext(node,nothing)
 end
 
 
 ################################################################################
 
 function add2msgbuf(buf,node,debug=false)
-	return buf*"\n"*string(node)
+	return buf*"\n"*getmsg(node)
 end
 
 
 
 ################################################################################
 
-at_end(gc) = gc.current isa EndNode
+at_end(gc) = gc.current isa End
 getinteraction(gc) = (gc.msg_buf, getopt(gc.current))
 die_used(gc) = gc.active_die.used ? gc.active_die.use_as : nothing
 
 function proceed!(gc, opt)
-	gc.current = gc.graph[getnext(gc.current,opt)]
+	gc.current = getnext(gc.current,opt)
 	gc.msg_buf = ""
 	autocrawl!(gc)
 end
