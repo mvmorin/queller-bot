@@ -12,6 +12,8 @@ end
 ActiveDie(die, use_as, use_modt, use_ring) = ActiveDie(die, use_as, use_modt, use_ring, false)
 use_active_die(d) = ActiveDie(d.die, d.use_as, d.use_modt, d.use_ring, true)
 
+article(d::ActiveDie) = Die.article(d.die)
+
 function Base.string(d::ActiveDie)
 	d.die == d.use_as && return string(d.die)
 
@@ -76,7 +78,7 @@ getnext!(n::CheckStrategy, state) = (state.strategy == n.strategy ? n.n_true : n
 setnext!(n::CheckStrategy, name::Symbol, next::Node) = setfield!(n,name,next)
 
 getmsg(n::CheckStrategy) = "The $(string(n.strategy)) strategy is used."
-getmsg(n::CheckStrategy, state) = "The $(string(n.strategy)) strategy is used: $(state.strategy == n.strategy)"
+getmsg(n::CheckStrategy, state) = "$(getmsg(n)): $(state.strategy == n.strategy)"
 
 
 ################################################################################
@@ -92,6 +94,23 @@ setnext!(n::SetStrategy, next::Node) = (n.next = next)
 getnext!(n::SetStrategy, state) = (state.strategy = n.strategy; n.next)
 
 getmsg(n::SetStrategy) = "Set Queller strategy to $(string(n.strategy))."
+
+
+################################################################################
+
+mutable struct CheckActiveDie <: StateInteractionNode
+	id::String
+	die::Die.Face
+	n_true::Node
+	n_false::Node
+
+	CheckActiveDie(die) = (obj = new(); obj.die = DieFace(die); obj)
+end
+setnext!(n::CheckActiveDie, name::Symbol, next::Node) = setfield!(n,name,next)
+getnext!(n::CheckActiveDie, state) = (state.active_die.use_as == n.die ? n.n_true : n.n_false)
+getmsg(n::CheckActiveDie) = "The active die is $(Die.article(n.die)) $(string(n.die))"
+getmsg(n::CheckActiveDie, state) = "$(getmsg(n)): $(state.active_die.use_as == n.die)"
+
 
 
 ################################################################################
@@ -154,45 +173,18 @@ setnext!(n::UseActiveDie, next::Node) = (n.next = next)
 function getnext!(n::UseActiveDie, state)
 	isnothing(state.active_die) && error("No active die have been set before it is used.")
 
-	state.active_die = use_active_die(state.active_die)
-
-	i = findfirst(==(state.active_die.die), state.available_dice)
-	state.available_dice = deleteat!(state.available_dice, i)
+	if !state.active_die.used
+		state.active_die = use_active_die(state.active_die)
+		i = findfirst(==(state.active_die.die), state.available_dice)
+		state.available_dice = deleteat!(state.available_dice, i)
+	end
 	return n.next
 end
 
 getmsg(n::UseActiveDie) = "Use the Active Die to:"
 function getmsg(n::UseActiveDie, state)
-	ad = state.active_die.die
-	article = (ad == Die.Army || ad == Die.Event) ? "an" : "a"
-	return "Use $(article) $(string(state.active_die)) to:"
-end
-
-
-################################################################################
-
-mutable struct GetAvailableDice <: InteractiveNode
-	id::String
-	next::Node
-	action::String
-
-	GetAvailableDice(action = """
-					 Roll all action dice not in the hunt box. Place all Eye results in the hunt box and input the remaining dice here.
-					 """) = (obj = new(); obj.action = strip(action); obj)
-end
-setnext!(n::GetAvailableDice, next::Node) = (n.next = next)
-getopt(n::GetAvailableDice) = [CMD.Dice()]
-getnext!(n::GetAvailableDice, state, opt::CMD.Dice) = (state.available_dice = opt.dice; n.next)
-
-function getmsg(n::GetAvailableDice)
-	diefaces = instances(Die.Face)
-	legends = Die.char.(diefaces).*": ".*string.(diefaces)
-
-	return """
-	$(n.action)
-
-	$(strvec2str(legends))
-	"""
+	die = state.active_die
+	return "Use $(article(die)) $(string(die)) to:"
 end
 
 
@@ -222,3 +214,32 @@ end
 setnext!(n::SetMoDTAvailable, next::Node) = (n.next = next)
 getnext!(n::SetMoDTAvailable, state) = (state.modt_available = n.modt_available; n.next)
 getmsg(n::SetMoDTAvailable) = n.modt_available ? "Set 'Messenger of the Dark Tower' as available." : "Set 'Messenger of the Dark Tower' as not available."
+
+
+################################################################################
+
+mutable struct GetAvailableDice <: InteractiveNode
+	id::String
+	next::Node
+	action::String
+
+	GetAvailableDice(action = """
+					 Roll all action dice not in the hunt box. Place all Eye results in the hunt box and input the remaining dice here.
+					 """) = (obj = new(); obj.action = strip(action); obj)
+end
+setnext!(n::GetAvailableDice, next::Node) = (n.next = next)
+getopt(n::GetAvailableDice) = [CMD.Dice()]
+getnext!(n::GetAvailableDice, state, opt::CMD.Dice) = (state.available_dice = opt.dice; n.next)
+
+function getmsg(n::GetAvailableDice)
+	diefaces = instances(Die.Face)
+	legends = Die.char.(diefaces).*": ".*string.(diefaces)
+
+	return """
+	$(n.action)
+
+	$(strvec2str(legends))
+	"""
+end
+
+

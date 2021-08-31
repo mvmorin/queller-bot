@@ -94,7 +94,8 @@
 	@node a9_jump_1_die = SetActiveDie('C') -> [next = a9_jump_1, no_die = a9_jump_2_die]
 	@node a9_jump_1 = JumpToGraph("character_army") -> a9_jump_2_die
 	@node a9_jump_2_die = SetActiveDie('A') -> [next = a9_jump_2, no_die = a10]
-	@node a9_jump_2 = JumpToGraph("movement_attack_basic") -> a10
+	@node a9_jump_2 = JumpToGraph("movement_attack_besiege") -> a9_jump_3
+	@node a9_jump_3 = JumpToGraph("movement_attack_corr") -> a10
 
 
 	#######################################

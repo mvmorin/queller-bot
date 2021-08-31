@@ -33,7 +33,6 @@ mutable struct ProgramState
 
 	iop::IOParser
 
-	debug_mode::Bool
 	reset::Bool
 	reset_phase::Bool
 	exit::Bool
@@ -50,7 +49,6 @@ function ProgramState()
 	queller = QuellerState()
 
 	iop = IOParser([
-		CMD.Debug()
 		CMD.ResetAll()
 		CMD.ResetPhase()
 		CMD.Exit()
@@ -58,11 +56,10 @@ function ProgramState()
 		])
 
 	cmds = Vector{CMD.Command}()
-	return ProgramState(phase,phases,graphs,queller,iop,false,false,false,false)
+	return ProgramState(phase,phases,graphs,queller,iop,false,false,false)
 end
 
 
-handle_general_command(state,cmd::CMD.Debug) = (state.debug_mode = !state.debug_mode)
 handle_general_command(state,cmd::CMD.ResetAll) = (state.reset = true)
 handle_general_command(state,cmd::CMD.ResetPhase) = (state.reset_phase = true)
 handle_general_command(state,cmd::CMD.Exit) = (state.exit = true)
@@ -81,7 +78,8 @@ function print_read_process(state, msg, options, callback)
 	end
 end
 
-function resolve_decision_graph(state,graph)
+function resolve_decision_graph(state, graph)
+	state.queller.active_die = nothing
 	gc = GraphCrawler(graph, state.graphs, state.queller)
 
 	callback(cmd) = proceed!(gc, cmd)
@@ -109,24 +107,12 @@ function main()
 	end
 end
 
-function phase1(state)
-	resolve_decision_graph(state, "phase_1")
-end
-
-function phase2(state)
-	resolve_decision_graph(state, "phase_2")
-end
-
-function phase3(state)
-	resolve_decision_graph(state, "phase_3")
-end
-
-function phase4(state)
-	resolve_decision_graph(state, "phase_4")
-end
+phase1(state) = resolve_decision_graph(state, "phase_1")
+phase2(state) = resolve_decision_graph(state, "phase_2")
+phase3(state) = resolve_decision_graph(state, "phase_3")
+phase4(state) = resolve_decision_graph(state, "phase_4")
 
 function phase5(state)
-	state.queller.active_die = nothing
 	menu = """
 	Available Dice: $(strvec2str(sort(Die.char.(state.queller.available_dice)),','))
 
@@ -139,29 +125,23 @@ function phase5(state)
 	5. Change the available dice (use this if the bot's available dice do not match reality)
 	6. End turn and go to phase 1
 	"""
+
+	graphs = [
+			  "phase_5",
+			  "event_cards_resolve_effect",
+			  "battle",
+			  "muster_minion_selection",
+			  "adjust_dice",
+			  ]
+
 	choice = Ref(0)
 	menu_callback(cmd) = (choice[] = cmd.opt)
 	!print_read_process(state, menu, CMD.Option.(1:6), menu_callback) && return
 
-	if choice[] == 1
-		ret = resolve_decision_graph(state, "phase_5")
+	if 1 <= choice[] <= 5
+		ret = resolve_decision_graph(state, graphs[choice[]])
 		isnothing(ret) && return
 
-	elseif choice[] == 2
-		ret = resolve_decision_graph(state, "event_cards_resolve_effect")
-		isnothing(ret) && return
-
-	elseif choice[] == 3
-		ret = resolve_decision_graph(state, "battle")
-		isnothing(ret) && return
-
-	elseif choice[] == 4
-		ret = resolve_decision_graph(state, "muster_minion_selection")
-		isnothing(ret) && return
-
-	elseif choice[] == 5
-		ret = resolve_decision_graph(state, "adjust_dice")
-		isnothing(ret) && return
 	elseif choice[] == 6
 		# Confirm exit
 		msg = "Exit phase 5 and return to phase 1."

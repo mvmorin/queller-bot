@@ -111,11 +111,23 @@
 
 					1. Region selection for muster
 					2. Army selection for movement or attack
-					3. Hunt allocation
-					4. No effect, return to Phase 5 menu
-					""") -> [er_muster, er_army, er_hunt, er_resolve_end]
+					3. Move minion or Nazgûl
+					4. Hunt allocation
+					5. No effect, return to Phase 5 menu
+					""") -> [er_muster, er_army, er_char_move, er_hunt, er_resolve_end]
 	 @node er_muster = JumpToGraph("muster_card") -> er_resolve_end
 	 @node er_army = JumpToGraph("movement_attack_card") -> er_resolve_end
+	 @node er_char_move = MultipleChoice("""
+					Select what to move.
+
+					1. The Which King
+					2. The Mouth of Sauron
+					3. The Nazgûl
+					4. Nothing
+					""") -> [er_move_wk, er_move_mos, er_move_naz, er_select_card_effect_choice]
+	 @node er_move_wk = JumpToGraph("character_wk_prio") -> er_resolve_end
+	 @node er_move_mos = JumpToGraph("character_mos_prio") -> er_resolve_end
+	 @node er_move_naz = JumpToGraph("character_nazgul_prio") -> er_resolve_end
 	 @node er_hunt = PerformAction("""
 				   For each die that is possible to add to the hunt pool, roll a d6. On a 4+, add it to the hunt pool. It is only possible to add a die to the hunt pool if it is not a *preferred* die.
 				   """) -> er_resolve_end

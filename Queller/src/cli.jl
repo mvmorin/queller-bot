@@ -16,7 +16,6 @@ struct ResetPhase <: AbortingCommand end
 struct Exit <: AbortingCommand end
 
 struct Repeat <: Command end
-struct Debug <: Command end
 struct Help <: Command end
 
 struct True <: InputCommand end
@@ -33,7 +32,6 @@ end
 
 Base.string(o::Option) = string(o.opt)
 
-minmatch(::Debug) = 0
 minmatch(::ResetAll) = 0
 minmatch(::ResetPhase) = 0
 minmatch(::Exit) = 0

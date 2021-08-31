@@ -96,7 +96,7 @@ end
 
 node2dot(n::CheckStrategy) =
 	"""
-		$(getid(n)) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) [shape=ellipse, style=filled, fillcolor=orange, label="$(escape_string(getmsg(n)))"];
 		$(getid(n)) -> $(getid(n.n_true)) [label="True"];
 		$(getid(n)) -> $(getid(n.n_false)) [label="False"];
 
@@ -104,8 +104,16 @@ node2dot(n::CheckStrategy) =
 
 node2dot(n::SetStrategy) =
 	"""
-		$(getid(n)) [shape=hexagon, style=filled, fillcolor=orange, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=orange, label="$(escape_string(getmsg(n)))"];
 		$(getid(n)) -> $(getid(n.next));
+
+	"""
+
+node2dot(n::CheckActiveDie) =
+	"""
+		$(getid(n)) [shape=ellipse, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) -> $(getid(n.n_true)) [label="True"];
+		$(getid(n)) -> $(getid(n.n_false)) [label="False"];
 
 	"""
 
@@ -133,14 +141,14 @@ node2dot(n::GetAvailableDice) =
 
 node2dot(n::SetRingAvailable) =
 	"""
-		$(getid(n)) [shape=ellipse, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
 		$(getid(n)) -> $(getid(n.next));
 
 	"""
 
 node2dot(n::SetMoDTAvailable) =
 	"""
-		$(getid(n)) [shape=ellipse, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
+		$(getid(n)) [shape=box, style=filled, fillcolor=pink, label="$(escape_string(getmsg(n)))"];
 		$(getid(n)) -> $(getid(n.next));
 
 	"""

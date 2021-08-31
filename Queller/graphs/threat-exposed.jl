@@ -28,7 +28,7 @@
 	"""
 
 	move_remain_cond = """
-	An army die was used and it have one move remaining.
+	The Army Die have one move remaining.
 	"""
 
 
@@ -109,7 +109,8 @@
 
 	########################################
 	@node tx_move_use_die = UseActiveDie() -> tx_move_action
-	@node tx_move_action = PerformAction(move_text) -> tx_move_movement_remains
+	@node tx_move_action = PerformAction(move_text) -> tx_move_army_die_to_move
+	@node tx_move_army_die_to_move = CheckActiveDie('A') -> [n_true=tx_move_movement_remains, n_false=tx_move_end]
 	@node tx_move_movement_remains = BinaryCondition(move_remain_cond) -> [n_true = tx_use_remaining_movement, n_false = tx_move_end]
 	@node tx_use_remaining_movement = JumpToGraph("movement_attack_corr") -> tx_m
 	@node tx_move_end = End() -> []

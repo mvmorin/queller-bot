@@ -137,12 +137,12 @@
 
 	################################################################################
 	@node character_nazgul_prio = Start() -> lc_nazgul_prio
-	@node lc_nazgul_prio = PerformAction(wk_prio) -> lc_nazgul_prio_end
+	@node lc_nazgul_prio = PerformAction(nazgul_prio) -> lc_nazgul_prio_end
 	@node lc_nazgul_prio_end = End() -> []
 
 
 	################################################################################
 	@node character_mos_prio = Start() -> lc_mos_prio
-	@node lc_mos_prio = PerformAction(wk_prio) -> lc_mos_prio_end
+	@node lc_mos_prio = PerformAction(mos_prio) -> lc_mos_prio_end
 	@node lc_mos_prio_end = End() -> []
 end

@@ -26,6 +26,9 @@ mutable struct GraphCrawler
 	end
 end
 
+
+################################################################################
+
 function autocrawl!(gc)
 	# crawls the graph until it encounters node that requires interaction
 	# store all node messages in a buffer
@@ -55,17 +58,6 @@ end
 
 ################################################################################
 
-function add2msgbuf(buf,node,queller,debug=false)
-	if node isa StateInteractionNode
-		return buf*"\n"*getmsg(node,queller)
-	else
-		return buf*"\n"*getmsg(node)
-	end
-end
-
-
-################################################################################
-
 at_end(gc) = gc.current isa End
 getinteraction(gc) = (gc.msg_buf, getopt(gc.current))
 die_used(gc) = gc.active_die.used ? gc.active_die.use_as : nothing
@@ -75,5 +67,18 @@ function proceed!(gc, opt)
 		getnext!(gc.current, gc.queller, opt) : getnext(gc.current, opt)
 	gc.msg_buf = ""
 	autocrawl!(gc)
+end
+
+
+################################################################################
+
+add2msgbuf(buf,node::UseActiveDie,queller) = buf*"\n"*getmsg(node,queller)*"\n"
+add2msgbuf(buf,node::InteractiveNode,queller) = buf*"\n"*getmsg(node)
+add2msgbuf(buf,node::Node,queller) = buf
+
+function add2msgbuf(buf, node::Union{BinaryCondition,MultipleChoice}, queller)
+	die = queller.active_die
+	!isnothing(die) && (buf = buf*"\n"*"Using $(Die.article(die.use_as)) $(string(die.use_as)):\n")
+	return buf*"\n"*getmsg(node)
 end
 

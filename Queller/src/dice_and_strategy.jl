@@ -45,17 +45,20 @@ end
 struct FaceInfo
 	str::String
 	c::Char
+	article::String
 end
 
 const FaceInfos = Dict(
-	Character => FaceInfo("Character Die",'C'),
-	Army => FaceInfo("Army Die",'A'),
-	Muster => FaceInfo("Muster Die",'M'),
-	ArmyMuster => FaceInfo("Muster/Army Die",'H'),
-	Event => FaceInfo("Event Die",'P'),
-	# Eye => FaceInfo("Eye",'E'),
-	# WillOfTheWest => FaceInfo("Will of the West",'W'),
+	Character => FaceInfo("Character Die",'C',"a"),
+	Army => FaceInfo("Army Die",'A',"an"),
+	Muster => FaceInfo("Muster Die",'M',"a"),
+	ArmyMuster => FaceInfo("Muster/Army Die",'H',"a"),
+	Event => FaceInfo("Event Die",'P',"an"),
+	# Eye => FaceInfo("Eye",'E',"an"),
+	# WillOfTheWest => FaceInfo("Will of the West",'W',"a"),
 	)
+
+article(f::Face) = FaceInfos[f].article
 
 Base.string(f::Face) = FaceInfos[f].str
 char(f::Face) = FaceInfos[f].c

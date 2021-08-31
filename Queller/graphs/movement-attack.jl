@@ -73,112 +73,118 @@
 	7. Random
 	"""
 
-	 ################################################################################
-	 @node movement_attack_besiege = Start() -> mv_1
+	################################################################################
+	@node movement_attack_besiege = Start() -> mv_1
 
-	 @node mv_1 = BinaryCondition("""
-					 A *mobile* army is adjacent to *target* not under siege.
-					 """) -> [n_true = mv_1_yes, n_false = mv_1_return]
-	 @node mv_1_return = ReturnFromGraph() -> []
-	 @node mv_1_yes = UseActiveDie() -> mv_1_action
-	 @node mv_1_action = PerformAction("""
-				   Attack with army adjacent to *target* not under siege.
+	@node mv_1 = BinaryCondition("""
+								 A *mobile* army is adjacent to *target* not under siege.
+								 """) -> [n_true = mv_1_yes, n_false = mv_1_return]
+	@node mv_1_return = ReturnFromGraph() -> []
+	@node mv_1_yes = UseActiveDie() -> mv_1_action
+	@node mv_1_action = PerformAction("""
+									  Attack with army adjacent to *target* not under siege.
 
-				   Priority:
-				   1. Army whose *target* is in a nation at war
-				   2. Army whose attack would not put a nation at war.
-				   3. Army whose *target* is in an active nation
-				   4. Highest value shadow army
-				   5. Random
-				   """) -> mv_1_end
-	 @node mv_1_end = End() -> []
-
-
-
-
-	 ################################################################################
-	 @node movement_attack_corr = Start() -> mv_2
-	 @node mv_2 = BinaryCondition("""
-					 There are dice in the hunt pool.
-					 And, no army is in the Fellowship's region.
-					 And, an army can move into that region without increasing the distance to its *target* (the *target* may change).
-					 """) -> [n_true = mv_2_yes, n_false = mv_3]
-	 @node mv_2_yes = UseActiveDie() -> mv_2_action
-	 @node mv_2_action = PerformAction("""
-				   Move: Select army at random if several armies satisfy the latest considered move.
-				   """) -> mv_2_movement_remains
-	 @node mv_2_movement_remains = BinaryCondition("""
-					 An army die was used and it have one move remaining.
-					 """) -> [n_true = mv_2, n_false = mv_2_end]
-	 @node mv_2_end = End() -> []
-
-
-	 ########################################
-	 @node mv_3 = BinaryCondition(settlement_cond) -> [n_true = mv_3_1, n_false = mv_4]
-	 @node mv_3_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_3_yes, n_false = mv_3_no]
-	 @node mv_3_yes = UseActiveDie() -> mv_3_yes_action
-	 @node mv_3_yes_action = PerformAction(settlement_move_army) -> mv_3_movement_remains
-	 @node mv_3_no = UseActiveDie() -> mv_3_no_action
-	 @node mv_3_no_action = PerformAction(settlement_move_unit) -> mv_3_movement_remains
-	 @node mv_3_movement_remains = BinaryCondition("""
-					 An army die was used and it have one move remaining.
-					 """) -> [n_true = mv_3, n_false = mv_3_end]
-	 @node mv_3_end = End() -> []
-
-
-	 ########################################
-	 @node mv_4 = BinaryCondition(merge_cond) -> [n_true = mv_4_yes, n_false = mv_5]
-	 @node mv_4_yes = UseActiveDie() -> mv_4_action
-	 @node mv_4_action = PerformAction(merge_move) -> mv_4_movement_remains
-	 @node mv_4_movement_remains = BinaryCondition("""
-					 An army die was used and it have one move remaining.
-					 """ ) -> [n_true = mv_4, n_false = mv_4_end]
-	 @node mv_4_end = End() -> []
+									  Priority:
+									  1. Army whose *target* is in a nation at war
+									  2. Army whose attack would not put a nation at war.
+									  3. Army whose *target* is in an active nation
+									  4. Highest value shadow army
+									  5. Random
+									  """) -> mv_1_end
+	@node mv_1_end = End() -> []
 
 
 
-	 ################################################################################
-	 @node movement_attack_basic = Start() -> mv_5
-	 @node mv_5 = BinaryCondition(move_target_cond) -> [n_true = mv_5_yes, n_false = mv_6]
-	 @node mv_5_yes = UseActiveDie() -> mv_5_action
-	 @node mv_5_action = PerformAction(move_target) -> mv_5_movement_remains
-	 @node mv_5_movement_remains = BinaryCondition("""
-					 An army die was used and it have one move remaining.
-					 """) -> [n_true = mv_5, n_false = mv_5_end]
-	 @node mv_5_end = End() -> []
+
+	################################################################################
+	@node movement_attack_corr = Start() -> mv_2
+	@node mv_2 = BinaryCondition("""
+								 There are dice in the hunt pool.
+								 And, no army is in the Fellowship's region
+								 And, the Fellowship do not reach mordor with the current progress.
+								 And, an army can move into that region without increasing the distance to its *target* (the *target* may change).
+								 """) -> [n_true = mv_2_yes, n_false = mv_3]
+	@node mv_2_yes = UseActiveDie() -> mv_2_action
+	@node mv_2_action = PerformAction("""
+									  Move: Select army at random if several armies satisfy the latest considered move.
+									  """) -> mv_2_army_die_to_move
+	@node mv_2_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_2_movement_remains, n_false=mv_2_end]
+	@node mv_2_movement_remains = BinaryCondition("""
+												  The Army Die have one move remaining.
+												  """) -> [n_true = mv_2, n_false = mv_2_end]
+	@node mv_2_end = End() -> []
 
 
-	 ########################################
-	 @node mv_6 = BinaryCondition(basic_move_cond) -> [n_true = mv_6_yes, n_false = mv_return]
-	 @node mv_return = ReturnFromGraph() -> []
-	 @node mv_6_yes = UseActiveDie() -> mv_6_action
-	 @node mv_6_action = PerformAction(basic_move) -> mv_6_movement_remains
-	 @node mv_6_movement_remains = BinaryCondition("""
-					 An army die was used and it have one move remaining.
-					 """) -> [n_true = mv_6, n_false = mv_6_end]
-	 @node mv_6_end = End() -> []
+	########################################
+	@node mv_3 = BinaryCondition(settlement_cond) -> [n_true = mv_3_1, n_false = mv_4]
+	@node mv_3_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_3_yes, n_false = mv_3_no]
+	@node mv_3_yes = UseActiveDie() -> mv_3_yes_action
+	@node mv_3_yes_action = PerformAction(settlement_move_army) -> mv_3_movement_remains
+	@node mv_3_no = UseActiveDie() -> mv_3_no_action
+	@node mv_3_no_action = PerformAction(settlement_move_unit) -> mv_3_army_die_to_move
+	@node mv_3_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_3_movement_remains, n_false=mv_3_end]
+	@node mv_3_movement_remains = BinaryCondition("""
+												  The Army Die have one move remaining.
+												  """) -> [n_true = mv_3, n_false = mv_3_end]
+	@node mv_3_end = End() -> []
 
 
-	 ################################################################################
-	 @node movement_attack_card = Start() -> mv_c_1
+	########################################
+	@node mv_4 = BinaryCondition(merge_cond) -> [n_true = mv_4_yes, n_false = mv_5]
+	@node mv_4_yes = UseActiveDie() -> mv_4_action
+	@node mv_4_action = PerformAction(merge_move) -> mv_4_army_die_to_move
+	@node mv_4_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_4_movement_remains, n_false=mv_4_end]
+	@node mv_4_movement_remains = BinaryCondition("""
+												  The Army Die have one move remaining.
+												  """ ) -> [n_true = mv_4, n_false = mv_4_end]
+	@node mv_4_end = End() -> []
 
-	 @node mv_c_1 = BinaryCondition(settlement_cond) -> [n_true = mv_c_1_1, n_false = mv_c_2]
-	 @node mv_c_1_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_c_1_army, n_false = mv_c_1_unit]
-	 @node mv_c_1_army = PerformAction(settlement_move_army) -> mv_c_1_army_end
-	 @node mv_c_1_army_end = End() -> []
 
-	 @node mv_c_1_unit = PerformAction(settlement_move_unit) -> mv_c_1_unit_end
-	 @node mv_c_1_unit_end = End() -> []
 
-	 @node mv_c_2 = BinaryCondition(merge_cond) -> [n_true = mv_c_2_move, n_false = mv_c_3]
-	 @node mv_c_2_move = PerformAction(merge_move) -> mv_c_2_end
-	 @node mv_c_2_end = End() -> []
+	################################################################################
+	@node movement_attack_basic = Start() -> mv_5
+	@node mv_5 = BinaryCondition(move_target_cond) -> [n_true = mv_5_yes, n_false = mv_6]
+	@node mv_5_yes = UseActiveDie() -> mv_5_action
+	@node mv_5_action = PerformAction(move_target) -> mv_5_army_die_to_move
+	@node mv_5_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_5_movement_remains, n_false=mv_5_end]
+	@node mv_5_movement_remains = BinaryCondition("""
+												  The Army Die have one move remaining.
+												  """) -> [n_true = mv_5, n_false = mv_5_end]
+	@node mv_5_end = End() -> []
 
-	 @node mv_c_3 = BinaryCondition(move_target_cond) -> [n_true = mv_c_3_move, n_false = mv_c_4_move]
-	 @node mv_c_3_move = PerformAction(move_target) -> mv_c_3_end
-	 @node mv_c_3_end = End() -> []
 
-	 @node mv_c_4_move = PerformAction(basic_move) -> mv_c_4_end
-	 @node mv_c_4_end = End() -> []
+	########################################
+	@node mv_6 = BinaryCondition(basic_move_cond) -> [n_true = mv_6_yes, n_false = mv_return]
+	@node mv_return = ReturnFromGraph() -> []
+	@node mv_6_yes = UseActiveDie() -> mv_6_action
+	@node mv_6_action = PerformAction(basic_move) -> mv_6_army_die_to_move
+	@node mv_6_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_6_movement_remains, n_false=mv_6_end]
+	@node mv_6_movement_remains = BinaryCondition("""
+												  The Army Die have one move remaining.
+												  """) -> [n_true = mv_6, n_false = mv_6_end]
+	@node mv_6_end = End() -> []
+
+
+	################################################################################
+	@node movement_attack_card = Start() -> mv_c_1
+
+	@node mv_c_1 = BinaryCondition(settlement_cond) -> [n_true = mv_c_1_1, n_false = mv_c_2]
+	@node mv_c_1_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_c_1_army, n_false = mv_c_1_unit]
+	@node mv_c_1_army = PerformAction(settlement_move_army) -> mv_c_1_army_end
+	@node mv_c_1_army_end = End() -> []
+
+	@node mv_c_1_unit = PerformAction(settlement_move_unit) -> mv_c_1_unit_end
+	@node mv_c_1_unit_end = End() -> []
+
+	@node mv_c_2 = BinaryCondition(merge_cond) -> [n_true = mv_c_2_move, n_false = mv_c_3]
+	@node mv_c_2_move = PerformAction(merge_move) -> mv_c_2_end
+	@node mv_c_2_end = End() -> []
+
+	@node mv_c_3 = BinaryCondition(move_target_cond) -> [n_true = mv_c_3_move, n_false = mv_c_4_move]
+	@node mv_c_3_move = PerformAction(move_target) -> mv_c_3_end
+	@node mv_c_3_end = End() -> []
+
+	@node mv_c_4_move = PerformAction(basic_move) -> mv_c_4_end
+	@node mv_c_4_end = End() -> []
 
 end
