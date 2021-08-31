@@ -1,8 +1,7 @@
 @graphs begin
 	################################################################################
-	@node select_action_mili = Start("Select Action:\nMilitary Strategy") -> threat_check
-	@node threat_check = JumpToGraph("Threat or Exposed",
-									 "threat_exposed") -> a1
+	@node select_action_mili = Start() -> threat_check
+	@node threat_check = JumpToGraph("threat_exposed") -> a1
 
 
 	########################################
@@ -11,22 +10,19 @@
 	@node a1_cond = BinaryCondition("""
 									The Which King is in play and not in a *mobile* army but is able to create or join one.
 									""") -> [n_true = a1_jump, n_false = a2]
-	@node a1_jump = JumpToGraph("Character: Which King",
-								"character_which_king") -> a2
+	@node a1_jump = JumpToGraph("character_which_king") -> a2
 
 
 	########################################
 	@node a2 = Dummy() -> a2_1
 	@node a2_1 = SetActiveDie('M', may_use_ring = true) -> [next = a2_jump, no_die = a3]
-	@node a2_jump = JumpToGraph("Muster: Minion",
-								"muster_minion") -> a3
+	@node a2_jump = JumpToGraph("muster_minion") -> a3
 
 
 	########################################
 	@node a3 = Dummy() -> a3_1
 	@node a3_1 = SetActiveDie('M') -> [next = a3_jump, no_die = a4]
-	@node a3_jump = JumpToGraph("Muster: Politics",
-								"muster_politics") -> a4
+	@node a3_jump = JumpToGraph("muster_politics") -> a4
 
 
 	########################################
@@ -60,8 +56,7 @@
 									- The *mobile* army's *target* is in a nation at war and not under siege.
 									- The Fellowship is on the Mordor track.
 									""") -> [n_true = a5_action, n_false = a6]
-	@node a5_action = JumpToGraph("Movement and Attack: Basic",
-								  "movement_attack_basic") -> a6
+	@node a5_action = JumpToGraph("movement_attack_basic") -> a6
 
 
 	########################################
@@ -95,10 +90,8 @@
 	########################################
 	@node a8 = Dummy() -> a8_1
 	@node a8_1 = SetActiveDie('P') -> [next = a8_jump_1, no_die = a9]
-	@node a8_jump_1 = JumpToGraph("Event Cards: Preferred",
-								  "event_cards_preferred") -> a8_jump_2
-	@node a8_jump_2 = JumpToGraph("Event Cards: General",
-								  "event_cards_general") -> a9
+	@node a8_jump_1 = JumpToGraph("event_cards_preferred") -> a8_jump_2
+	@node a8_jump_2 = JumpToGraph("event_cards_general") -> a9
 
 
 	########################################
@@ -108,33 +101,27 @@
 	@node a9_cond = BinaryCondition("""
 									A *mobile* army is adjacent to its *target*.
 									""") -> [n_true = a9_action, n_false = a10]
-	@node a9_action = JumpToGraph("Movement and Attack: Basic",
-								  "movement_attack_basic") -> a10
+	@node a9_action = JumpToGraph("movement_attack_basic") -> a10
 
 
 	########################################
 	@node a10 = Dummy() -> a10_1
 	@node a10_1 = SetActiveDie('A') -> [next = a10_action, no_die = a11]
-	@node a10_action = JumpToGraph("Movement and Attack: Corruption",
-								   "movement_attack_corr") -> a11
+	@node a10_action = JumpToGraph("movement_attack_corr") -> a11
 
 
 	########################################
 	@node a11 = Dummy() -> a11_1
 	@node a11_1 = SetActiveDie('C') -> [next = a11_action, no_die = a12]
-	@node a11_action = JumpToGraph("Character: Army Movement",
-								   "character_army") -> a12
+	@node a11_action = JumpToGraph("character_army") -> a12
 
 
 	########################################
 	@node a12 = Dummy() -> a12_start
 	@node a12_start = SetActiveDie('M') -> [next = a12_1, no_die = a13]
-	@node a12_1 = JumpToGraph("Muster: Minion",
-							  "muster_minion") -> a12_2
-	@node a12_2 = JumpToGraph("Muster: Politics",
-							  "muster_politics") -> a12_3
-	@node a12_3 = JumpToGraph("Muster: Muster",
-							  "muster_muster") -> a13
+	@node a12_1 = JumpToGraph("muster_minion") -> a12_2
+	@node a12_2 = JumpToGraph("muster_politics") -> a12_3
+	@node a12_3 = JumpToGraph("muster_muster") -> a13
 
 
 	########################################

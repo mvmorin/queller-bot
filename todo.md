@@ -6,10 +6,7 @@
 * corruption strategy should try to use a ring as a last resort but this isn't
   added yet. only add actions that weren't allowed to use a ring already.
 
-* pretty up output when traversing the graphs (add2buf)
+* pretty up output when traversing the graphs (add2msgbuf)
 
 # Maybe
 * some sort of debug output (node ids of the nodes at least)
-
-* have a state aware nodes so all game logic, even the state related game logic,
-  can be represented in the graph

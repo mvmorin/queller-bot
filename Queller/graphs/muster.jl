@@ -43,7 +43,7 @@
 
 
 	################################################################################
-	@node muster_minion = Start("Muster: Minion") -> m_2_reserved_check
+	@node muster_minion = Start() -> m_2_reserved_check
 	@node m_2_reserved_check = BinaryCondition("""
 											   A die has been reserved for recruiting a minion as a last action.
 											   """) -> [n_true = m_2_return, n_false = m_2]
@@ -80,7 +80,7 @@
 
 
 	################################################################################
-	@node muster_minion_selection = Start("Muster: Minion Selectoin") -> m_2_minion_selection_last
+	@node muster_minion_selection = Start() -> m_2_minion_selection_last
 	@node m_2_minion_selection_last = MultipleChoice(minion_prio) -> [m_2_saruman_last, m_2_wk_last, m_2_mos_last]
 
 	@node m_2_saruman_last = PerformAction(recruit_saruman) -> m_2_saruman_end_last
@@ -94,7 +94,7 @@
 
 
 	################################################################################
-	@node muster_politics = Start("Muster: Politics") -> m_3
+	@node muster_politics = Start() -> m_3
 	@node m_3 = BinaryCondition("A Shadow nation is not at war.") -> [n_true = m_3_yes, n_false = m_3_return]
 	@node m_3_return = ReturnFromGraph() -> []
 
@@ -114,7 +114,7 @@
 
 
 	################################################################################
-	@node muster_muster = Start("Muster: Muster") -> m_4
+	@node muster_muster = Start() -> m_4
 	@node m_4 = BinaryCondition("A card that musters is *playable*.") -> [n_true = m_4_die, n_false = m_5]
 	@node m_4_die = UseActiveDie() -> m_4_action
 	@node m_4_action = PerformAction("""
@@ -231,7 +231,7 @@
 
 	################################################################################
 
-	@node muster_card = Start("Muster: Card") -> m_c_6
+	@node muster_card = Start() -> m_c_6
 	@node m_c_6 = BinaryCondition("Muster can create an *exposed* region.") -> [n_true = m_c_6_action, n_false = m_c_7]
 	@node m_c_6_action = PerformAction("""
 									   *Focus* priority:

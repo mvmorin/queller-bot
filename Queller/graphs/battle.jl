@@ -57,7 +57,7 @@
 
 
 	################################################################################
-	 @node battle = Start("Battle") -> rearguard
+	 @node battle = Start() -> rearguard
 	 @node rearguard = PerformAction("All units from nations not at war form the rearguard.") -> army_attacking
 	 @node army_attacking = BinaryCondition("The Shadow army is attacking.") -> [n_true = is_sortie, n_false = def_in_stronghold]
 
@@ -66,8 +66,7 @@
 					 The Shadow army is defending in a region with a stronghold.
 					 """) -> [n_true = should_retreat_to_stronghold, n_false = field_def_card_prio]
 	 @node field_def_card_prio = PerformAction(def_card_prio) -> field_def_resolve
-	 @node field_def_resolve = JumpToGraph("Battle: Resolve",
-										   "battle_resolve") -> field_attacking_fp_continues
+	 @node field_def_resolve = JumpToGraph("battle_resolve") -> field_attacking_fp_continues
 	 @node field_attacking_fp_continues = BinaryCondition("""
 														  The Free People's player is continuing the attack.
 														  """) -> [n_true = retreat_prio, n_false = field_def_end]
@@ -94,8 +93,7 @@
 					 And, the number of units is less than 8.
 					 """) -> [n_true = retreat_to_stronghold, n_false = def_card_prio]
 	 @node def_card_prio = PerformAction(def_card_prio) -> def_resolve
-	 @node def_resolve = JumpToGraph("Battle: Resolve",
-									 "battle_resolve") -> attacking_fp_continues
+	 @node def_resolve = JumpToGraph("battle_resolve") -> attacking_fp_continues
 	 @node attacking_fp_continues = BinaryCondition("""
 													The Free People's player is continuing the attack.
 													""") -> [n_true = should_retreat_to_stronghold, n_false = def_end]
@@ -108,19 +106,15 @@
 	 ########################################
 	 @node is_sortie = BinaryCondition("Battle is a sortie.") -> [n_true = sortie_card_prio, n_false = army_with_wk]
 	 @node sortie_card_prio = PerformAction(sortie_card_prio) -> sortie_resolve
-	 @node sortie_resolve = JumpToGraph("Battle: Resolve",
-										"battle_resolve") -> sortie_round_end
-	 @node sortie_round_end = JumpToGraph("Battle: Round End",
-										  "battle_round_end") -> sortie_card_prio
+	 @node sortie_resolve = JumpToGraph("battle_resolve") -> sortie_round_end
+	 @node sortie_round_end = JumpToGraph("battle_round_end") -> sortie_card_prio
 
 
 	 ########################################
 	 @node army_with_wk = BinaryCondition("Army include the Witch King.") -> [n_true = wk_card_prio, n_false = should_play_card]
 	 @node wk_card_prio = PerformAction(wk_card_prio) -> wk_resolve
-	 @node wk_resolve = JumpToGraph("Battle: Resolve",
-									"battle_resolve") -> wk_round_end
-	 @node wk_round_end = JumpToGraph("Battle: Round End",
-									  "battle_round_end") -> should_play_card
+	 @node wk_resolve = JumpToGraph("battle_resolve") -> wk_round_end
+	 @node wk_round_end = JumpToGraph("battle_round_end") -> should_play_card
 
 
 	 ########################################
@@ -131,14 +125,12 @@
 
 	 @node attack_card_prio = PerformAction(attack_card_prio) -> attack_resolve
 	 @node attack_play_no_card = PerformAction("Do not play a combat card.") -> attack_resolve
-	 @node attack_resolve = JumpToGraph("Battle: Resolve",
-										"battle_resolve") -> attack_round_end
-	 @node attack_round_end = JumpToGraph("Battle: Round End",
-										  "battle_round_end") -> should_play_card
+	 @node attack_resolve = JumpToGraph("battle_resolve") -> attack_round_end
+	 @node attack_round_end = JumpToGraph("battle_round_end") -> should_play_card
 
 
 	 ################################################################################
-	 @node battle_resolve = Start("Battle: Resolve") -> roll
+	 @node battle_resolve = Start() -> roll
 	 @node roll = PerformAction("Roll for combat and reroll misses.") -> casualties
 	 @node casualties = PerformAction("""
 				   Remove casualties.
@@ -155,7 +147,7 @@
 
 
 	 ################################################################################
-	 @node battle_round_end = Start("Battle: Round End") -> is_fp_dead
+	 @node battle_round_end = Start() -> is_fp_dead
 	 @node is_fp_dead = BinaryCondition("There are Free People's units remaining.") -> [n_true = press_on, n_false = no_fp_left]
 	 @node no_fp_left = BinaryCondition("""
 					 Moving in to the conquered region would:

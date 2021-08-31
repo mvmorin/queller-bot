@@ -1,6 +1,8 @@
 @graphs begin
+	@node phase_1 = Start() -> p1_strat
+	@node p1_strat = CheckStrategy("military") -> [n_true=p1_mili_1, n_false=p1_corr_1]
+
 	# Military
-	@node phase_1_mili = Start("Phase 1: Military Strategy") -> p1_mili_1
 	@node p1_mili_1 = PerformAction("Recover action dice.") -> p1_mili_2
 	@node p1_mili_2 = PerformAction("Draw event cards.") -> p1_mili_3
 	@node p1_mili_3 = BinaryCondition("Holding more than 6 cards.") -> [n_true = p1_mili_discard, n_false = p1_mili_end]
@@ -18,7 +20,6 @@
 	@node p1_mili_end = End("End of Phase") -> []
 
 	# Corruption
-	@node phase_1_corr = Start("Phase 1: Corruption Strategy") -> p1_corr_1
 	@node p1_corr_1 = PerformAction("Recover action dice.") -> p1_corr_2
 	@node p1_corr_2 = PerformAction("Draw event cards.") -> p1_corr_3
 	@node p1_corr_3 = BinaryCondition("Holding more than 6 cards.") -> [n_true = p1_corr_discard, n_false = p1_corr_end_1]

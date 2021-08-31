@@ -56,7 +56,7 @@
 
 	################################################################################
 
-	@node threat_exposed = Start("Threat or Exposed") -> tx_t
+	@node threat_exposed = Start() -> tx_t
 	@node tx_t = BinaryCondition("A *threat* exist.") -> [n_true = tx_1, n_false = tx_5]
 
 	########################################
@@ -111,8 +111,7 @@
 	@node tx_move_use_die = UseActiveDie() -> tx_move_action
 	@node tx_move_action = PerformAction(move_text) -> tx_move_movement_remains
 	@node tx_move_movement_remains = BinaryCondition(move_remain_cond) -> [n_true = tx_use_remaining_movement, n_false = tx_move_end]
-	@node tx_use_remaining_movement = JumpToGraph("Movement and Attack:\nCorruption",
-												  "movement_attack_corr") -> tx_m
+	@node tx_use_remaining_movement = JumpToGraph("movement_attack_corr") -> tx_m
 	@node tx_move_end = End() -> []
 
 
@@ -129,8 +128,7 @@
 	@node tx_c = SetActiveDie('C', may_use_ring = true) -> [next = tx_c_cond, no_die = tx_return]
 
 	@node tx_c_cond = BinaryCondition(character_cond) -> [n_true = tx_c_1, n_false = tx_return]
-	@node tx_c_1 = JumpToGraph("Characters:\nCharacter Movement",
-							   "character_move") -> tx_return
+	@node tx_c_1 = JumpToGraph("character_move") -> tx_return
 
 
 	########################################

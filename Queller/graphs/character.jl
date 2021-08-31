@@ -57,7 +57,7 @@
 	"""
 
 	################################################################################
-	@node character_army = Start("Character:\n Army Movement") -> lc_1
+	@node character_army = Start() -> lc_1
 
 	@node lc_1 = BinaryCondition("""
 								 An *aggressive* army with the Witch King or maximum leadership is adjacent to its *target*.
@@ -71,22 +71,20 @@
 	@node lc_2 = BinaryCondition("""
 								 A *mobile* army with leadership and a valid move/attack towards *target* exists.
 								 """) -> [n_true = lc_2_yes, n_false = lc_3]
-	@node lc_2_yes = JumpToGraph("Movement and Attack:\n Basic",
-								 "movement_attack_basic") -> lc_3
+	@node lc_2_yes = JumpToGraph("movement_attack_basic") -> lc_3
 
 
 	################################################################################
-	@node character_move = Start("Character:\n Movement") -> lc_3
+	@node character_move = Start() -> lc_3
 	@node lc_3 = BinaryCondition("""
 								 A Nazgûl or the Witch King is in play.
 								 """) -> [n_true = lc_wk, n_false = lc_3_no]
-	@node lc_3_no = JumpToGraph("Event Cards: Preferred",
-								"event_cards_preferred") -> lc_3_return
+	@node lc_3_no = JumpToGraph("event_cards_preferred") -> lc_3_return
 	@node lc_3_return = ReturnFromGraph() -> []
 
 
 	########################################
-	@node character_which_king = Start("Character:\n Which King") -> lc_wk_yes
+	@node character_which_king = Start() -> lc_wk_yes
 
 	@node lc_wk = BinaryCondition(move_wk_cond) -> [n_true = lc_wk_yes, n_false = lc_naz_1]
 	@node lc_wk_yes = UseActiveDie() -> lc_wk_action
@@ -127,25 +125,24 @@
 
 
 	########################################
-	@node lc_play_card = JumpToGraph("Event Cards: Preferred",
-									 "event_cards_preferred") -> lc_play_card_return
+	@node lc_play_card = JumpToGraph("event_cards_preferred") -> lc_play_card_return
 	@node lc_play_card_return = ReturnFromGraph() -> []
 
 
 	################################################################################
-	@node character_wk_prio = Start("Character:\n Witch King Priority") -> lc_wk_prio
+	@node character_wk_prio = Start() -> lc_wk_prio
 	@node lc_wk_prio = PerformAction(wk_prio) -> lc_wk_prio_end
 	@node lc_wk_prio_end = End() -> []
 
 
 	################################################################################
-	@node character_nazgul_prio = Start("Character:\n Nazgûl Priority") -> lc_nazgul_prio
+	@node character_nazgul_prio = Start() -> lc_nazgul_prio
 	@node lc_nazgul_prio = PerformAction(wk_prio) -> lc_nazgul_prio_end
 	@node lc_nazgul_prio_end = End() -> []
 
 
 	################################################################################
-	@node character_mos_prio = Start("Character:\n Mouth of Sauron Priority") -> lc_mos_prio
+	@node character_mos_prio = Start() -> lc_mos_prio
 	@node lc_mos_prio = PerformAction(wk_prio) -> lc_mos_prio_end
 	@node lc_mos_prio_end = End() -> []
 end

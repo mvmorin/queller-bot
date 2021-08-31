@@ -74,7 +74,7 @@
 	"""
 
 	 ################################################################################
-	 @node movement_attack_besiege = Start("Movement and Attack:\n Besiege") -> mv_1
+	 @node movement_attack_besiege = Start() -> mv_1
 
 	 @node mv_1 = BinaryCondition("""
 					 A *mobile* army is adjacent to *target* not under siege.
@@ -97,7 +97,7 @@
 
 
 	 ################################################################################
-	 @node movement_attack_corr = Start("Movement and Attack:\n Corruption") -> mv_2
+	 @node movement_attack_corr = Start() -> mv_2
 	 @node mv_2 = BinaryCondition("""
 					 There are dice in the hunt pool.
 					 And, no army is in the Fellowship's region.
@@ -138,7 +138,7 @@
 
 
 	 ################################################################################
-	 @node movement_attack_basic = Start("Movement and Attack:\n Basic") -> mv_5
+	 @node movement_attack_basic = Start() -> mv_5
 	 @node mv_5 = BinaryCondition(move_target_cond) -> [n_true = mv_5_yes, n_false = mv_6]
 	 @node mv_5_yes = UseActiveDie() -> mv_5_action
 	 @node mv_5_action = PerformAction(move_target) -> mv_5_movement_remains
@@ -160,7 +160,7 @@
 
 
 	 ################################################################################
-	 @node movement_attack_card = Start("Movement and Attack:\n Card") -> mv_c_1
+	 @node movement_attack_card = Start() -> mv_c_1
 
 	 @node mv_c_1 = BinaryCondition(settlement_cond) -> [n_true = mv_c_1_1, n_false = mv_c_2]
 	 @node mv_c_1_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_c_1_army, n_false = mv_c_1_unit]

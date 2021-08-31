@@ -1,6 +1,6 @@
 @graphs begin
 	 ################################################################################
-	 @node event_cards_preferred = Start("Event Cards: Preferred") -> ep_1
+	 @node event_cards_preferred = Start() -> ep_1
 	 @node ep_1 = BinaryCondition("""
 					 A *preferred* card is *playable*.
 					 """) -> [n_true = ep_1_yes, n_false = ep_return]
@@ -17,7 +17,7 @@
 
 
 	 ################################################################################
-	 @node event_cards_general = Start("Event Cards: General") -> eg_1
+	 @node event_cards_general = Start() -> eg_1
 	 @node eg_1 = BinaryCondition("""
 					 Holding less than 4 cards.
 					 """) -> [n_true = eg_1_yes, n_false = eg_2]
@@ -64,7 +64,7 @@
 
 
 	 ################################################################################
-	 @node event_cards_corruption = Start("Event Cards: Corruption") -> ec_1
+	 @node event_cards_corruption = Start() -> ec_1
 	 @node ec_1 = BinaryCondition("""
 					 An "Fellowship revealed" card
 					 is *playable*.
@@ -105,7 +105,7 @@
 
 
 	 ################################################################################
-	 @node event_cards_resolve_effect = Start("Event Cards: Resolve Effect") -> er_select_card_effect_choice
+	 @node event_cards_resolve_effect = Start() -> er_select_card_effect_choice
 	 @node er_select_card_effect_choice = MultipleChoice("""
 					Select card effect to resolve.
 
@@ -114,10 +114,8 @@
 					3. Hunt allocation
 					4. No effect, return to Phase 5 menu
 					""") -> [er_muster, er_army, er_hunt, er_resolve_end]
-	 @node er_muster = JumpToGraph("Muster: Card",
-								   "muster_card") -> er_resolve_end
-	 @node er_army = JumpToGraph("Movement and Attack:\nCard",
-								 "movement_attack_card") -> er_resolve_end
+	 @node er_muster = JumpToGraph("muster_card") -> er_resolve_end
+	 @node er_army = JumpToGraph("movement_attack_card") -> er_resolve_end
 	 @node er_hunt = PerformAction("""
 				   For each die that is possible to add to the hunt pool, roll a d6. On a 4+, add it to the hunt pool. It is only possible to add a die to the hunt pool if it is not a *preferred* die.
 				   """) -> er_resolve_end

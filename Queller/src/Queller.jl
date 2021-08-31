@@ -12,24 +12,24 @@ const PKG_DIR = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
 
 not_unique(v, f=isequal) = filter(e -> (count(f.([e],v)) > 1), v)
 strvec2str(v,sep='\n') = isempty(v) ? "" : reduce((s,t) -> s*sep*t, v)
+fieldsdefined(obj) = all(i -> isdefined(obj,i), 1:nfields(obj))
 
 ################################################################################
 
 include("dice_and_strategy.jl")
 include("cli.jl")
 include("graph.jl")
+include("quellerstate.jl")
 include("crawler.jl")
 
 ################################################################################
-
 
 mutable struct ProgramState
 	phase::Int
 	phases::Vector{Function}
 	graphs::Dict{String,QuellerGraph}
 
-	strategy::Strategy.Choice
-	dice::Vector{Die.Face}
+	queller::QuellerState
 
 	iop::IOParser
 
@@ -47,8 +47,7 @@ function ProgramState()
 	graph_files = filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))
 	graphs = load_graphs(graph_files...)
 
-	strategy = rand(instances(Strategy.Choice))
-	dice = Vector{Die.Face}()
+	queller = QuellerState()
 
 	iop = IOParser([
 		CMD.Debug()
@@ -59,7 +58,7 @@ function ProgramState()
 		])
 
 	cmds = Vector{CMD.Command}()
-	return ProgramState(phase,phases,graphs,strategy,dice,iop,false,false,false,false)
+	return ProgramState(phase,phases,graphs,queller,iop,false,false,false,false)
 end
 
 
@@ -82,8 +81,8 @@ function print_read_process(state, msg, options, callback)
 	end
 end
 
-function resolve_decision_graph(state,graph;modt_available=false,ring_available=false)
-	gc = GraphCrawler(graph, state.graphs, state.strategy, state.dice, modt_available=modt_available, ring_available=ring_available)
+function resolve_decision_graph(state,graph)
+	gc = GraphCrawler(graph, state.graphs, state.queller)
 
 	callback(cmd) = proceed!(gc, cmd)
 
@@ -111,54 +110,25 @@ function main()
 end
 
 function phase1(state)
-	state.strategy == Strategy.Military && (graph = "phase_1_mili")
-	state.strategy == Strategy.Corruption && (graph = "phase_1_corr")
-
-	resolve_decision_graph(state, graph)
+	resolve_decision_graph(state, "phase_1")
 end
 
 function phase2(state)
-	if state.strategy == Strategy.Military
-		condition = """
-		The Shadow's victory points are less than the corruption points after the Free Peoples' have chosen whether to reveal.
-		"""
-		change_strategy = Strategy.Corruption
-	elseif state.strategy == Strategy.Corruption
-		condition = """
-		The corruption points are less than the Shadow's victory points after the Free Peoples' have chosen whether to reveal.
-		"""
-		change_strategy = Strategy.Military
-	end
-
-	callback(cmd::CMD.False) = nothing
-	callback(cmd::CMD.True) = (state.strategy = change_strategy)
-	!print_read_process(state, condition, [CMD.True(),CMD.False()], callback) && return
+	resolve_decision_graph(state, "phase_2")
 end
 
 function phase3(state)
-	state.strategy == Strategy.Military && (graph = "phase_3_mili")
-	state.strategy == Strategy.Corruption && (graph = "phase_3_corr")
-
-	resolve_decision_graph(state, graph)
+	resolve_decision_graph(state, "phase_3")
 end
 
 function phase4(state)
-	diefaces = instances(Die.Face)
-	legends = Die.char.(diefaces).*": ".*string.(diefaces)
-
-	msg = """
-	Roll all action dice not in the hunt box. Place all Eye results in the hunt box and input the remaining dice here.
-
-	$(strvec2str(legends))
-	"""
-
-	callback(cmd) = (state.dice = cmd.dice)
-	!print_read_process(state, msg, [CMD.Dice()], callback) && return
+	resolve_decision_graph(state, "phase_4")
 end
 
 function phase5(state)
+	state.queller.active_die = nothing
 	menu = """
-	Available Dice: $(strvec2str(sort(Die.char.(state.dice)),','))
+	Available Dice: $(strvec2str(sort(Die.char.(state.queller.available_dice)),','))
 
 	Select phase 5 action.
 
@@ -174,7 +144,7 @@ function phase5(state)
 	!print_read_process(state, menu, CMD.Option.(1:6), menu_callback) && return
 
 	if choice[] == 1
-		ret = phase5_action(state)
+		ret = resolve_decision_graph(state, "phase_5")
 		isnothing(ret) && return
 
 	elseif choice[] == 2
@@ -190,16 +160,8 @@ function phase5(state)
 		isnothing(ret) && return
 
 	elseif choice[] == 5
-		diefaces = instances(Die.Face)
-		legends = Die.char.(diefaces).*": ".*string.(diefaces)
-
-		msg = """
-		Input the available action dice.
-
-		$(strvec2str(legends))
-		"""
-		dice_callback(cmd) = (state.dice = cmd.dice)
-		!print_read_process(state, msg, [CMD.Dice()], dice_callback) && return
+		ret = resolve_decision_graph(state, "adjust_dice")
+		isnothing(ret) && return
 	elseif choice[] == 6
 		# Confirm exit
 		msg = "Exit phase 5 and return to phase 1."
@@ -215,35 +177,6 @@ function phase5(state)
 
 	phase5(state)
 end
-
-function phase5_action(state)
-	state.strategy == Strategy.Military && (graph = "select_action_mili")
-	state.strategy == Strategy.Corruption && (graph = "select_action_corr")
-
-	msg = "The Shadow have an Elven ring."
-	ring_available = Ref(false)
-	ring_callback(cmd::CMD.False) = (ring_available[] = false)
-	ring_callback(cmd::CMD.True) = (ring_available[] = true)
-	!print_read_process(state, msg, [CMD.True(), CMD.False()], ring_callback) && return
-
-	msg = """
-	The Mouth of Sauron is recruited and his "Messenger of the Dark Tower" ability have not been used this turn.
-	"""
-	modt_available = Ref(false)
-	modt_callback(cmd::CMD.False) = (modt_available[] = false)
-	modt_callback(cmd::CMD.True) = (modt_available[] = true)
-	!print_read_process(state, msg, [CMD.True(), CMD.False()], modt_callback) && return
-
-	gc = resolve_decision_graph(state, graph, modt_available=modt_available[], ring_available=ring_available[])
-
-	isnothing(gc) && return
-	if !isnothing(gc.active_die) && gc.active_die.used
-		i = findfirst(==(gc.active_die.die), state.dice)
-		deleteat!(state.dice, i)
-	end
-	return true
-end
-
 
 ################################################################################
 
