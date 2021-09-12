@@ -51,11 +51,10 @@ mutable struct QuellerState
 	modt_available::Bool
 end
 
-function QuellerState()
+function QuellerState(available_dice = Vector{Die.Face}())
 	strategy = rand(instances(Strategy.Choice))
 
 	active_die = nothing
-	available_dice = Vector{Die.Face}()
 
 	ring_available = false
 	modt_available = false

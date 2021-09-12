@@ -29,7 +29,7 @@ mutable struct ProgramState
 	phases::Vector{Function}
 	graphs::Dict{String,QuellerGraph}
 
-	queller::QuellerState
+	available_dice::Vector{Die.Face}
 
 	iop::IOParser
 
@@ -46,7 +46,7 @@ function ProgramState()
 	graph_files = filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))
 	graphs = load_graphs(graph_files...)
 
-	queller = QuellerState()
+	available_dice = Vector{Die.Face}()
 
 	iop = IOParser([
 		CMD.ResetAll()
@@ -56,7 +56,7 @@ function ProgramState()
 		])
 
 	cmds = Vector{CMD.Command}()
-	return ProgramState(phase,phases,graphs,queller,iop,false,false,false)
+	return ProgramState(phase,phases,graphs,available_dice,iop,false,false,false)
 end
 
 
@@ -79,18 +79,19 @@ function print_read_process(state, msg, options, callback)
 end
 
 function resolve_decision_graph(state, graph)
-	state.queller.active_die = nothing
-	gc = GraphCrawler(graph, state.graphs, state.queller)
+	gc = GraphCrawler(graph, state.graphs, state.available_dice)
 
 	callback(cmd) = proceed!(gc, cmd)
 
 	while !at_end(gc)
 		msg, options = getinteraction(gc)
-		!print_read_process(state, msg, options, callback) && return
+		!print_read_process(state, msg, options, callback) && return false
 	end
 
-	return gc
+	state.available_dice = get_available_dice(gc)
+	return true
 end
+
 
 
 ################################################################################
@@ -114,7 +115,7 @@ phase4(state) = resolve_decision_graph(state, "phase_4")
 
 function phase5(state)
 	menu = """
-	Available Dice: $(strvec2str(sort(Die.char.(state.queller.available_dice)),','))
+	Available Dice: $(strvec2str(sort(Die.char.(state.available_dice)),','))
 
 	Select phase 5 action.
 
@@ -139,8 +140,7 @@ function phase5(state)
 	!print_read_process(state, menu, CMD.Option.(1:6), menu_callback) && return
 
 	if 1 <= choice[] <= 5
-		ret = resolve_decision_graph(state, graphs[choice[]])
-		isnothing(ret) && return
+		!resolve_decision_graph(state, graphs[choice[]]) && return
 
 	elseif choice[] == 6
 		# Confirm exit

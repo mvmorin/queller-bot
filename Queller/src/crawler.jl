@@ -9,7 +9,7 @@ mutable struct GraphCrawler
 
 	msg_buf::String
 
-	function GraphCrawler(startgraph::String, graphs, queller)
+	function GraphCrawler(startgraph::String, graphs, available_dice)
 		current = root(graphs[startgraph])
 
 		jump_stack = Vector{Node}()
@@ -18,6 +18,8 @@ mutable struct GraphCrawler
 		active_die = nothing
 
 		msg_buf = ""
+
+		queller = QuellerState(available_dice)
 
 		gc = new(current,jump_stack,graphs,queller,msg_buf)
 
@@ -58,9 +60,9 @@ end
 
 ################################################################################
 
+get_available_dice(gc) = gc.queller.available_dice
 at_end(gc) = gc.current isa End
 getinteraction(gc) = (gc.msg_buf, getopt(gc.current))
-die_used(gc) = gc.active_die.used ? gc.active_die.use_as : nothing
 
 function proceed!(gc, opt)
 	gc.current = gc.current isa GetAvailableDice ?
@@ -68,6 +70,7 @@ function proceed!(gc, opt)
 	gc.msg_buf = ""
 	autocrawl!(gc)
 end
+
 
 
 ################################################################################

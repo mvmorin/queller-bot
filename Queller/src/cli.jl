@@ -22,6 +22,7 @@ struct True <: InputCommand end
 struct False <: InputCommand end
 struct Option <: InputCommand opt end
 struct Blank <: InputCommand end
+
 struct Dice <: InputCommand dice end
 Dice() = Dice(nothing)
 function Base.:(==)(a::Dice,b::Dice)
