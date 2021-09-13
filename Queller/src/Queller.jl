@@ -49,31 +49,39 @@ function ProgramState()
 	available_dice = Vector{Die.Face}()
 
 	iop = IOParser([
-		CMD.ResetAll()
 		CMD.ResetPhase()
 		CMD.Exit()
 		CMD.Repeat()
+		CMD.Phase(length(phases))
+		CMD.Help()
 		])
 
 	cmds = Vector{CMD.Command}()
 	return ProgramState(phase,phases,graphs,available_dice,iop,false,false,false)
 end
 
+help_str = """
+help help
 
-handle_general_command(state,cmd::CMD.ResetAll) = (state.reset = true)
-handle_general_command(state,cmd::CMD.ResetPhase) = (state.reset_phase = true)
-handle_general_command(state,cmd::CMD.Exit) = (state.exit = true)
-handle_general_command(state,cmd::CMD.Command) = nothing
+help help help help
+"""
 
-function print_read_process(state, msg, options, callback)
+
+################################################################################
+
+function print_read_process(state, msg, options, callback, silent_options=Vector{CMD.Command}())
 	display_message(state.iop, msg)
 
 	while true
-		cmd = read_input(state.iop, options)
-		cmd in options && (callback(cmd); return true)
+		cmd = read_input(state.iop, options, silent_options)
+
+		if cmd in options || cmd in silent_options
+			callback(cmd)
+			return true
+		end
 
 		cmd isa CMD.Command && handle_general_command(state,cmd)
-		cmd isa CMD.Repeat && return print_read_process(state, msg, options, callback)
+		cmd isa CMD.Repeat && return print_read_process(state, msg, options, callback, silent_options)
 		cmd isa CMD.AbortingCommand && return false
 	end
 end
@@ -81,17 +89,19 @@ end
 function resolve_decision_graph(state, graph)
 	gc = GraphCrawler(graph, state.graphs, state.available_dice)
 
+	abort = Ref(false)
 	callback(cmd) = proceed!(gc, cmd)
+	callback(cmd::CMD.Undo) = !undo!(gc) && (abort[] = !print_read_process(state, "Cannot undo more.", [CMD.Blank()], x->nothing))
 
 	while !at_end(gc)
 		msg, options = getinteraction(gc)
-		!print_read_process(state, msg, options, callback) && return false
+		!print_read_process(state, msg, options, callback, [CMD.Undo()]) && return false
+		abort[] && return false
 	end
 
 	state.available_dice = get_available_dice(gc)
 	return true
 end
-
 
 
 ################################################################################
@@ -102,16 +112,27 @@ function main()
 		state.phases[state.phase](state)
 
 		state.reset_phase && (state.reset_phase = false; continue)
-		state.reset && (state = ProgramState(); continue)
 
 		state.phase = 1 + (state.phase % length(state.phases))
 	end
 end
 
-phase1(state) = resolve_decision_graph(state, "phase_1")
-phase2(state) = resolve_decision_graph(state, "phase_2")
-phase3(state) = resolve_decision_graph(state, "phase_3")
-phase4(state) = resolve_decision_graph(state, "phase_4")
+handle_general_command(state,cmd::CMD.Command) = nothing
+handle_general_command(state,cmd::CMD.ResetPhase) = (state.reset_phase = true)
+handle_general_command(state,cmd::CMD.Exit) = (state.exit = true)
+handle_general_command(state,cmd::CMD.Phase) = (state.reset_phase = true; state.phase = cmd.nbr)
+handle_general_command(state,cmd::CMD.Help) = display_message(state.iop, help_str)
+
+
+phase1(state) = graph_phase(state, "phase_1", "Phase 1")
+phase2(state) = graph_phase(state, "phase_2", "Phase 2")
+phase3(state) = graph_phase(state, "phase_3", "Phase 3")
+phase4(state) = graph_phase(state, "phase_4", "Phase 4")
+
+function graph_phase(state, graph, name)
+	display_message(state.iop, name)
+	resolve_decision_graph(state, graph)
+end
 
 function phase5(state)
 	menu = """

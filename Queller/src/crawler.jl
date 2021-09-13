@@ -1,31 +1,46 @@
 ################################################################################
 
 mutable struct GraphCrawler
+	root_node::Node
+	available_dice::Vector{Die.Face}
+	graphs::Dict{String,QuellerGraph}
+
 	current::Node
 	jump_stack::Vector{Node}
-	graphs::Dict{String,QuellerGraph}
+
+	options::Vector{CMD.Command}
 
 	queller::QuellerState
 
 	msg_buf::String
 
 	function GraphCrawler(startgraph::String, graphs, available_dice)
-		current = root(graphs[startgraph])
+		gc = new()
 
-		jump_stack = Vector{Node}()
-		sizehint!(jump_stack, 10)
+		gc.root_node = root(graphs[startgraph])
+		gc.available_dice = available_dice
+		gc.graphs = graphs
 
-		active_die = nothing
-
-		msg_buf = ""
-
-		queller = QuellerState(available_dice)
-
-		gc = new(current,jump_stack,graphs,queller,msg_buf)
-
-		autocrawl!(gc)
-		return gc
+		return initialize!(gc)
 	end
+end
+
+function initialize!(gc::GraphCrawler)
+	gc.current = gc.root_node
+
+	gc.jump_stack = Vector{Node}()
+	sizehint!(gc.jump_stack, 10)
+
+	gc.options = Vector{CMD.Command}()
+	sizehint!(gc.options, 30)
+
+	gc.queller = QuellerState(deepcopy(gc.available_dice))
+
+	gc.msg_buf = ""
+
+	autocrawl!(gc)
+
+	return gc
 end
 
 
@@ -35,7 +50,7 @@ function autocrawl!(gc)
 	# crawls the graph until it encounters node that requires interaction
 	# store all node messages in a buffer
 
-	!isempty(gc.msg_buf) && return # A step have already been taken
+	gc.msg_buf = ""
 
 	while !at_end(gc)
 		gc.msg_buf = add2msgbuf(gc.msg_buf, gc.current, gc.queller)
@@ -65,10 +80,26 @@ at_end(gc) = gc.current isa End
 getinteraction(gc) = (gc.msg_buf, getopt(gc.current))
 
 function proceed!(gc, opt)
+	push!(gc.options, opt)
 	gc.current = gc.current isa GetAvailableDice ?
 		getnext!(gc.current, gc.queller, opt) : getnext(gc.current, opt)
-	gc.msg_buf = ""
 	autocrawl!(gc)
+end
+
+function undo!(gc)
+	isempty(gc.options) && return false # nothing to undo
+
+	# undo latest options
+	options = gc.options
+	pop!(options)
+
+	# reset state and replay remaining options
+	initialize!(gc)
+	for opt in options
+		proceed!(gc, opt)
+	end
+
+	return true
 end
 
 
