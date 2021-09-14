@@ -60,11 +60,33 @@ function ProgramState()
 	return ProgramState(phase,phases,graphs,available_dice,iop,false,false,false)
 end
 
-help_str = """
-help help
+greeting_str = """
+Queller: War of the Ring Shadow AI
 
-help help help help
+Please read the general information and have it and the glossary available.
+
+This program will present a number of selections, true/false statements, and actions for each of the 5 game phases. Simply answer and perfom these when they are presented to you.
+
+Type "help" for more information regarding the operation of the program.
 """
+
+help_str = """
+# Inputs #
+All inputs are case insensitive and can in many cases be shorten to one letter, i.e., "t" for "true", "f" for "false", "u" for "undo" etc.
+
+The valid options for a query are given by the input prompt. If the options are separated by "/" only one of the options should be given. If they are separated by "," several options can be given separated either by spaces or nothing at all.
+
+# Commands #
+The following commands can (almost) always be used when prompted for input.
+
+help        :: Shows this help message.
+exit        :: Exits the program.
+undo        :: Undo the latest input and step back. Note, everything can not be undone, use the "reset" or "phase" command in these circumstances.
+repeat      :: Repeats the latest query.
+reset       :: Reset and restart the current phase.
+phase <nbr> :: Jumps to the beginning of a phase, e.g., type "phase 3" to jump to phase 3
+"""
+
 
 
 ################################################################################
@@ -108,6 +130,8 @@ end
 
 function main()
 	state = ProgramState()
+	display_message(state.iop, greeting_str)
+
 	while !state.exit
 		state.phases[state.phase](state)
 

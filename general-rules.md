@@ -1,30 +1,29 @@
-# Actions
-1. Game rules override Queller’s actions e.g. it won’t carry out an action it doesn’t have a die for.
-2. Never carry out an action that would cause Queller to lose or miss an immediate win.
-3. Where Queller has multiple equally valid options use a die to select one at random.
+# Queller Statments
+- Any word written between asterisks, e.g. *threat*, refers to the glossary.
+- The term Nazgûl excludes the Witch King.
+- For statements which require a specific die to evaluate, the die you should consider to evaluate the statement will be given.
+	- For example, the statment "Using a Character Die: An army can attack a Free People's army." is true if there is a Shadow army adjacent to a Free People's army and it contains a Nazgûl or Minion while "Using an Army Die: An army can attack a Free People's army." is true even if the army does not have a Nazgûl or Minion in it.
 
-# Armies
-4. Never move in a way that would create a threat unless the move decreases the distance to it.
-   Split an army to avoid this if the split force still contains enough army value to meet the action’s requirements.
+# Queller Actions
+- Game rules override Queller’s actions e.g. it won’t carry out an action it doesn’t have a die for.
+- Never carry out an action that would cause Queller to lose or miss an immediate win.
+- Where Queller has multiple equally valid options use a die to select one at random.
 
-6. When moving from a region containing the Fellowship and the Fellowships progress places them outside Mordor,
+# Moves
+- Never move in a way that would create a *threat* unless the move decreases the distance to it. When evaluating a move statement, consider splitting an army to avoid this as long as the split force still contains enough army value to make the statment true.
+- When moving from a region containing the Fellowship and the Fellowships progress do not reach Mordor,
    leave a Nazgûl and regular behind if eyes are in the hunt pool and the move criteria are still met. Ignore this rule when attacking.
-
-9. Consider both moves when evaluating true/false and priorities for an army die. If two moves combined can meet a condition, then the condition is true.
+- Consider both moves when evaluating true/false and priorities for an army die. If two moves combined can meet a condition, then the condition is true.
 
 # Cards
-15. If a card is blocking Queller from carrying out an action it will carry out the requirements to remove it from play if possible. It will do this only if it tries to carry out the blocked action.
-16. Use cards “in play” at the first opportunity.
+- If Queller tries to perfom an action but is blocked by a card in play, Queller will carry out the requirements to remove it from play if possible.
+- Use cards “in play” at the first opportunity.
 
 # Characters
-20. In this bot, the term Nazgûl excludes the Witch King.
-21. Do not use a character’s ability if it would have no effect.
-
-# Dice
-22. If required to discard dice, do so at random from those not matching the preferred type.
+- Do not use a character’s ability if it would have no effect.
 
 # Muster
-26. Where Isengard is the source of the primary and Saruman is in play, use Voice of Saruman.
-    If Orthanc is under threat use upgrade, otherwise if 3 regulars available use muster.
-    If there aren’t enough figures for either ability use, then muster as normal
+- Where Isengard is the source of the primary and Saruman is in play, use Voice of Saruman.
+  If Orthanc is under threat use upgrade, otherwise if 3 regulars available use muster.
+  If there aren’t enough figures for either ability use, then muster as normal
 

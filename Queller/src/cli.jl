@@ -131,8 +131,8 @@ function display_message(iop::IOParser,msg,header="-"^10)
 	println(iop, header)
 	msg = strip(msg)
 	for p in split(msg, '\n')
-		m = match(r"^\s*(?:[0-9]+\.|-|And,|Or,)\s+", p)
+		m = match(r"^(?:\s*[0-9]+\.|\s*-|And,|Or,|.+::)\s+", p)
 		list_item_indent = isnothing(m) ? 0 : length(m.match)
-		println(iop, wrap(p, width=50, subsequent_indent=' '^list_item_indent))
+		println(iop, wrap(p, width=60, subsequent_indent=' '^list_item_indent))
 	end
 end
