@@ -1,19 +1,33 @@
 @graphs begin
 	 ################################################################################
-	 @node event_cards_preferred = Start() -> ep_1
-	 @node ep_1 = BinaryCondition("""
-					 A *preferred* card is *playable*.
-					 """) -> [n_true = ep_1_yes, n_false = ep_return]
+	 @node event_cards_preferred = Start() -> ep_1_strat
+
+	 @node ep_1_strat = CheckStrategy("military") -> [n_true = ep_1_mili, n_false = ep_1_corr]
+	 @node ep_1_mili = BinaryCondition("""
+					 A card with army or muster type is *playable*.
+					 """) -> [n_true = ep_2_yes, n_false = ep_return]
+	 @node ep_1_corr = BinaryCondition("""
+					 A card with character type is *playable*.
+					 """) -> [n_true = ep_2_yes, n_false = ep_return]
+
 	 @node ep_return = ReturnFromGraph() -> []
-	 @node ep_1_yes = UseActiveDie() -> ep_1_action
-	 @node ep_1_action = PerformAction("""
-				   Play a *playable* *preferred* card.
+	 @node ep_2_yes = UseActiveDie() -> ep_2_strat
+	 @node ep_2_strat = CheckStrategy("military") -> [n_true = ep_2_mili, n_false = ep_2_corr]
+	 @node ep_2_mili = PerformAction("""
+				   Play a *playable* card with muster or army type.
 
 				   Priority:
 				   1. Ascending Order of Initiative
 				   2. Random
-				   """) -> ep_1_end
-	 @node ep_1_end = End() -> []
+				   """) -> ep_2_end
+	 @node ep_2_corr = PerformAction("""
+				   Play a *playable* card with character type.
+
+				   Priority:
+				   1. Ascending Order of Initiative
+				   2. Random
+				   """) -> ep_2_end
+	 @node ep_2_end = End() -> []
 
 
 	 ################################################################################
@@ -21,9 +35,13 @@
 	 @node eg_1 = BinaryCondition("""
 					 Holding less than 4 cards.
 					 """) -> [n_true = eg_1_yes, n_false = eg_2]
-	 @node eg_1_yes = UseActiveDie() -> eg_1_action
-	 @node eg_1_action = PerformAction("""
-				   Draw a *preferred* card.
+	 @node eg_1_yes = UseActiveDie() -> eg_1_strat
+	 @node eg_1_strat = CheckStrategy("military") -> [n_true = eg_1_mili, n_false = eg_1_corr]
+	 @node eg_1_mili = PerformAction("""
+				   Draw a strategy card.
+				   """) -> eg_1_end
+	 @node eg_1_corr = PerformAction("""
+				   Draw a character card.
 				   """) -> eg_1_end
 	 @node eg_1_end = End() -> []
 
@@ -42,25 +60,41 @@
 	 @node eg_2_end = End() -> []
 
 
-	 @node eg_3 = UseActiveDie() -> eg_3_action
-	 @node eg_3_action = PerformAction("""
-				   Draw a *preferred* card.
+	 @node eg_3 = UseActiveDie() -> eg_3_strat
+	 @node eg_3_strat = CheckStrategy("military") -> [n_true = eg_3_mili, n_false = eg_3_corr]
+	 @node eg_3_mili = PerformAction("""
+				   Draw a strategy card.
+				   """) -> eg_3_discard
+	 @node eg_3_corr = PerformAction("""
+				   Draw a character card.
 				   """) -> eg_3_discard
 	 @node eg_3_discard = BinaryCondition("""
 					 Holding more than 6 cards.
-					 """) -> [n_true = eg_3_discard_yes, n_false = eg_3_discard_no]
-	 @node eg_3_discard_yes = PerformAction("""
+					 """) -> [n_true = eg_3_discard_strat, n_false = eg_3_end]
+	 @node eg_3_end = End() -> []
+
+	 @node eg_3_discard_strat = CheckStrategy("military") -> [n_true = eg_3_discard_mili, n_false = eg_3_discard_corr]
+	 @node eg_3_discard_mili = PerformAction("""
 				   Discard down to 6 cards.
 
 				   Priority:
-				   1. Not *preferred* card
+				   1. Not a card with army or muster type
 				   2. Doesn't use the term "Fellowship revealed"
 				   3. Doesn't place a tile
 				   4. Ascending order of initiative
 				   5. Random
-				   """) -> eg_3_discard_yes_end
-	 @node eg_3_discard_yes_end = End() -> []
-	 @node eg_3_discard_no = End() -> []
+				   """) -> eg_3_discard_end
+	 @node eg_3_discard_corr = PerformAction("""
+				   Discard down to 6 cards.
+
+				   Priority:
+				   1. Not card with character type
+				   2. Doesn't use the term "Fellowship revealed"
+				   3. Doesn't place a tile
+				   4. Ascending order of initiative
+				   5. Random
+				   """) -> eg_3_discard_end
+	 @node eg_3_discard_end = End() -> []
 
 
 	 ################################################################################
@@ -128,8 +162,13 @@
 	 @node er_move_wk = JumpToGraph("character_wk_prio") -> er_resolve_end
 	 @node er_move_mos = JumpToGraph("character_mos_prio") -> er_resolve_end
 	 @node er_move_naz = JumpToGraph("character_nazgul_prio") -> er_resolve_end
-	 @node er_hunt = PerformAction("""
-				   For each die that is possible to add to the hunt pool, roll a d6. On a 4+, add it to the hunt pool. It is only possible to add a die to the hunt pool if it is not a *preferred* die.
-				   """) -> er_resolve_end
+
+	 @node er_hunt = CheckStrategy("military") -> [n_true = er_hunt_mili, n_false = er_hunt_corr]
+	 @node er_hunt_mili = PerformAction("""
+										Select a character or event die at random, roll a d6. On a 4+, add it to the hunt pool. Do this for each die it is possible to add to the hunt pool.
+										""") -> er_resolve_end
+	 @node er_hunt_corr = PerformAction("""
+										Select a army, muster, muster/army, or event die at random, roll a d6. On a 4+, add it to the hunt pool. Do this for each die it is possible to add to the hunt pool.
+										""") -> er_resolve_end
 	 @node er_resolve_end = End() -> []
 end

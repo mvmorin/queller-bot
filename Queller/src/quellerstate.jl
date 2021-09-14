@@ -223,7 +223,7 @@ mutable struct GetAvailableDice <: InteractiveNode
 	action::String
 
 	GetAvailableDice(action = """
-					 Roll all action dice not in the hunt box. Place all Eye results in the hunt box and input the remaining dice here.
+					 Input the available action dice (not counting dice set aside for later use).
 					 """) = (obj = new(); obj.action = strip(action); obj)
 end
 setnext!(n::GetAvailableDice, next::Node) = (n.next = next)

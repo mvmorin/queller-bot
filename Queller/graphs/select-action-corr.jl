@@ -126,9 +126,16 @@
 
 	########################################
 	@node a14 = Dummy() -> a14_1
-	@node a14_1 = PerformAction("""
-								Queller failed to find an action. Discard a random non-*preferred* die (this can be done in the main menu).
-								""") -> a_end
+	@node a14_1 = CheckStrategy("military") -> [n_true = a14_mili, n_false = a14_corr]
+	@node a14_mili = PerformAction("""
+								   Queller failed to find an action. Discard a random Character or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
+								   """) -> a14_dice
+	@node a14_corr = PerformAction("""
+								   Queller failed to find an action. Discard a random Army, Muster, Muster/Army or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
+								   """) -> a14_dice
+	@node a14_dice = GetAvailableDice("""
+									  After discarding the random die, input the remaining available dice here (not counting dice set aside for later use).
+									  """) -> a_end
 	@node a_end = End() -> []
 
 end

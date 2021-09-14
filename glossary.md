@@ -13,10 +13,6 @@
 	- does not achieve the same this the used die would on its own; and
 	- does not require a non-aggressive army to attack.
 
-- Preferred:
-	- Corruption strategy: Character Dice for dice, Character Cards when drawing cards and cards with a character symbol when playing cards.
-	- Military strategy: Army, Muster and Army/Muster Dice and Strategy Cards when drawing cards and cards with an army or muster symbol when playing cards.
-
 # Army Glossary
 - Aggressive: An army is aggressive if
 	- its nation is active and its value is equal or greater than the specified opposing army's value; or
