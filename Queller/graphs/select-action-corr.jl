@@ -124,16 +124,98 @@
 	@node a13_2 = JumpToGraph("muster_politics") -> a13_3
 	@node a13_3 = JumpToGraph("muster_muster") -> a14
 
-	########################################
+
+
+
+	# From here on we retry everything but are allowed to use a ring
+
+
+	#######################################
 	@node a14 = Dummy() -> a14_1
-	@node a14_1 = CheckStrategy("military") -> [n_true = a14_mili, n_false = a14_corr]
-	@node a14_mili = PerformAction("""
+	@node a14_1 = SetActiveDie('C', may_use_ring=true) -> [next = a14_cond, no_die = a15]
+	@node a14_cond = BinaryCondition("""
+									The Fellowship is in a region with no Nazgûl and which Nazgûl can move to.
+									""") -> [n_true = a14_jump, n_false = a15]
+	@node a14_jump = JumpToGraph("character_move") -> a15
+
+	########################################
+	@node a15 = Dummy() -> a15_1
+	@node a15_1 = SetActiveDie('M', may_use_ring=true) -> [next = a15_jump, no_die = a16]
+	@node a15_jump = JumpToGraph("muster_politics") -> a16
+
+	########################################
+	@node a16 = Dummy() -> a16_1
+
+	@node a16_1 = SetActiveDie('C', may_use_ring=true) -> [next = a16_cond, no_die = a16_2]
+	@node a16_2 = SetActiveDie('A', may_use_ring=true) -> [next = a16_cond, no_die = a17]
+	@node a16_cond = BinaryCondition("""
+											A *mobile* army is adjacent to its *target*.
+											And, the *target* is in a nation at war and not under siege.
+											""") -> [n_true = a16_jump_1_die, n_false = a17]
+	@node a16_jump_1_die = SetActiveDie('C', may_use_ring=true) -> [next = a16_jump_1, no_die = a16_jump_2_die]
+	@node a16_jump_1 = JumpToGraph("character_army") -> a16_jump_2_die
+	@node a16_jump_2_die = SetActiveDie('A', may_use_ring=true) -> [next = a16_jump_2, no_die = a17]
+	@node a16_jump_2 = JumpToGraph("movement_attack_basic") -> a17
+
+	########################################
+	@node a17 = Dummy() -> a17_1
+	@node a17_1 = SetActiveDie('C', may_use_ring=true) -> [next = a17_jump_1, no_die = a17_2]
+	@node a17_jump_1 = JumpToGraph("event_cards_preferred") -> a17_2
+	@node a17_2 = SetActiveDie('P', may_use_ring=true) -> [next = a17_jump_2, no_die = a18]
+	@node a17_jump_2 = JumpToGraph("event_cards_preferred") -> a18
+
+
+	########################################
+	@node a18 = Dummy() -> a18_1
+	@node a18_1 = SetActiveDie('C', may_use_ring=true) -> [next = a18_cond, no_die = a18_2]
+	@node a18_2 = SetActiveDie('A', may_use_ring=true) -> [next = a18_cond, no_die = a19]
+	@node a18_cond = BinaryCondition("""
+									A *mobile* army is adjacent to its *target* that is not under siege.
+									""") -> [n_true = a18_jump_1_die, n_false = a19]
+	@node a18_jump_1_die = SetActiveDie('C', may_use_ring=true) -> [next = a18_jump_1, no_die = a18_jump_2_die]
+	@node a18_jump_1 = JumpToGraph("character_army") -> a18_jump_2_die
+	@node a18_jump_2_die = SetActiveDie('A', may_use_ring=true) -> [next = a18_jump_2, no_die = a19]
+	@node a18_jump_2 = JumpToGraph("movement_attack_besiege") -> a18_jump_3
+	@node a18_jump_3 = JumpToGraph("movement_attack_corr") -> a19
+
+	#######################################
+	@node a19 = Dummy() -> a19_start
+	@node a19_start = SetActiveDie('P', may_use_ring=true) -> [next = a19_1, no_die = a20]
+	@node a19_1 = JumpToGraph("event_cards_preferred") -> a19_2
+	@node a19_2 = JumpToGraph("event_cards_general") -> a20
+
+	########################################
+	@node a20 = Dummy() -> a20_1
+	@node a20_1 = SetActiveDie('A', may_use_ring=true) -> [next = a20_action, no_die = a21]
+	@node a20_action = JumpToGraph("movement_attack_corr") -> a21
+
+
+	########################################
+	@node a21 = Dummy() -> a21_start
+	@node a21_start = SetActiveDie('C', may_use_ring=true) -> [next = a21_1, no_die = a22]
+	@node a21_1 = JumpToGraph("character_army") -> a22
+
+	########################################
+	@node a22 = Dummy() -> a22_start
+	@node a22_start = SetActiveDie('M', may_use_ring=true) -> [next = a22_1, no_die = a23]
+	@node a22_1 = JumpToGraph("muster_minion") -> a22_2
+	@node a22_2 = JumpToGraph("muster_politics") -> a22_3
+	@node a22_3 = JumpToGraph("muster_muster") -> a23
+
+
+
+	# No action found and end
+
+	########################################
+	@node a23 = Dummy() -> a23_1
+	@node a23_1 = CheckStrategy("military") -> [n_true = a23_mili, n_false = a23_corr]
+	@node a23_mili = PerformAction("""
 								   Queller failed to find an action. Discard a random Character or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
-								   """) -> a14_dice
-	@node a14_corr = PerformAction("""
+								   """) -> a23_dice
+	@node a23_corr = PerformAction("""
 								   Queller failed to find an action. Discard a random Army, Muster, Muster/Army or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
-								   """) -> a14_dice
-	@node a14_dice = GetAvailableDice("""
+								   """) -> a23_dice
+	@node a23_dice = GetAvailableDice("""
 									  After discarding the random die, input the remaining available dice here (not counting dice set aside for later use).
 									  """) -> a_end
 	@node a_end = End() -> []

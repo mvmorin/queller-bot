@@ -1,7 +1,4 @@
 # Do
-* corruption strategy should try to use a ring as a last resort but this isn't
-  added yet. only add actions that weren't allowed to use a ring already.
-
 * Double check all graphs
 
 # Maybe
