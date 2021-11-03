@@ -1,18 +1,15 @@
-# Muster Glossary
+# Glossary
+
+---
 
 Focus
 : A region selected by a priority list defined by the muster action.
 
 Primary
-: The muster region/settlement closest to the *Focus* of muster. If tied for
-distance, it is selected at random among the tied.
+: The muster region/settlement closest to the *Focus* of muster.
 
 Secondary
-: The muster region/settlement closest to the *Primary* of muster. If tied for
-distance, it is selected at random among the tied.
-
-
-# Card and Dice Glossary
+: The muster region/settlement closest to the *Primary* of muster.
 
 Playable
 : A card for which the card-precondition is met and:
@@ -20,9 +17,6 @@ Playable
 	- no paragraph is ineligible or would have no effect; and
 	- does not achieve the same this the used die would on its own; and
 	- does not require a non-aggressive army to attack.
-
-
-# Army Glossary
 
 Aggressive
 : An army is aggressive if:
