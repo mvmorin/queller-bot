@@ -63,11 +63,10 @@ end
 greeting_str = """
 Queller: War of the Ring Shadow AI
 
-Please read the general information and have it and the glossary available.
+This program will present a number of statements, selections, and actions for each of the 5 game phases. Simply answer/perform these when they are presented to you. Read the general rules and have the glossary available to help you interpret them.
 
-This program will present a number of selections, true/false statements, and actions for each of the 5 game phases. Simply answer and perfom these when they are presented to you.
-
-Type "help" for more information regarding the operation of the program.
+Use the `help` command for more information regarding the operation of the
+program.
 """
 
 help_str = """

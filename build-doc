@@ -1,0 +1,6 @@
+#!/bin/sh
+format="-V geometry:margin=30mm -V pagestyle=empty"
+pandoc ${format} -o general-rules.pdf general-rules.md
+pandoc ${format} -o glossary.pdf glossary.md
+pdftk general-rules.pdf glossary.pdf cat output queller.pdf
+rm general-rules.pdf glossary.pdf
