@@ -3,7 +3,7 @@
 ---
 
 Focus
-: A region selected by a priority list defined by the muster action.
+: A region defined by a Queller muster action.
 
 Primary
 : The muster region/settlement closest to the *Focus* of muster.
