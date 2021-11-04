@@ -127,6 +127,11 @@ end
 
 ################################################################################
 
+function julia_main()::Cint
+	main()
+	return 0
+end
+
 function main()
 	state = ProgramState()
 	display_message(state.iop, greeting_str)
