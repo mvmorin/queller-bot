@@ -1,2 +1,2 @@
 #!/bin/bash
-julia --project=Queller -q -- queller.jl
+julia --project=Queller -e 'using Queller; main()'

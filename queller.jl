@@ -1,2 +1,0 @@
-using Queller
-main()
