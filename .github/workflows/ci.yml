@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - ci-play
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   compile:
@@ -30,5 +33,5 @@ jobs:
         shell: bash
       - uses: actions/upload-artifact@v2
         with:
-          name: test-artifact-${{ runner.os }}-${{ github.ref_name }}
-          path: build-output
+          name: QuellerCLI-${{ runner.os }}-${{ matrix.arch }}-${{ github.ref_name }}
+          path: QuellerCLI
