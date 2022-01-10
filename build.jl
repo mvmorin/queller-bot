@@ -22,6 +22,7 @@
 # run(zip)
 
 println("Hello, World")
-mkpath("build-output")
+mkpath("build-output/tjo")
 write("build-output/test.txt", "hej\n")
-write("build-output/test2.txt", "hej\n")
+write("build-output/test2.txt", "hallå\n")
+write("build-output/tjo/test.txt", "tjena\n")
