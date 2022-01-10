@@ -31,4 +31,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: test-artifact-${{ matrix.os }}
-          path: build-output/test.txt
+          path: build-output

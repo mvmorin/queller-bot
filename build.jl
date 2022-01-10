@@ -24,3 +24,4 @@
 println("Hello, World")
 mkpath("build-output")
 write("build-output/test.txt", "hej\n")
+write("build-output/test2.txt", "hej\n")
