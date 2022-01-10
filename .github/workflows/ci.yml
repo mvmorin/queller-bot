@@ -1,0 +1,92 @@
+name: Build
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  manual:
+    name: Compile Manual
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install pandoc texlive-latex-base texlive-fonts-recommended texlive-extra-utils texlive-latex-extra
+      - run: ./build-man
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Manual
+          path: QuellerCLI/manual.pdf
+
+  program:
+    strategy:
+      matrix:
+        julia-version:
+          - '1.6'
+        os:
+          - ubuntu-18.04
+          - windows-latest
+          - macos-10.15
+        arch:
+          - x64
+          # - x86
+
+    name: Compile Program - Julia ${{ matrix.julia-version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.arch }}
+      - run: |
+          julia build.jl
+          tar -czf QuellerCLI.tar.gz QuellerCLI
+        shell: bash
+      - uses: actions/upload-artifact@v2
+        with:
+          name: QuellerCLI-${{ runner.os }}-${{ matrix.arch }}-${{ github.ref_name }}
+          path: QuellerCLI.tar.gz
+
+  package:
+    name: Package Program and Manual for Release
+    needs: [manual, program]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: Manual
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: QuellerCLI-Linux-x64-${{ github.ref_name }}
+      - run: |
+          tar -xf QuellerCLI.tar.gz
+          cp manual.pdf QuellerCLI/manual.pdf
+          tar -czf QuellerCLI-Linux-x64-${{ github.ref_name }}.tar.gz QuellerCLI
+          rm -r QuellerCLI
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: QuellerCLI-Windows-x64-${{ github.ref_name }}
+      - run: |
+          tar -xf QuellerCLI.tar.gz
+          cp manual.pdf QuellerCLI/manual.pdf
+          zip -r QuellerCLI-Windows-x64-${{ github.ref_name }}.zip QuellerCLI
+          rm -r QuellerCLI
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: QuellerCLI-macOS-x64-${{ github.ref_name }}
+      - run: |
+          tar -xf QuellerCLI.tar.gz
+          cp manual.pdf QuellerCLI/manual.pdf
+          tar -czf QuellerCLI-macOS-x64-${{ github.ref_name }}.tar.gz QuellerCLI
+          rm -r QuellerCLI
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: QuellerCLI-All-${{ github.ref_name }}
+          path: |
+            QuellerCLI-Linux-x64-${{ github.ref_name }}.tar.gz
+            QuellerCLI-Windows-x64-${{ github.ref_name }}.zip
+            QuellerCLI-macOS-x64-${{ github.ref_name }}.tar.gz

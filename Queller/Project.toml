@@ -4,5 +4,4 @@ authors = ["Martin Morin <martin.morin@control.lth.se>"]
 version = "0.1.0"
 
 [deps]
-PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
 TextWrap = "b718987f-49a8-5099-9789-dcd902bef87d"

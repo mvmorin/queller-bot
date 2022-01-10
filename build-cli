@@ -1,2 +1,0 @@
-#!/bin/sh
-julia -q --project=Queller -e 'using PackageCompiler; create_app("Queller", "QuellerCompiled", force=true)'
