@@ -22,3 +22,5 @@
 # run(zip)
 
 println("Hello, World")
+mkpath("build-output")
+write("build-output/test.txt", "hej\n")

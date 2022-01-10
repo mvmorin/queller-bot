@@ -18,7 +18,7 @@ jobs:
           - x64
           # - x86
 
-    name: Julia ${{ matrix.julia-version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    name: Compile Queller - Julia ${{ matrix.julia-version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -28,5 +28,7 @@ jobs:
           arch: ${{ matrix.arch }}
       - run: julia build.jl
         shell: bash
-      # - uses: julia-actions/julia-buildpkg@v1
-      # - uses: julia-actions/julia-runtest@v1
+      - uses: actions/upload-artifact@v2
+        with:
+          name: test-artifact-${{ matrix.os }}
+          path: build-output/test.txt
