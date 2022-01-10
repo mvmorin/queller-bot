@@ -1,0 +1,32 @@
+name: Build-Test
+on:
+  push:
+    branches:
+      - ci-play
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        juila-version:
+          - '1.6'
+        os:
+          - ubuntu-latest
+          # - windows-latest
+          # - macOS-latest
+        arch:
+          - x64
+          # - x86
+
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.arch }}
+      - run: julia -e 'println("Hello, world!")'
+        shell: bash
+      # - uses: julia-actions/julia-buildpkg@v1
+      # - uses: julia-actions/julia-runtest@v1
