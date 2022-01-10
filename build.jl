@@ -12,6 +12,3 @@ create_app(src_dir, output_dir, force=true)
 # name = "Queller"*(Sys.iswindows() ? ".exe" : "")
 # path = joinpath("bin", name)
 # link = joinpath(output_dir, name)
-
-# rm(link)
-# symlink(path, link, dir_target=false)

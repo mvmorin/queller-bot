@@ -7,4 +7,3 @@ pandoc ${format} -o queller.pdf general-rules.md  glossary.md
 # pandoc ${format} -o glossary.pdf glossary.md
 # pdftk general-rules.pdf glossary.pdf cat output queller.pdf
 # rm general-rules.pdf glossary.pdf
-
