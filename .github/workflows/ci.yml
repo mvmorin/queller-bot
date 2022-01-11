@@ -9,7 +9,7 @@ on:
 jobs:
   docs:
     name: Compile Doc PDF
-    runs-on: ubuntu-latestA
+    runs-on: ubuntu-latest
     steps:
       - uses: r-lib/actions/setup-pandoc@v1
         with:
