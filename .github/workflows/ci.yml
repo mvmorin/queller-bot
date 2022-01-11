@@ -7,6 +7,20 @@ on:
       - 'v*.*.*'
 
 jobs:
+  docs:
+    name: Compile Doc PDF
+    runs-on: ubuntu-latestA
+    steps:
+      - uses: r-lib/actions/setup-pandoc@v1
+        with:
+          pandoc-version: '2.2.1' # this is the same as my local version
+      - run: ./build-doc
+        shell: bash
+      - uses: actions/upload-artifact@v2
+        with:
+          name: QuellerDocs
+          path: queller.pdf
+
   compile:
     strategy:
       matrix:
