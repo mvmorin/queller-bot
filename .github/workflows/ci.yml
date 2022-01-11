@@ -1,6 +1,8 @@
 name: Build
 on:
   push:
+    branches:
+      - ci-play
     tags:
       - 'v*.*.*'
 
@@ -28,7 +30,9 @@ jobs:
           arch: ${{ matrix.arch }}
       - run: julia build.jl
         shell: bash
+      - run: tar -czf QuellerCLI.tar.gz QuellerCLI
+        shell: bash
       - uses: actions/upload-artifact@v2
         with:
           name: QuellerCLI-${{ runner.os }}-${{ matrix.arch }}-${{ github.ref_name }}
-          path: QuellerCLI
+          path: QuellerCLI.tar.gz
