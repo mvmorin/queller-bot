@@ -11,7 +11,7 @@ jobs:
     name: Compile Doc PDF
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2A
+      - uses: actions/checkout@v2
       - run: sudo apt install -y texlive-full
       - uses: r-lib/actions/setup-pandoc@v1
         with:
