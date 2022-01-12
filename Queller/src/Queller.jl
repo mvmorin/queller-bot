@@ -2,11 +2,8 @@ module Queller
 
 using TextWrap
 
-export load_graphs,
-	check_queller_graphs,
-	main
-
-const PKG_DIR = abspath(joinpath(dirname(pathof(@__MODULE__)),".."))
+export main,
+	check_queller_graphs
 
 ################################################################################
 
@@ -21,6 +18,10 @@ include("cli.jl")
 include("graph.jl")
 include("quellerstate.jl")
 include("crawler.jl")
+
+const PKG_DIR = abspath(joinpath(@__DIR__, ".."))
+const GRAPH_FILES = filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))
+const GRAPHS = load_graphs(GRAPH_FILES...)
 
 ################################################################################
 
@@ -42,10 +43,6 @@ function ProgramState()
 	phase = 1
 	phases = [phase1,phase2,phase3,phase4,phase5]
 
-	# Load all graphs in Queller/graphs directory
-	graph_files = filter(p-> splitext(p)[2] == ".jl", readdir("$(PKG_DIR)/graphs", join=true))
-	graphs = load_graphs(graph_files...)
-
 	available_dice = Vector{Die.Face}()
 
 	iop = IOParser([
@@ -57,7 +54,7 @@ function ProgramState()
 		])
 
 	cmds = Vector{CMD.Command}()
-	return ProgramState(phase,phases,graphs,available_dice,iop,false,false,false)
+	return ProgramState(phase,phases,GRAPHS,available_dice,iop,false,false,false)
 end
 
 greeting_str = """
@@ -126,11 +123,6 @@ end
 
 
 ################################################################################
-
-function julia_main()::Cint
-	main()
-	return 0
-end
 
 function main()
 	state = ProgramState()
@@ -212,17 +204,14 @@ end
 include("graphviz.jl")
 
 function check_queller_graphs()
-	state = ProgramState()
-	graphs = state.graphs
-
 	println("\nAll graphs in PostScript can be found in Queller/graph_output.")
 	graph_output_file(f) = joinpath(PKG_DIR, "graph_output", splitext(basename(f))[1]*".ps")
 
-	for f in getfield.(values(graphs),:source_file)
+	for f in getfield.(values(GRAPHS),:source_file)
 		graph2ps(f, graph_output_file(f))
 	end
 
-	unjumped = get_graphs_not_jumped_to(values(graphs))
+	unjumped = get_graphs_not_jumped_to(values(GRAPHS))
 	println("\nGraphs that are not jumped to from another graph:\n$(strvec2str(unjumped))")
 
 	return

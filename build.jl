@@ -1,13 +1,14 @@
-src_dir="Queller"
-output_dir="QuellerCLI"
+src_dir = "Queller"
+output_dir = "QuellerCLI"
+build_env = "julia_build_env"
 
 using Pkg
-Pkg.activate(src_dir)
+Pkg.activate(build_env)
 Pkg.instantiate()
 
 using PackageCompiler
 
-create_app(src_dir, output_dir, force=true)
+create_app(src_dir, output_dir, executables=["Queller"=>"main"], force=true)
 
 # mkpath(output_dir * "/dummy_dir")
 # write(output_dir * "/dummy.txt", "Hej")
