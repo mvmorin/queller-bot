@@ -23,4 +23,4 @@ else
 	"""
 	startup_file_name = "QuellerCLI"
 end
-write(output_dir*startup_file_name, startup_body)
+write(output_dir*"/"*startup_file_name, startup_body)
