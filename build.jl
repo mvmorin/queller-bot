@@ -1,17 +1,17 @@
 src_dir="Queller"
 output_dir="QuellerCLI"
 
-# using Pkg
-# Pkg.activate(src_dir)
-# Pkg.instantiate()
+using Pkg
+Pkg.activate(src_dir)
+Pkg.instantiate()
 
-# using PackageCompiler
+using PackageCompiler
 
-# create_app(src_dir, output_dir, force=true)
+create_app(src_dir, output_dir, force=true)
 
-mkpath(output_dir * "/dummy_dir")
-write(output_dir * "/dummy.txt", "Hej")
-write(output_dir * "/dummy_dir/dummy.txt", "Hello")
+# mkpath(output_dir * "/dummy_dir")
+# write(output_dir * "/dummy.txt", "Hej")
+# write(output_dir * "/dummy_dir/dummy.txt", "Hello")
 
 
 
