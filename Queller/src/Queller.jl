@@ -67,12 +67,12 @@ program.
 """
 
 help_str = """
-# Inputs #
+# Inputs
 All inputs are case insensitive and can in many cases be shorten to one letter, i.e., "t" for "true", "f" for "false", "u" for "undo" etc.
 
 The valid options for a query are given by the input prompt. If the options are separated by "/" only one of the options should be given. If they are separated by "," several options can be given separated either by spaces or nothing at all.
 
-# Commands #
+# Commands
 The following commands can (almost) always be used when prompted for input.
 
 help        :: Shows this help message.
@@ -124,17 +124,23 @@ end
 
 ################################################################################
 
-function main()
-	state = ProgramState()
-	display_message(state.iop, greeting_str)
+function main()::Cint
+	try
+		state = ProgramState()
+		display_message(state.iop, greeting_str)
 
-	while !state.exit
-		state.phases[state.phase](state)
+		while !state.exit
+			state.phases[state.phase](state)
 
-		state.reset_phase && (state.reset_phase = false; continue)
+			state.reset_phase && (state.reset_phase = false; continue)
 
-		state.phase = 1 + (state.phase % length(state.phases))
+			state.phase = 1 + (state.phase % length(state.phases))
+		end
+	catch e
+		println(e)
+		return 1
 	end
+	return 0
 end
 
 handle_general_command(state,cmd::CMD.Command) = nothing
