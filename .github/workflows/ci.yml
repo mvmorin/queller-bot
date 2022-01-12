@@ -50,9 +50,8 @@ jobs:
           path: QuellerCLI.tar.gz
 
   package:
-    name: Package Manual and Program
-    needs: [manual, program]
     name: Package Program and Manual for Release
+    needs: [manual, program]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
