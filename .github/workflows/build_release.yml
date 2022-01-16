@@ -1,8 +1,9 @@
-name: Build
+name: Build manual and program for realease on all platforms
 on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   manual:
@@ -18,6 +19,8 @@ jobs:
           path: QuellerCLI/manual.pdf
 
   program:
+    name: Compile Program - Julia ${{ matrix.julia-version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+
     strategy:
       matrix:
         julia-version:
@@ -29,9 +32,8 @@ jobs:
         arch:
           - x64
           # - x86
-
-    name: Compile Program - Julia ${{ matrix.julia-version }} - ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
