@@ -58,22 +58,39 @@ function ProgramState()
 end
 
 greeting_str = """
-Queller: War of the Ring Shadow AI
+Queller CLI: War of the Ring Shadow AI
 
-This program will present a number of statements, selections, and actions for each of the 5 game phases. Simply answer/perform these when they are presented to you. Read the general rules and have the glossary available to help you interpret them.
-
-Use the `help` command for more information regarding the operation of the
-program.
+Type 'help' and press enter for more information regarding the operation of the program.
 """
 
 help_str = """
-# Inputs
+Queller CLI: War of the Ring Shadow AI
+
+-- Usage --
+
+This program will present a number of statements, selections, and actions for each of the 5 game phases. Simply answer/perform these when they are presented to you. Read the short manual before starting and have it available, word between asterisks, e.g., *threat*, refers to the glossary.
+
+-- Dice --
+
+The program will keep track of the dice available to the Shadow player and instruct you on which to use. However, it is possible, due to both mistakes and legitimate reasons, that the program will get out of sync with reality. There is a menu option in Phase 5 for correcting this.
+
+-- Inputs --
+
+The valid options for a query are given by the input prompt. If the options are separated by "/" only one of the options should be given. If they are separated by "," several options can be given. To select an options, simply type in the selected option and press enter, multiple options should be separated by spaces or nothing at all.
+
 All inputs are case insensitive and can in many cases be shorten to one letter, i.e., "t" for "true", "f" for "false", "u" for "undo" etc.
 
-The valid options for a query are given by the input prompt. If the options are separated by "/" only one of the options should be given. If they are separated by "," several options can be given separated either by spaces or nothing at all.
+Examples:
 
-# Commands
-The following commands can (almost) always be used when prompted for input.
+[true/false] > true
+[true/false] > f
+[1/2/3/4] > 3
+[1,2,3,4] > 2 4 1
+[C,A,M,H,P] > mappc
+
+-- Commands --
+
+The following commands can (almost) always be used when prompted for input. To use a command type the name of the command and press enter.
 
 help        :: Shows this help message.
 exit        :: Exits the program.
@@ -81,6 +98,8 @@ undo        :: Undo the latest input and step back. Note, everything can not be 
 repeat      :: Repeats the latest query.
 reset       :: Reset and restart the current phase.
 phase <nbr> :: Jumps to the beginning of a phase, e.g., type "phase 3" to jump to phase 3
+
+----------
 """
 
 

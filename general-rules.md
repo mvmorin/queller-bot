@@ -1,4 +1,4 @@
-# Queller: War of the Ring Shadow AI CLI
+# Queller CLI: War of the Ring Shadow AI
 
 ---
 
@@ -6,9 +6,6 @@ The program will present a number of statements, selections, and
 actions for each of the 5 game phases. Simply answer/perform these when
 they are presented to you. Read the following general rules and have the
 glossary available to help you interpret them.
-
-Use the `help` command for more information regarding the operation of the
-program.
 
 ### Basics
 - Follow the game rules.
@@ -23,7 +20,7 @@ program.
   satisfy the statement, ignore units left behind.
 
 ### Terminology
-- Any word written between asterisks, e.g. `*threat*`, refers to the glossary.
+- Any word written between asterisks, e.g., `*threat*`, refers to the glossary.
 - The term Nazgûl excludes the Witch King.
 
 ### Cards

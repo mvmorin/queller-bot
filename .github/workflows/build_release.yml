@@ -89,7 +89,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: QuellerCLI-All-${{ github.ref_name }}
+          name: QuellerCLI-Release-${{ github.ref_name }}
           path: |
             QuellerCLI-Linux-x64-${{ github.ref_name }}.tar.gz
             QuellerCLI-Windows-x64-${{ github.ref_name }}.zip
