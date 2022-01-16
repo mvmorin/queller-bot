@@ -49,11 +49,11 @@
 	@node a5_1 = SetActiveDie('C', may_use_ring = true) -> [next = a5_2, no_die = a6]
 	@node a5_2 = SetActiveDie('A', may_use_ring = true) -> [next = a5_cond, no_die = a6]
 	@node a5_cond = BinaryCondition("""
-									A *mobile* army is adjacent to its *target* or has another *mobile* army blocking the shortest route to *target*.
+									A *mobile* army is adjacent to its *target* or a Free Peoples' army on the shortest route to its *target*.
 
 									And, any of the following conditions hold:
 									- The *mobile* army's *target* gives enough points to win.
-									- The *mobile* army's *target* is in a nation at war and not under siege.
+									- The *mobile* army's *target* is in a nation at war and is not under siege.
 									- The Fellowship is on the Mordor track.
 									""") -> [n_true = a5_action, n_false = a6]
 	@node a5_action = JumpToGraph("movement_attack_basic") -> a6

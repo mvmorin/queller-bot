@@ -45,7 +45,7 @@ army is adjacent to the sieging army.
 Mobile
 : An army which can move towards its `*target*` without creating `*threat*` and:
 
-	- is `*aggressive*` against its `*target*`, or one within the same national border,
+	- is `*aggressive*` against its `*target*`, or an army within the same national border,
 	  and all armies on the shortest route to it; or
 	- would turn a non-`*aggressive*` siege `*aggressive*` when it reach its `*target*`; or
 	- has hit the stacking limit.

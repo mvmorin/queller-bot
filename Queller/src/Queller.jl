@@ -68,7 +68,9 @@ Queller CLI: War of the Ring Shadow AI
 
 -- Usage --
 
-This program will present a number of statements, selections, and actions for each of the 5 game phases. Simply answer/perform these when they are presented to you. Read the short manual before starting and have it available, word between asterisks, e.g., *threat*, refers to the glossary.
+This program will present a number of statements, selections, and actions for each of the 5 game phases. Simply answer/perform these when they are presented to you. All statments refer to the Shadow player's hand, armies etc. unless specifically stated that it refers to the Free People's hand, armies etc.
+
+Read the short manual before starting and have it available. Words between asterisks, e.g., *threat*, refers to the glossary in the manual.
 
 -- Dice --
 

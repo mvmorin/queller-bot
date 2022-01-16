@@ -8,7 +8,7 @@
 	"""
 
 	move_stronghold_cond = """
-	Army/armies can move such that the value at stronghold under *threat* increases.
+	Army/armies can move such that the *value* at a stronghold under *threat* increases.
 	"""
 
 	move_toward_cond = """
@@ -33,16 +33,16 @@
 
 
 	attack_text = """
-	Attack: Select army at random if several can perform the latest considered attack.
+	Attack according to the latest statement. Select army at random if several can perform such an attack.
 	"""
 
 	move_text = """
-	Move: Select army at random if several armies satisfy the latest considered move.
+	Move according to the latest statement. Select army at random if several can perform such a move.
 	"""
 
 	muster_text = """
 	*Focus* priority:
-	1. Stronghold under threat
+	1. Stronghold under *threat*
 	2. Random
 
 	Muster:

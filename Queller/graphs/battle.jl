@@ -1,9 +1,9 @@
 @graphs begin
 	def_card_prio = """
-	After the Free People's player have selected combat card, select and play a card. If no card is matching the 4 first items in the priority list, do not play any card.
+	After the Free Peoples' player have selected their combat card, select and play a card. If no card is matching the 4 first items in the priority list, do not play any card.
 
 	Priority:
-	1. Strategy card that cancels the Free People's card
+	1. Strategy card that cancels the Free Peoples' card
 	2. Doesn't use the term "Fellowship revealed"
 	3. Doesn't add a hunt tile or corruption
 	4. Character card
@@ -14,7 +14,7 @@
 	"""
 
 	sortie_card_prio = """
-	After the Free People's player have selected combat card, select and play a card. If no card is matching the 2 first items in the priority list, do not play any card.
+	After the Free Peoples' player have selected their combat card, select and play a card. If no card is matching the 2 first items in the priority list, do not play any card.
 
 	Priority:
 	1. Charcter card that doesn't use the term "Fellowship revealed"
@@ -26,7 +26,7 @@
 	"""
 
 	wk_card_prio = """
-	After the Free People's player have selected combat card, select and play a card.
+	After the Free Peoples' player have selected their combat card, select and play a card.
 
 	Priority:
 	1. Strategy card
@@ -41,7 +41,7 @@
 	"""
 
 	attack_card_prio = """
-	After the Free People's player have selected combat card, select and play a card.
+	After the Free Peoples' player have selected their combat card, select and play a card.
 
 	Priority:
 	1. Durin's Bane
@@ -68,13 +68,13 @@
 	 @node field_def_card_prio = PerformAction(def_card_prio) -> field_def_resolve
 	 @node field_def_resolve = JumpToGraph("battle_resolve") -> field_attacking_fp_continues
 	 @node field_attacking_fp_continues = BinaryCondition("""
-														  The Free People's player is continuing the attack.
+														  The Free Peoples' player is continuing the attack.
 														  """) -> [n_true = retreat_prio, n_false = field_def_end]
 	 @node retreat_prio = PerformAction("""
 				   Retreat from combat into region accroding to the following prioirty.
 
 				   Priority:
-				   1. Does not creat a threat
+				   1. Does not creat a *threat*
 				   2. Reduce distance to *target* or *exposed* region
 				   3. Increase the number of *mobile* armies
 				   4. Increase the number of *aggressive* armies
@@ -95,7 +95,7 @@
 	 @node def_card_prio = PerformAction(def_card_prio) -> def_resolve
 	 @node def_resolve = JumpToGraph("battle_resolve") -> attacking_fp_continues
 	 @node attacking_fp_continues = BinaryCondition("""
-													The Free People's player is continuing the attack.
+													The Free Peoples' player is continuing the attack.
 													""") -> [n_true = should_retreat_to_stronghold, n_false = def_end]
 	 @node def_end = End("End of Battle") -> []
 
@@ -148,12 +148,12 @@
 
 	 ################################################################################
 	 @node battle_round_end = Start() -> is_fp_dead
-	 @node is_fp_dead = BinaryCondition("There are Free People's units remaining.") -> [n_true = press_on, n_false = no_fp_left]
+	 @node is_fp_dead = BinaryCondition("There are Free Peoples' units remaining.") -> [n_true = press_on, n_false = no_fp_left]
 	 @node no_fp_left = BinaryCondition("""
 					 Moving in to the conquered region would:
 					 - win the game; or
 					 - decrease distance to *target*; or
-					 - remove a threat.
+					 - remove a *threat*.
 					 """) -> [n_true = move_into_conquered, n_false = end_without_moving]
 
 	 @node move_into_conquered = PerformAction("Move the largest *value* possible into the conquered region.") -> move_into_conquered_end

@@ -1,12 +1,13 @@
 @graphs begin
+	generic_move = """
+	Move according to the latest statement. Select army at random if several can perform such a move.
+	"""
+
 	settlement_cond = """
 	An army can move into an emtpy settlement of a nation at war.
 	"""
 	settlement_cond_2 = """
 	An army can move into an empty settlement of a nation at war, without increasing the distance to its *target* (the *target* may change).
-	"""
-	settlement_move_army = """
-	Move: Select army at random if several armies satisfy the latest considered move.
 	"""
 	settlement_move_unit = """
 	Move 1 unit into an empty settlement of nation at war.
@@ -22,18 +23,18 @@
 	merge_cond = """
 	Two armies, where at least one is not *mobile*, can merge.
 	And, merging the armies would increase the number of *mobile* armies.
-	Or, the merged army would have higher value then either of the two currently have.
+	Or, the merged army would have higher *value* then either of the two currently have.
 	"""
 
 	merge_move = """
 	Merge two armies.
 
 	Priority:
-	1. Merge decrease distance to *target* (*target* may change)
-	2. *Value* of resulting army
+	1. Merge decrease greatest distance to *target* (*target* may change)
+	2. Highest *value* of resulting army
 	3. Moves the army furthest from its *target*
 	4. Least number of units left behind after move
-	5. Destination contains stronghold
+	5. Region where armies merge contains a stronghold
 	6. Random
 	"""
 
@@ -42,17 +43,17 @@
 	"""
 
 	move_target = """
-	Select a *mobile* army and move towards *target* or attack *target*.
+	Select a *mobile* army and move towards or attack *target*.
 
 	Priority:
-	1. Shadow army is adjacent to *target*
-	2. Army whose *target* is in a nation at war
+	1. Army is adjacent to its *target*
+	2. Army's *target* is in a nation at war
 	3. Move/attack doesn't activate a nation
 	4. Move/attack doesn't change a nation to "at war"
-	5. By order of *target* priority
-	6. Shadow army with hightest *value*
+	5. Army whose *target* is highest in the priority list in the definition of *target*
+	6. Army with hightest *value*
 	7. Move/attack does not block another *mobile* army's shortest route to their *target*
-	8. Destination region contains the fellowship
+	8. Destination region contains the Fellowship
 	9. Random
 	"""
 
@@ -64,12 +65,12 @@
 	Move an army.
 
 	Priority:
-	1. Move/attack doesn't change a nation to "at war"
-	2. Highest army *value* of the resulting army
-	3. *Target* of army have a passive shadow army adjacent
-	4. Movement ends adjacent to another shadow army
+	1. Move doesn't change a nation to "at war"
+	2. Merge two armies to create the highest army *value* possible
+	3. Army's *target* is adjacent to a passive Shadow army
+	4. Movement ends adjacent to another Shadow army
 	5. Decreases distance to *target* (*target* may change)
-	6. Shadow army with hightest *value*
+	6. Army with hightest *value*
 	7. Random
 	"""
 
@@ -88,7 +89,7 @@
 									  1. Army whose *target* is in a nation at war
 									  2. Army whose attack would not put a nation at war.
 									  3. Army whose *target* is in an active nation
-									  4. Highest value shadow army
+									  4. Highest *value* army
 									  5. Random
 									  """) -> mv_1_end
 	@node mv_1_end = End() -> []
@@ -102,12 +103,10 @@
 								 There are dice in the hunt pool.
 								 And, no army is in the Fellowship's region
 								 And, the Fellowship do not reach mordor with the current progress.
-								 And, an army can move into that region without increasing the distance to its *target* (the *target* may change).
+								 And, an army can move into the Fellowship's region without increasing the distance to its *target* (the *target* may change).
 								 """) -> [n_true = mv_2_yes, n_false = mv_3]
 	@node mv_2_yes = UseActiveDie() -> mv_2_action
-	@node mv_2_action = PerformAction("""
-									  Move: Select army at random if several armies satisfy the latest considered move.
-									  """) -> mv_2_army_die_to_move
+	@node mv_2_action = PerformAction(generic_move) -> mv_2_army_die_to_move
 	@node mv_2_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_2_movement_remains, n_false=mv_2_end]
 	@node mv_2_movement_remains = BinaryCondition("""
 												  The Army Die have one move remaining.
@@ -119,7 +118,7 @@
 	@node mv_3 = BinaryCondition(settlement_cond) -> [n_true = mv_3_1, n_false = mv_4]
 	@node mv_3_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_3_yes, n_false = mv_3_no]
 	@node mv_3_yes = UseActiveDie() -> mv_3_yes_action
-	@node mv_3_yes_action = PerformAction(settlement_move_army) -> mv_3_movement_remains
+	@node mv_3_yes_action = PerformAction(generic_move) -> mv_3_movement_remains
 	@node mv_3_no = UseActiveDie() -> mv_3_no_action
 	@node mv_3_no_action = PerformAction(settlement_move_unit) -> mv_3_army_die_to_move
 	@node mv_3_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_3_movement_remains, n_false=mv_3_end]
@@ -170,7 +169,7 @@
 
 	@node mv_c_1 = BinaryCondition(settlement_cond) -> [n_true = mv_c_1_1, n_false = mv_c_2]
 	@node mv_c_1_1 = BinaryCondition(settlement_cond_2) -> [n_true = mv_c_1_army, n_false = mv_c_1_unit]
-	@node mv_c_1_army = PerformAction(settlement_move_army) -> mv_c_1_army_end
+	@node mv_c_1_army = PerformAction(generic_move) -> mv_c_1_army_end
 	@node mv_c_1_army_end = End() -> []
 
 	@node mv_c_1_unit = PerformAction(settlement_move_unit) -> mv_c_1_unit_end

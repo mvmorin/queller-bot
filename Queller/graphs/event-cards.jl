@@ -100,8 +100,7 @@
 	 ################################################################################
 	 @node event_cards_corruption = Start() -> ec_1
 	 @node ec_1 = BinaryCondition("""
-					 An "Fellowship revealed" card
-					 is *playable*.
+					 A "Fellowship revealed" card is *playable*.
 					 """) -> [n_true = ec_1_yes, n_false = ec_2]
 	 @node ec_1_yes = UseActiveDie() -> ec_1_action
 	 @node ec_1_action = PerformAction("""

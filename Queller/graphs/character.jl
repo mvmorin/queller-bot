@@ -4,16 +4,17 @@
 	"""
 
 	wk_prio = """
-	Move the Witch King, place it in a valid region according to the following priority.
+	Move the Witch King, place it in a valid region with an army.
 
+	Priority:
 	1. Army is *mobile*
-	2. *Target* nation is at war
-	3. Army becomes mobile if the Witch King is added
-	4. Opposing army does not contain Gandalf the White
-	5. Opposing army does not contain hobbits
-	6. Adjacent to *threat*
+	2. Army's *target* is in nation at war
+	3. Army becomes *mobile* if the Witch King is added
+	4. Free Peoples' army at *target* or on the route to *target* does not contain Gandalf the White
+	5. Free Peoples' army at *target* or on the route to *target* does not contain a hobbit
+	6. Army is adjacent to a *threat*
 	7. Army that is conduction a siege
-	8. Army adjacent to its *target*
+	8. Army is adjacent to its *target*
 	9. Highest *value* Shadow army
 	10. Random
 	"""
@@ -24,10 +25,11 @@
 	"""
 
 	nazgul_prio = """
-	Gather all Nazgûl and place them one at the time according to the following priority.
+	Gather all Nazgûl and place them one at the time.
 
+	Priority:
 	1. One, and only one, in the Fellowship's region
-	2. Army with leadership value less than the number of army units and 5
+	2. Army with leadership *value* less than the number of army units and less than 5
 	3. Army which contain the Which King
 	4. Shadow stronghold under siege
 	5. *Mobile* army
@@ -48,7 +50,7 @@
 	Move Mouth of Sauron.
 
 	Priority:
-	1. Towards army with leadership value less than the number of army units and 5
+	1. Towards army with leadership *value* less than the number of army units and 5
 	2. Towards *mobile* army
 	3. Towards army adjacent to its *target*
 	4. Army which can be reach with this die
@@ -64,7 +66,7 @@
 								 """) -> [n_true = lc_1_yes, n_false = lc_2]
 	@node lc_1_yes = UseActiveDie() -> lc_1_action
 	@node lc_1_action = PerformAction("""
-									  Attack: Select army at random if severl armies satisfy the considered attack.
+									  Attack according to the latest statement. Select army at random if several can perform such an attack.
 									  """) -> lc_1_end
 	@node lc_1_end = End() -> []
 

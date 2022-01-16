@@ -13,27 +13,29 @@
 	"""
 
 	recruit_wk = """
-	Recruit the Witch King, place it in a valid region according to the following priority.
+	Recruit the Witch King, place it in a valid region with an army.
 
+	Priority:
 	1. Army is *mobile*
-	2. *Target* nation is at war
-	3. Army becomes mobile if the Witch King is added
-	4. Opposing army does not contain Gandalf the White
-	5. Opposing army does not contain hobbits
-	6. Adjacent to *threat*
+	2. Army's *target* is in nation at war
+	3. Army becomes *mobile* if the Witch King is added
+	4. Free Peoples' army at *target* or on the route to *target* does not contain Gandalf the White
+	5. Free Peoples' army at *target* or on the route to *target* does not contain a hobbit
+	6. Army is adjacent to a *threat*
 	7. Army that is conduction a siege
-	8. Army adjacent to its *target*
+	8. Army is adjacent to its *target*
 	9. Highest *value* Shadow army
 	10. Random
 	"""
 
 	recruit_mos = """
-	Recruit Mouth of Sauron, place it in a valid region according to the following priority.
+	Recruit Mouth of Sauron, place it in a valid region with an army or stronghold.
 
-	1. Army than is conducting a siege.
-	2. A *mobile* army
-	3. Army becomes mobile if Mouth of Sauron is added
-	4. Army that contains Saruman
+	Priority:
+	1. Army is conducting a siege.
+	2. Army is *mobile*
+	3. Army becomes *mobile* if Mouth of Sauron is added
+	4. Army contains Saruman
 	5. Army with the highest *value*
 	6. Stronghold closest to army whose *target* is in a nation at war
 	7. Stronghold closest to army whose *target* is in an active nation
@@ -59,7 +61,7 @@
 								  """) -> [n_true = m_2_1_yes, n_false = m_2_minion_selection]
 	@node m_2_1_yes = UseActiveDie() -> m_2_1_reserve
 	@node m_2_1_reserve = PerformAction("""
-										Set aside the die (and ring if necessary). Use this die as an last action to recruit a minion. Minion selection and placement can be made from the main menu.
+										Set aside the die (and ring if necessary). Use this die as an last action to recruit a minion. Minion selection and placement can be made from the main menu of Phase 5.
 										""") -> m_2_1_return
 	@node m_2_1_return = ReturnFromGraph() -> []
 
@@ -172,10 +174,10 @@
 	@node m_8_die = UseActiveDie() -> m_8_action
 	@node m_8_action = PerformAction("""
 									 *Focus* priority:
-									 1. Army is *mobile*
-									 2. Army's *target* is a nation at war
-									 3. Army becomes mobile if the Witch King is added
-									 4. Opposing army does not contain Gandalf the White
+									 1. Army is conducting a siege.
+									 2. Army is *mobile*
+									 3. Army becomes mobile if Mouth of Sauron is added
+									 4. Army contains Saruman
 									 5. Army with the highest *value*
 									 6. Random
 
@@ -189,7 +191,7 @@
 	@node m_8_end = End() -> []
 
 
-	@node m_9 = BinaryCondition("Less than 6 Nazgûl in play.") -> [n_true = m_10_yes, n_false = m_10_no]
+	@node m_9 = BinaryCondition("Less than 6 Nazgûl are in play.") -> [n_true = m_10_yes, n_false = m_10_no]
 	@node m_10_yes = UseActiveDie() -> m_10_yes_action
 	@node m_10_yes_action = PerformAction("""
 										  *Focus* priority:
@@ -268,7 +270,7 @@
 									   1. Army is *mobile*
 									   2. Army's *target* is a nation at war
 									   3. Army becomes mobile if the Witch King is added
-									   4. Opposing army does not contain Gandalf the White
+									   4. Free Peoples' army at *target* or on the route to *target* does not contain Gandalf the White
 									   5. Army with the highest *value*
 									   6. Random
 

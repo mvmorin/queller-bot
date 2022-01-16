@@ -134,8 +134,8 @@
 	@node a14 = Dummy() -> a14_1
 	@node a14_1 = SetActiveDie('C', may_use_ring=true) -> [next = a14_cond, no_die = a15]
 	@node a14_cond = BinaryCondition("""
-									The Fellowship is in a region with no Nazgûl and which Nazgûl can move to.
-									""") -> [n_true = a14_jump, n_false = a15]
+									 The Fellowship is in a region with no Nazgûl which a Nazgûl can move to.
+									 """) -> [n_true = a14_jump, n_false = a15]
 	@node a14_jump = JumpToGraph("character_move") -> a15
 
 	########################################
@@ -149,9 +149,9 @@
 	@node a16_1 = SetActiveDie('C', may_use_ring=true) -> [next = a16_cond, no_die = a16_2]
 	@node a16_2 = SetActiveDie('A', may_use_ring=true) -> [next = a16_cond, no_die = a17]
 	@node a16_cond = BinaryCondition("""
-											A *mobile* army is adjacent to its *target*.
-											And, the *target* is in a nation at war and not under siege.
-											""") -> [n_true = a16_jump_1_die, n_false = a17]
+									 A *mobile* army is adjacent to its *target*.
+									 And, the *target* is in a nation at war and not under siege.
+									 """) -> [n_true = a16_jump_1_die, n_false = a17]
 	@node a16_jump_1_die = SetActiveDie('C', may_use_ring=true) -> [next = a16_jump_1, no_die = a16_jump_2_die]
 	@node a16_jump_1 = JumpToGraph("character_army") -> a16_jump_2_die
 	@node a16_jump_2_die = SetActiveDie('A', may_use_ring=true) -> [next = a16_jump_2, no_die = a17]
