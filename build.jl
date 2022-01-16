@@ -29,5 +29,5 @@ if Sys.iswindows()
 
 	run(cmd)
 else
-	symlink(shortcut, "bin/Queller")
+	symlink("bin/Queller", shortcut)
 end
