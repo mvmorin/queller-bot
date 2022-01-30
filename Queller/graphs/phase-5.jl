@@ -13,8 +13,19 @@
 
 	@node p5_strat = CheckStrategy("military") -> [n_true=p5_mili, n_false=p5_corr]
 
-	@node p5_mili = JumpToGraph("select_action_mili") -> p5_end
-	@node p5_corr = JumpToGraph("select_action_corr") -> p5_end
+	@node p5_mili = JumpToGraph("select_action_mili") -> p5_discard_check
+	@node p5_corr = JumpToGraph("select_action_corr") -> p5_discard_check
+
+	@node p5_discard_check = CheckStrategy("military") -> [n_true = p5_mili_discard, n_false = p5_corr_discard]
+	@node p5_mili_discard = PerformAction("""
+										  Queller failed to find an action. Discard a random Character or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
+										  """) -> p5_dice
+	@node p5_corr_discard = PerformAction("""
+										  Queller failed to find an action. Discard a random Army, Muster, Muster/Army or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
+										  """) -> p5_dice
+	@node p5_dice = GetAvailableDice("""
+									 Input the remaining available dice here (not counting dice set aside for later use).
+									 """) -> p5_end
 
 	@node p5_end = End("End of Phase") -> []
 end

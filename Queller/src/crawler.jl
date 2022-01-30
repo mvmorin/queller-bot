@@ -4,6 +4,7 @@ mutable struct GraphCrawler
 	root_node::Node
 	available_dice::Vector{Die.Face}
 	graphs::Dict{String,QuellerGraph}
+	strategy::Strategy.Choice
 
 	current::Node
 	jump_stack::Vector{Node}
@@ -14,12 +15,13 @@ mutable struct GraphCrawler
 
 	msg_buf::String
 
-	function GraphCrawler(startgraph::String, graphs, available_dice)
+	function GraphCrawler(startgraph::String, graphs, available_dice, strategy)
 		gc = new()
 
 		gc.root_node = root(graphs[startgraph])
 		gc.available_dice = available_dice
 		gc.graphs = graphs
+		gc.strategy = strategy
 
 		return initialize!(gc)
 	end
@@ -34,7 +36,7 @@ function initialize!(gc::GraphCrawler)
 	gc.options = Vector{CMD.Command}()
 	sizehint!(gc.options, 30)
 
-	gc.queller = QuellerState(deepcopy(gc.available_dice))
+	gc.queller = QuellerState(gc.strategy, deepcopy(gc.available_dice))
 
 	gc.msg_buf = ""
 
@@ -76,6 +78,7 @@ end
 ################################################################################
 
 get_available_dice(gc) = gc.queller.available_dice
+get_strategy(gc) = gc.queller.strategy
 at_end(gc) = gc.current isa End
 getinteraction(gc) = (gc.msg_buf, getopt(gc.current))
 

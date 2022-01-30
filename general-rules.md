@@ -11,11 +11,14 @@ glossary available to help you interpret them.
 - Follow the game rules.
 - A statement is never true if carrying out the implied action would cause a
   Shadow loss or make it miss an immediate win.
-- If you are presented with multiple equally valid actions, use a die to select
+- If you are presented with multiple equally valid options, use a die to select
   one at random.
-- Statements may depend on a specific die. *Example*: For `Using a Character
-  Die: An army can attack a Free Peoples' army.` to be true, the army needs to
-  contains a Nazgûl or Minion.
+- Statements may depend on a specific die. *Example*: `Using a Character Die: An
+  army can attack a Free Peoples' army.` can only be true if the army contains a
+  Nazgûl or a Minion. Note, the specified die might not be available but you
+  should still evaluate the statement as if it is. You might be instructed to
+  convert a die using an Elven ring or other ability once an action is to be
+  performed.
 - For move and attack statements, it is the moving/attacking army that should
   satisfy the statement, ignore units left behind.
 
@@ -25,7 +28,7 @@ glossary available to help you interpret them.
 
 ### Cards
 - Use Shadow cards "in play" at the first opportunity.
-- If a card "in play" prevents a statement from begin true, perform the
+- If a card "in play" prevents a statement from being true, perform the
   necessary action to remove it from play if possible.
 
 ### Moves and Muster Special Rules

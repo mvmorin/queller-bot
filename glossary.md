@@ -3,7 +3,7 @@
 ---
 
 Focus
-: A region defined in the each muster statement made by the program.
+: A region defined in each muster statement made by the program.
 
 Primary
 : The muster region/settlement closest to the `*focus*` of muster.
@@ -30,16 +30,16 @@ Aggressive
 	- it has hit the stacking limit and contains the Witch King or 5 leadership.
 
 Exposed
-: A region is `*exposed*` to a Shadow army if:
+: A region is `*exposed*` to a Shadow army if it is the `*target*` and it:
 
-	- it could be the `*target*` if distance is ignored; and
+	- does not contain a Free Peoples' army; and
 	- the shortest path to the region is clear of Free Peoples' armies.
 
 
 Garrison
-: An army inside a stronghold or in a stronghold region. A sieging army are
-adjacent to the besieged `*garrison*` as well as the surrounding regions. A besieged
-army is adjacent to the sieging army.
+: An army inside a stronghold or in a stronghold region. A sieging army is
+adjacent to the besieged `*garrison*` as well as the surrounding regions. A
+besieged army is adjacent to the sieging army.
 
 
 Mobile
@@ -52,12 +52,12 @@ Mobile
 
 
 Target
-: Each army has a `*target*`. The `*target*` is the region closest to an army containing
-one of the following. When tied for distance, the priority is from top to
-bottom.
+: Each army has a `*target*`. The `*target*` is the region closest to an army
+containing one of the following. When tied for distance, the priority is from
+top to bottom.
 
 	1. Conquered Shadow stronghold.
-	2. Free Peoples' army creating `*threat*`.
+	2. Free Peoples' army that creats a `*threat*` if it's not a `*target*`.
 	3. Free Peoples' stronghold not currently under siege by a `*mobile*` Shadow
 	   army in a:
 		1. Nation at war
@@ -66,7 +66,7 @@ bottom.
 	4. Unconquered Free Peoples' city in a:
 		1. Nation at war
 		2. Active nation
-	5. Lowest `*value*` `*garrison*`.
+	5. A Free Peoples' `*garrison*` (prioritize by `*value*`).
 
 
 Threat

@@ -57,7 +57,9 @@
 	################################################################################
 
 	@node threat_exposed = Start() -> tx_t
-	@node tx_t = BinaryCondition("A *threat* exist.") -> [n_true = tx_1, n_false = tx_5]
+	@node tx_t = BinaryCondition("A *threat* exists.") -> [n_true = tx_1, n_false = tx_exp]
+	@node tx_exp = BinaryCondition("An *exposed* region exists.") -> [n_true = tx_5, n_false=tx_skip_return]
+	@node tx_skip_return = ReturnFromGraph() -> []
 
 	########################################
 	@node tx_1 = SetActiveDie('C') -> [next = tx_1_char_cond, no_die = tx_1_army]
@@ -111,9 +113,19 @@
 	@node tx_move_use_die = UseActiveDie() -> tx_move_action
 	@node tx_move_action = PerformAction(move_text) -> tx_move_army_die_to_move
 	@node tx_move_army_die_to_move = CheckActiveDie('A') -> [n_true=tx_move_movement_remains, n_false=tx_move_end]
-	@node tx_move_movement_remains = BinaryCondition(move_remain_cond) -> [n_true = tx_use_remaining_movement, n_false = tx_move_end]
-	@node tx_use_remaining_movement = JumpToGraph("movement_attack_corr") -> tx_m
+	@node tx_move_movement_remains = BinaryCondition(move_remain_cond) -> [n_true = tx_move_rem_2, n_false = tx_move_end]
 	@node tx_move_end = End() -> []
+
+
+	########################################
+	@node tx_move_rem_2 = BinaryCondition(move_adjacent_cond) -> [n_true = tx_move_rem_use_die, n_false = tx_move_rem_3]
+	@node tx_move_rem_3 = BinaryCondition(move_stronghold_cond) -> [n_true = tx_move_rem_use_die, n_false = tx_move_rem_4]
+	@node tx_move_rem_4 = BinaryCondition(move_toward_cond) -> [n_true = tx_move_rem_use_die, n_false = tx_move_rem_5]
+	@node tx_move_rem_5 = BinaryCondition(move_exposed_cond) -> [n_true = tx_move_rem_use_die, n_false = tx_move_rem_6]
+	@node tx_move_rem_use_die = UseActiveDie() -> tx_move_rem_action
+	@node tx_move_rem_action = PerformAction(move_text) -> tx_move_rem_end
+	@node tx_move_rem_6 = JumpToGraph("movement_attack_corr") -> tx_move_rem_end
+	@node tx_move_rem_end = End() -> []
 
 
 	########################################

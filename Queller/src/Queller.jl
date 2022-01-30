@@ -31,6 +31,7 @@ mutable struct ProgramState
 	graphs::Dict{String,QuellerGraph}
 
 	available_dice::Vector{Die.Face}
+	strategy::Strategy.Choice
 
 	iop::IOParser
 
@@ -44,6 +45,7 @@ function ProgramState()
 	phases = [phase1,phase2,phase3,phase4,phase5]
 
 	available_dice = Vector{Die.Face}()
+	strategy = rand(instances(Strategy.Choice))
 
 	iop = IOParser([
 		CMD.ResetPhase()
@@ -54,7 +56,7 @@ function ProgramState()
 		])
 
 	cmds = Vector{CMD.Command}()
-	return ProgramState(phase,phases,GRAPHS,available_dice,iop,false,false,false)
+	return ProgramState(phase,phases,GRAPHS,available_dice,strategy,iop,false,false,false)
 end
 
 greeting_str = """
@@ -126,7 +128,7 @@ function print_read_process(state, msg, options, callback, silent_options=Vector
 end
 
 function resolve_decision_graph(state, graph)
-	gc = GraphCrawler(graph, state.graphs, state.available_dice)
+	gc = GraphCrawler(graph, state.graphs, state.available_dice, state.strategy)
 
 	abort = Ref(false)
 	callback(cmd) = proceed!(gc, cmd)
@@ -139,6 +141,7 @@ function resolve_decision_graph(state, graph)
 	end
 
 	state.available_dice = get_available_dice(gc)
+	state.strategy = get_strategy(gc)
 	return true
 end
 

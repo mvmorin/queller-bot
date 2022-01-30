@@ -51,9 +51,7 @@ mutable struct QuellerState
 	modt_available::Bool
 end
 
-function QuellerState(available_dice = Vector{Die.Face}())
-	strategy = rand(instances(Strategy.Choice))
-
+function QuellerState(strategy::Strategy.Choice, available_dice = Vector{Die.Face}() )
 	active_die = nothing
 
 	ring_available = false
@@ -126,10 +124,8 @@ mutable struct SetActiveDie <: StateInteractionNode
 end
 setnext!(n::SetActiveDie, name::Symbol, next::Node) = setfield!(n,name,next)
 
-function get_active_die(n::SetActiveDie,state)
-	!isnothing(state.active_die) && state.active_die.used && error("Trying to set an active die when a die already have been used.")
-	return get_active_die(n.die, state.available_dice, state.strategy, state.modt_available, state.ring_available && n.may_use_ring)
-end
+get_active_die(n::SetActiveDie,state) =
+	get_active_die(n.die, state.available_dice, state.strategy, state.modt_available, state.ring_available && n.may_use_ring)
 
 function getnext!(n::SetActiveDie,state)
 	state.active_die = get_active_die(n, state)

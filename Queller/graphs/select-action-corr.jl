@@ -203,21 +203,7 @@
 	@node a22_3 = JumpToGraph("muster_muster") -> a23
 
 
-
 	# No action found and end
-
 	########################################
-	@node a23 = Dummy() -> a23_1
-	@node a23_1 = CheckStrategy("military") -> [n_true = a23_mili, n_false = a23_corr]
-	@node a23_mili = PerformAction("""
-								   Queller failed to find an action. Discard a random Character or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
-								   """) -> a23_dice
-	@node a23_corr = PerformAction("""
-								   Queller failed to find an action. Discard a random Army, Muster, Muster/Army or Event die if possible, otherwise discard a random die (do not discard a die set aside for later use).
-								   """) -> a23_dice
-	@node a23_dice = GetAvailableDice("""
-									  After discarding the random die, input the remaining available dice here (not counting dice set aside for later use).
-									  """) -> a_end
-	@node a_end = End() -> []
-
+	@node a23 = ReturnFromGraph() -> []
 end

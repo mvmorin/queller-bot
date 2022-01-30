@@ -120,7 +120,9 @@ end
 
 function read_input(iop::IOParser, options::Vector{CMD.Dice}, silent_options::Vector{<:CMD.Command})
 	prompt = "[$(strvec2str(Die.char.(instances(Die.Face)),','))] > "
-	return read_input(iop, [options; silent_options], prompt)
+	dice = read_input(iop, [[CMD.Blank()]; options; silent_options], prompt)
+	dice isa CMD.Blank && (dice = CMD.Dice(Vector{Die.Face}()) )
+	return dice
 end
 
 function read_input(iop::IOParser, options::Vector{CMD.Blank}, silent_options::Vector{<:CMD.Command})

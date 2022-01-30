@@ -74,6 +74,10 @@
 	7. Random
 	"""
 
+	one_move_left_on_die = """
+	The Army Die have one move remaining.
+	"""
+
 	################################################################################
 	@node movement_attack_besiege = Start() -> mv_1
 
@@ -108,9 +112,7 @@
 	@node mv_2_yes = UseActiveDie() -> mv_2_action
 	@node mv_2_action = PerformAction(generic_move) -> mv_2_army_die_to_move
 	@node mv_2_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_2_movement_remains, n_false=mv_2_end]
-	@node mv_2_movement_remains = BinaryCondition("""
-												  The Army Die have one move remaining.
-												  """) -> [n_true = mv_2, n_false = mv_2_end]
+	@node mv_2_movement_remains = BinaryCondition(one_move_left_on_die) -> [n_true = mv_2, n_false = mv_2_end]
 	@node mv_2_end = End() -> []
 
 
@@ -122,9 +124,7 @@
 	@node mv_3_no = UseActiveDie() -> mv_3_no_action
 	@node mv_3_no_action = PerformAction(settlement_move_unit) -> mv_3_army_die_to_move
 	@node mv_3_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_3_movement_remains, n_false=mv_3_end]
-	@node mv_3_movement_remains = BinaryCondition("""
-												  The Army Die have one move remaining.
-												  """) -> [n_true = mv_3, n_false = mv_3_end]
+	@node mv_3_movement_remains = BinaryCondition(one_move_left_on_die) -> [n_true = mv_3, n_false = mv_3_end]
 	@node mv_3_end = End() -> []
 
 
@@ -133,9 +133,7 @@
 	@node mv_4_yes = UseActiveDie() -> mv_4_action
 	@node mv_4_action = PerformAction(merge_move) -> mv_4_army_die_to_move
 	@node mv_4_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_4_movement_remains, n_false=mv_4_end]
-	@node mv_4_movement_remains = BinaryCondition("""
-												  The Army Die have one move remaining.
-												  """ ) -> [n_true = mv_4, n_false = mv_4_end]
+	@node mv_4_movement_remains = BinaryCondition(one_move_left_on_die) -> [n_true = mv_4, n_false = mv_4_end]
 	@node mv_4_end = End() -> []
 
 
@@ -146,21 +144,23 @@
 	@node mv_5_yes = UseActiveDie() -> mv_5_action
 	@node mv_5_action = PerformAction(move_target) -> mv_5_army_die_to_move
 	@node mv_5_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_5_movement_remains, n_false=mv_5_end]
-	@node mv_5_movement_remains = BinaryCondition("""
-												  The Army Die have one move remaining.
-												  """) -> [n_true = mv_5, n_false = mv_5_end]
+	@node mv_5_movement_remains = BinaryCondition(one_move_left_on_die) -> [n_true = mv_5, n_false = mv_5_end]
 	@node mv_5_end = End() -> []
 
 
 	########################################
-	@node mv_6 = BinaryCondition(basic_move_cond) -> [n_true = mv_6_yes, n_false = mv_return]
-	@node mv_return = ReturnFromGraph() -> []
+	@node mv_6 = BinaryCondition(basic_move_cond) -> [n_true = mv_6_yes, n_false = mv_6_return_okay]
+
+	@node mv_6_return_okay = BinaryCondition("""
+											 An Army Die has been used with one move remaining.
+											 """) -> [n_true = mv_6_return_end, n_false = mv_6_return]
+	@node mv_6_return_end = End() -> []
+	@node mv_6_return = ReturnFromGraph() -> []
+
 	@node mv_6_yes = UseActiveDie() -> mv_6_action
 	@node mv_6_action = PerformAction(basic_move) -> mv_6_army_die_to_move
 	@node mv_6_army_die_to_move = CheckActiveDie('A') -> [n_true=mv_6_movement_remains, n_false=mv_6_end]
-	@node mv_6_movement_remains = BinaryCondition("""
-												  The Army Die have one move remaining.
-												  """) -> [n_true = mv_6, n_false = mv_6_end]
+	@node mv_6_movement_remains = BinaryCondition(one_move_left_on_die) -> [n_true = mv_6, n_false = mv_6_end]
 	@node mv_6_end = End() -> []
 
 
