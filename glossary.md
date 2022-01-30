@@ -30,16 +30,7 @@ Aggressive
 	- it has hit the stacking limit and contains the Witch King or 5 leadership.
 
 Exposed
-: A region is `*exposed*` to a Shadow army if it is the `*target*` and it:
-
-	- does not contain a Free Peoples' army; and
-	- the shortest path to the region is clear of Free Peoples' armies.
-
-
-Garrison
-: An army inside a stronghold or in a stronghold region. A sieging army is
-adjacent to the besieged `*garrison*` as well as the surrounding regions. A
-besieged army is adjacent to the sieging army.
+: A region is `*exposed*` to a Shadow army if it is the `*target*` and it does not contain a Free Peoples' army and the shortest path to the region is clear of Free Peoples' armies.
 
 
 Mobile
@@ -57,7 +48,7 @@ containing one of the following. When tied for distance, the priority is from
 top to bottom.
 
 	1. Conquered Shadow stronghold.
-	2. Free Peoples' army that creats a `*threat*` if it's not a `*target*`.
+	2. Free Peoples' army that creates a `*threat*` if it's not a `*target*`.
 	3. Free Peoples' stronghold not currently under siege by a `*mobile*` Shadow
 	   army in a:
 		1. Nation at war
@@ -66,7 +57,7 @@ top to bottom.
 	4. Unconquered Free Peoples' city in a:
 		1. Nation at war
 		2. Active nation
-	5. A Free Peoples' `*garrison*` (prioritize by `*value*`).
+	5. A Free Peoples' army inside a besieged stronghold (prioritize by `*value*`).
 
 
 Threat
@@ -75,8 +66,9 @@ Threat
 	- is within 2 regions of an unconquered Shadow stronghold; and
 	- contains a Free Peoples' army of an active nation; and
 	- is not a `*target*` of a Shadow army; and
-	- is not a Free Peoples' `*garrison*`; and
-	- the Free Peoples' army has higher `*value*` than the Shadow `*garrison*`.
+	- does not contain a besieged Free Peoples' army; and
+	- the Free Peoples' army has higher `*value*` than the Shadow army att he
+	  unconquered stronghold.
 	- Orthanc is considered under `*threat*` if:
 		- it contains less than 4 hit points of Shadow units; and
 		- Gandalf the White is in play; and
