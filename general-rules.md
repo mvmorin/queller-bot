@@ -33,7 +33,7 @@ glossary available to help you interpret them.
 
 ### Moves and Muster Special Rules
 - A Shadow move should never create a `*threat*`, unless it also decrease the
-  distance to said `*thread*`. Units can be left behind to avoid this.
+  distance to said `*threat*`. Units can be left behind to avoid this.
 - A Shadow army that moves out of a region containing the Fellowship should
   leave a Nazgûl and a regular behind if: the moving army is not attacking, the
   Fellowship's progress do not reach Mordor, and there are Eyes in the hunt pool.
