@@ -104,7 +104,7 @@
 	################################################################################
 	@node movement_attack_corr = Start() -> mv_2
 	@node mv_2 = BinaryCondition("""
-								 There are dice in the hunt pool.
+								 There are Eyes in the hunt pool.
 								 And, no army is in the Fellowship's region
 								 And, the Fellowship do not reach mordor with the current progress.
 								 And, an army can move into the Fellowship's region without increasing the distance to its *target* (the *target* may change).

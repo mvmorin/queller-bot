@@ -4,8 +4,11 @@
 
 The program will present a number of statements, selections, and
 actions for each of the 5 game phases. Simply answer/perform these when
-they are presented to you. Read the following general rules and have the
-glossary available to help you interpret them.
+they are presented to you. Read the following general rules and familiarize
+yourself with the glossary before starting and have the glossary available to
+help you interpret the given statements. At the end of this manual there is
+relevant information regarding all starting armies of the standard setup is
+given.
 
 ### Basics
 - Follow the game rules.
@@ -39,4 +42,4 @@ glossary available to help you interpret them.
   Fellowship's progress do not reach Mordor, and there are Eyes in the hunt pool.
 - Use Saruman's ability *The Voice of Saruman* if: Saurman is in play, Isengard
   is the source of the `*primary*` muster, and units are available. If Orthanc
-  is under threat, upgrade to elites in Orthanc, othewise use the muster option.
+  is under threat, upgrade to elites in Orthanc, otherwise use the muster option.

@@ -4,7 +4,7 @@
 This is a command line implementation of the [Queller Bot](https://boardgamegeek.com/filepage/141333/queller-bot-war-ring-solo-play) for War of the Ring. It started with me simply learning the bot but, since my play frequency is low at best, it evolved into an attempt to lower the barrier for entry.
 
 ## Goals
-- No prior knowledge of Queller should be needed. Knowing the game and reading a short one page manual should be enough to get started. Queries to answer and actions to perform should be explicit and self-contained.
+- No knowledge of how Queller works should be needed. Knowing the game and reading a short manual should be enough to get started. Queries to answer and actions to perform should be explicit and self-contained.
 - Friendly command line interface (CLI). Features like help, undo, and reset the available dice are not needed in a perfect word but, alas, mistakes happen.
 - Easy install, simply copy files over to your machine and run it.
 

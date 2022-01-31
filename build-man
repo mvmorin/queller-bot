@@ -4,4 +4,4 @@ output_file="${output_dir}/manual.pdf"
 format="-V geometry:margin=25mm -V pagestyle=empty"
 
 mkdir -p ${output_dir}
-pandoc ${format} -o ${output_file} general-rules.md  glossary.md
+pandoc ${format} -o ${output_file} general-rules.md  glossary.md starting-stats.md

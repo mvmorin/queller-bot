@@ -45,7 +45,7 @@ Mobile
 Target
 : Each army has a `*target*`. The `*target*` is the region closest to an army
 containing one of the following. When tied for distance, the priority is from
-top to bottom.
+top to bottom and last by `*value*` of Free Peoples' army in region.
 
 	1. Conquered Shadow stronghold.
 	2. Free Peoples' army that creates a `*threat*` if it's not a `*target*`.
@@ -57,7 +57,6 @@ top to bottom.
 	4. Unconquered Free Peoples' city in a:
 		1. Nation at war
 		2. Active nation
-	5. A Free Peoples' army inside a besieged stronghold (prioritize by `*value*`).
 
 
 Threat
