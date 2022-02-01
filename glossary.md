@@ -34,18 +34,17 @@ Exposed
 
 
 Mobile
-: An army which can move towards its `*target*` without creating `*threat*` and:
+: An army which can move towards its `*target*` (or other specified region) without creating `*threat*` and:
 
-	- is `*aggressive*` against its `*target*`, or an army within the same national border,
-	  and all armies on the shortest route to it; or
+	- is `*aggressive*` towards all armies on the shortest path up to and including the `*target*`, or an army within the `*target*` national border, or other specified region.
 	- would turn a non-`*aggressive*` siege `*aggressive*` when it reach its `*target*`; or
 	- has hit the stacking limit.
 
 
 Target
-: Each army has a `*target*`. The `*target*` is the region closest to an army
-containing one of the following. When tied for distance, the priority is from
-top to bottom and last by `*value*` of Free Peoples' army in region.
+: Each army has a `*target*`. The `*target*` is the closest of the following.
+When tied for distance, the priority is from top to bottom and last by `*value*`
+of Free Peoples' army in region of the `*target*`.
 
 	1. Conquered Shadow stronghold.
 	2. Free Peoples' army that creates a `*threat*` if it's not a `*target*`.
@@ -66,7 +65,7 @@ Threat
 	- contains a Free Peoples' army of an active nation; and
 	- is not a `*target*` of a Shadow army; and
 	- does not contain a besieged Free Peoples' army; and
-	- the Free Peoples' army has higher `*value*` than the Shadow army att he
+	- has a Free Peoples' army with higher `*value*` than the Shadow army at the
 	  unconquered stronghold.
 	- Orthanc is considered under `*threat*` if:
 		- it contains less than 4 hit points of Shadow units; and
@@ -77,7 +76,7 @@ Threat
 
 
 Value
-: Point rating of army calculated as:
+: Points rating of army calculated as:
 
 	- 1 point for each hit point. When defending in a region with a stronghold, only
 	  count the 5 strongest units.

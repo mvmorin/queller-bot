@@ -172,9 +172,9 @@
 					 The Fellowship is on the Mordor track.
 					 """) -> [n_true = another_round_if_possible, n_false = no_more_round]
 	 @node aggressive_if_continue = BinaryCondition("""
-					 The Shadow army is *aggressive* and, if a siege battle is fought, would remain *aggressive* after an Elite downgrade to continue the battle.
+					 The Shadow army is *aggressive* and, if a siege battle is being fought, would remain *aggressive* after an Elite downgrade to continue the battle.
 					 """) -> [n_true = another_round_if_possible, n_false = no_more_round_2]
-	 @node another_round_if_possible = BinaryCondition("A siege battle is fought and the Shadow army have no Elites left") -> [n_true = no_more_round_2, n_false = one_more_round]
+	 @node another_round_if_possible = BinaryCondition("A siege battle is being fought and the Shadow army has no Elites left") -> [n_true = no_more_round_2, n_false = one_more_round]
 	 @node one_more_round = PerformAction("Continue the battle, downgrade an Elite if necessary.") -> one_more_round_return
 	 @node one_more_round_return = ReturnFromGraph() -> []
 

@@ -39,11 +39,11 @@
 	"""
 
 	move_target_cond = """
-	A *mobile* army can move towards, or attack, its *target*.
+	A *mobile* army can move or attack towards its *target*.
 	"""
 
 	move_target = """
-	Select a *mobile* army and move towards or attack *target*.
+	Select a *mobile* army and move or attack towards *target*.
 
 	Priority:
 	1. Army is adjacent to its *target*
