@@ -28,7 +28,7 @@ To run the program from source you first need to install the [Julia Language](ht
 
 After Julia is installed, clone or download this git repo. In the base directly of this repo there is a file called `run.jl`, run this file with Julia to launch the program, i.e., execute `julia run.jl` if you are in a terminal and Julia is on your path or execute `include("run.jl")` in a Julia session. Make sure the current working directory is the base directory of the repo.
 
-# Issues
+# Bugs, Errors and Issues
 You can always create an [issue](https://github.com/mvmorin/queller-bot/issues) but I'm currently not planning on developing this much further than the current rough state. However, if I get back to this project they might still be useful.
 
 ---
