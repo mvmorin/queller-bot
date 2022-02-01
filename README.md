@@ -34,4 +34,4 @@ You can always create an [issue](https://github.com/mvmorin/queller-bot/issues) 
 ---
 
 # Alternatives
-For a number of years there have existed a Java implementation [Queller Bot - Java](https://www.boardgamegeek.com/thread/2070989/play-solo-queller-bot-java-program). If you have a Java runtime installed, or can install one, it is a perfectly valid option. Note, this implementation is independent of [Queller Bot - Java](https://www.boardgamegeek.com/thread/2070989/play-solo-queller-bot-java-program) and, although it implement the same AI, the command line interface and usage are not the same.
+For a number of years there have existed a Java implementation [Queller Bot - Java](https://www.boardgamegeek.com/thread/2070989/play-solo-queller-bot-java-program). If you have a Java runtime installed, or can install one, it is a perfectly valid option. Note, this implementation is independent of [Queller Bot - Java](https://www.boardgamegeek.com/thread/2070989/play-solo-queller-bot-java-program) and, although both implement the same AI, the command line interfaces and their usages are not the same.
