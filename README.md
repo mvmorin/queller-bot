@@ -6,7 +6,7 @@ This is a command line interface (CLI) for the [Queller Bot](https://boardgamege
 - Friendly command line interface. Features like help, undo, and reset the available dice are not needed in a perfect word but, alas, mistakes happen.
 - Easy install, simply copy files over to your machine and run it.
 
-How well I managed to execute these goals remains to be seen... The first round is most likely not still gonna take some time and it is probably beneficial if one can tolerate and work with some ambiguity. I am not gonna be able to, nor do I really want to, perform the amount of play testing necessary to make the experience completely friction free and I'm simply releasing this to the curious in an 'as-is' state, "Here Be Dragons".
+How well I managed to execute these goals remains to be seen... The first round is most likely gonna take some time and it is probably beneficial if one can tolerate and work with some ambiguity. I am not gonna be able to, nor do I really want to, perform the amount of play testing necessary to make the experience completely friction free and I'm simply releasing this to the curious in an 'as-is' state, "Here Be Dragons".
 
 # CLI vs. Paper
 This CLI version is based on version 3.0.1 of Queller and I believe it to be a faithful adaptation. However, the decision tree has been 'massaged' slightly and many queries, statements, rules, and parts of the glossary have been rewritten. I can therefore not guarantee equivalence with the paper version, or even consistency within the CLI itself.
